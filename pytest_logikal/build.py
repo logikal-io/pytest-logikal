@@ -27,7 +27,7 @@ class BuildItem(CheckItem):
 
         # Checking build process
         process = subprocess.run(  # nosec: secure, not using untrusted input
-            ['/usr/bin/env', 'python3', '-m', 'build', '--sdist', '--wheel'],
+            ['python3', '-m', 'build', '--sdist', '--wheel'],
             capture_output=True, text=True, check=False,
         )
         errors = (process.stderr or process.stdout) if process.returncode != 0 else process.stderr
@@ -41,8 +41,7 @@ class BuildItem(CheckItem):
 
         # Checking distribution
         process = subprocess.run(  # nosec: secure, not using untrusted input
-            ['/usr/bin/env', 'twine', 'check', '--strict', 'dist/*'],
-            capture_output=True, text=True, check=False,
+            ['twine', 'check', '--strict', 'dist/*'], capture_output=True, text=True, check=False,
         )
         if process.returncode != 0:
             raise ItemRunError(process.stdout or process.stderr)

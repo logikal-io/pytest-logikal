@@ -28,8 +28,7 @@ class BanditItem(CheckItem):
             or str(Path(__file__).parent / 'bandit_config.yml')
         )
         command = [
-            '/usr/bin/env', 'bandit', '--configfile', config_file, '--quiet',
-            '--format', 'json', str(self.path),
+            'bandit', '--configfile', config_file, '--quiet', '--format', 'json', str(self.path),
         ]
 
         # This subprocess call is secure as it is not using untrusted input
