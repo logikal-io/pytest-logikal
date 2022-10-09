@@ -1,0 +1,5 @@
+-e .
+-r core.txt
+-r browser.txt
+-r django.txt
+-r build.txt

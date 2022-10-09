@@ -1,0 +1,62 @@
+[build-system]
+requires = ['setuptools>=45', 'setuptools-scm[toml]>=6.2']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'pytest-logikal'
+description = 'Common testing environment'
+readme = 'README.rst'
+requires-python = '~= 3.8'
+license = {file = 'LICENSE.txt'}
+authors = [{name = 'Logikal GmbH', email = 'contact@logikal.io'}]
+keywords = ['pytest']
+classifiers = [
+  'Development Status :: 5 - Production/Stable',
+  'Framework :: Pytest',
+  'Intended Audience :: Developers',
+  'License :: OSI Approved :: MIT License',
+  'Operating System :: POSIX :: Linux',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.8',
+  'Topic :: Software Development',
+]
+dynamic = ['version', 'entry-points', 'dependencies', 'optional-dependencies']
+
+[project.urls]
+'Documentation' = 'https://docs.logikal.io/pytest-logikal/'
+'Release notes' = 'https://github.com/logikal-io/pytest-logikal/releases'
+'Issue tracker' = 'https://github.com/logikal-io/pytest-logikal/issues'
+'Source code' = 'https://github.com/logikal-io/pytest-logikal'
+
+[tool.setuptools.dynamic]
+entry-points = {file = 'entry_points.ini'}
+dependencies = {file = 'requirements/core.txt'}
+
+[tool.setuptools.dynamic.optional-dependencies]
+browser = {file = 'requirements/browser.txt'}
+django = {file = 'requirements/django.txt'}
+
+[tool.setuptools.package-data]
+pytest_logikal = ['py.typed', 'bandit_config.yml']
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'tests.dummy_django_settings'
+
+[tool.mypy]
+plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issues/11667
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+  'PIL',  # see https://github.com/python-pillow/Pillow/issues/2625
+  'pyorbs.orbs',
+  'pycodestyle',
+  'pydocstyle',
+  'xdist.*',
+]
+
+[tool.coverage.report]
+omit = ['/tmp/*']  # ignore temporary files created during testing
+exclude_lines = ['\.\.\.']  # exclude abstract methods
