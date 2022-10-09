@@ -3,4 +3,4 @@ on: pull_request
 
 jobs:
   run-python-tests:
-    uses: logikal-io/github-workflows/.github/workflows/run-python-tests.yml
+    uses: logikal-io/github-workflows/.github/workflows/run-python-tests.yml@v1.0.0
