@@ -22,7 +22,7 @@ def pytest_configure(config: pytest.Config) -> None:
 class PylintItem(CheckItem):
     def run(self) -> None:
         command = [
-            'pylint', str(self.path),
+            '/usr/bin/env', 'pylint', str(self.path),
             '--init-hook=import sys; sys.path.append(".")',
             f'--max-line-length={self.config.getini("max_line_length")}',
             '--include-naming-hint=y',

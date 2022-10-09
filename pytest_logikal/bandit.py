@@ -28,21 +28,25 @@ class BanditItem(CheckItem):
             or str(Path(__file__).parent / 'bandit_config.yml')
         )
         command = [
-            'bandit', '--configfile', config_file, '--quiet', '--format', 'json', str(self.path)
+            '/usr/bin/env', 'bandit', '--configfile', config_file, '--quiet',
+            '--format', 'json', str(self.path),
         ]
 
         # This subprocess call is secure as it is not using untrusted input
         process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
-        report = json.loads(process.stdout)
-        if report.get('results'):
-            raise ItemRunError('\n\n'.join(
-                f'{error["line_number"]}:{error["col_offset"]}: '
-                f'{severity[error["issue_severity"]]}: {error["issue_text"]} '
-                f'({error["test_id"]}: {error["test_name"]}, '
-                f'confidence: {error["issue_confidence"].lower()})\n'
-                f'More info: {error["more_info"]}'
-                for error in report['results']
-            ))
+        try:
+            report = json.loads(process.stdout)
+            if report.get('results'):
+                raise ItemRunError('\n\n'.join(
+                    f'{error["line_number"]}:{error["col_offset"]}: '
+                    f'{severity[error["issue_severity"]]}: {error["issue_text"]} '
+                    f'({error["test_id"]}: {error["test_name"]}, '
+                    f'confidence: {error["issue_confidence"].lower()})\n'
+                    f'More info: {error["more_info"]}'
+                    for error in report['results']
+                ))
+        except json.decoder.JSONDecodeError as error:
+            raise ItemRunError(f'Error: {process.stdout or process.stderr}') from error
 
 
 class BanditPlugin(FileCheckPlugin):

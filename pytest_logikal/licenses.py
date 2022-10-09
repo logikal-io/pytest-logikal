@@ -59,7 +59,7 @@ class LicensePlugin(Plugin):
 
 class LicenseItem(Item):
     def runtest(self) -> None:
-        command = ['pip-licenses', '--format=json', '--with-system', '--with-urls']
+        command = ['/usr/bin/env', 'pip-licenses', '--format=json', '--with-system', '--with-urls']
 
         # This subprocess call is secure as it is not using untrusted input
         process = subprocess.run(command, capture_output=True, text=True, check=True)  # nosec
