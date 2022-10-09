@@ -36,7 +36,7 @@ which automatically runs a broad range of checks:
 - Security checks (via `Bandit <https://bandit.readthedocs.io/>`_)
 - License checks (via `pip-licenses <https://github.com/raimon49/pip-licenses>`_)
 - Requirements lockfile checks (via `pyorbs <https://pyorbs.readthedocs.io/>`_)
-- Documentation and package build checks (when applicable)
+- Package build checks (when applicable)
 
 The checks are configured to be strict, and all checks and tests are distributed across multiple
 CPUs by default (via `pytest-xdist <https://pytest-xdist.readthedocs.io/>`_).
