@@ -1,0 +1,5 @@
+# Necessary for building, see https://github.com/pypa/setuptools/issues/3570
+include entry_points.ini
+include requirements/core.txt
+include requirements/browser.txt
+include requirements/django.txt

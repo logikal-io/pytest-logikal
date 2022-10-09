@@ -1,0 +1,10 @@
+[build-system]
+requires = ['setuptools>=45']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'test-package'
+version = '0.0.0'
+readme = 'README.rst'
+authors = [{name = 'Author'}]
+urls = {Documentation = 'https://docs.logikal.io/'}

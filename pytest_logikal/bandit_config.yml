@@ -1,0 +1,6 @@
+# Default Bandit configuration file
+skips:
+  - 'B404'  # blacklist, import-subprocess: there are more specific issues related to subprocesses
+
+assert_used:
+  skips: ['*/test_*.py']

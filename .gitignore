@@ -1,0 +1,11 @@
+# Caches
+__pycache__
+.coverage*
+.mypy_cache/
+.pytest_cache/
+
+# Build artifacts
+/build/
+/dist/
+/docs/build/
+*.egg-info/

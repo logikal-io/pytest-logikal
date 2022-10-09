@@ -1,0 +1,6 @@
+name: Test pull request
+on: pull_request
+
+jobs:
+  run-python-tests:
+    uses: logikal-io/github-workflows/.github/workflows/run-python-tests.yml
