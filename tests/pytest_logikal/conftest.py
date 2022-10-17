@@ -6,7 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from pytest_logikal import (
-    bandit, build, core, file_checker, isort, licenses,
+    bandit, build, core, docs, file_checker, isort, licenses,
     plugin as pytest_logikal_plugin, pylint, requirements, style,
 )
 
@@ -17,6 +17,7 @@ reload(file_checker)
 
 reload(bandit)
 reload(build)
+reload(docs)
 reload(isort)
 reload(licenses)
 reload(pylint)
@@ -73,7 +74,7 @@ def plugin_item(
         plugin_obj = plugin(config=config)
         parent = mocker.Mock(nodeid='parent', config=plugin_obj.config, path=path)
         args = {'parent': parent, 'name': plugin_obj.name}
-        if issubclass(item, file_checker.CheckItem):
+        if issubclass(item, file_checker.FileCheckItem):
             args['plugin'] = plugin_obj
         item_obj = item.from_parent(**args)
         return cast(pytest_logikal_plugin.Item, item_obj)

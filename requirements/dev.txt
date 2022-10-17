@@ -3,3 +3,4 @@
 -r browser.txt
 -r django.txt
 -r build.txt
+-r docs.txt

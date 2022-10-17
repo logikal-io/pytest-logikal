@@ -6,7 +6,7 @@ import pytest
 from isort.wrap_modes import WrapModes
 
 from pytest_logikal.core import PYPROJECT
-from pytest_logikal.file_checker import CheckItem, FileCheckPlugin
+from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
 
@@ -21,7 +21,7 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(IsortPlugin(config=config))
 
 
-class IsortItem(CheckItem):
+class IsortItem(CachedFileCheckItem):
     def run(self) -> None:
         config = {
             'py_version': 'auto',
@@ -45,6 +45,6 @@ class IsortItem(CheckItem):
             raise ItemRunError(message.lstrip('\n').rstrip())
 
 
-class IsortPlugin(FileCheckPlugin):
+class IsortPlugin(CachedFileCheckPlugin):
     name = 'isort'
     item = IsortItem

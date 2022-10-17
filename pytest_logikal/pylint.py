@@ -4,7 +4,7 @@ import subprocess
 import pytest
 
 from pytest_logikal.core import PYPROJECT
-from pytest_logikal.file_checker import CheckItem, FileCheckPlugin
+from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
 
@@ -19,7 +19,7 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(PylintPlugin(config=config))
 
 
-class PylintItem(CheckItem):
+class PylintItem(CachedFileCheckItem):
     def run(self) -> None:
         command = [
             'pylint', str(self.path),
@@ -65,6 +65,6 @@ class PylintItem(CheckItem):
             raise ItemRunError(f'Error: {process.stdout or process.stderr}') from error
 
 
-class PylintPlugin(FileCheckPlugin):
+class PylintPlugin(CachedFileCheckPlugin):
     name = 'pylint'
     item = PylintItem

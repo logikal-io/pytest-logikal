@@ -1,7 +1,6 @@
 import json
 import subprocess
-from pathlib import Path
-from typing import Any, Iterable, List
+from typing import List
 
 import pytest
 
@@ -49,14 +48,6 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(LicensePlugin(config=config))
 
 
-class LicensePlugin(Plugin):
-    name = 'licenses'
-
-    @staticmethod
-    def pytest_collect_file(file_path: Path, parent: pytest.Collector) -> Any:
-        return LicenseFile.from_parent(parent, path=file_path)
-
-
 class LicenseItem(Item):
     def runtest(self) -> None:
         command = ['pip-licenses', '--format=json', '--with-system', '--with-urls']
@@ -87,7 +78,6 @@ class LicenseItem(Item):
         return (self.path, None, f'[{LicensePlugin.name}]')
 
 
-class LicenseFile(pytest.File):
-    def collect(self) -> Iterable[LicenseItem]:
-        if not any(isinstance(item, LicenseItem) for item in self.session.items):
-            yield LicenseItem.from_parent(parent=self, name=LicensePlugin.name)
+class LicensePlugin(Plugin):
+    name = 'licenses'
+    item = LicenseItem

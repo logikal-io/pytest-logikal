@@ -1,11 +1,11 @@
 import re
 from pathlib import Path
-from typing import Any, Iterable
 
 import pytest
 from pyorbs.orbs import Orbs
 
-from pytest_logikal.plugin import Item, ItemRunError, Plugin
+from pytest_logikal.file_checker import FileCheckItem, FileCheckPlugin
+from pytest_logikal.plugin import ItemRunError
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -20,26 +20,20 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(RequirementsPlugin(config=config))
 
 
-class RequirementsPlugin(Plugin):
-    name = 'requirements'
-
-    def pytest_collect_file(self, file_path: Path, parent: pytest.Collector) -> Any:
-        relative_file_path = file_path.relative_to(self.config.invocation_params.dir)
-        if (
-            bool(re.match(r'reqirements\.txt$|requirements/.+\.txt$', str(relative_file_path)))
-            and file_path.with_suffix(file_path.suffix + '.lock').exists()
-        ):
-            return RequirementsFile.from_parent(parent, path=file_path)
-        return None
-
-
-class RequirementsItem(Item):
+class RequirementsItem(FileCheckItem):
     def runtest(self) -> None:
         if Orbs.test(str(self.path), quiet=True):
             relative_path = self.path.relative_to(self.config.invocation_params.dir)
             raise ItemRunError(f'Requirements lockfile "{relative_path}.lock" is outdated')
 
 
-class RequirementsFile(pytest.File):
-    def collect(self) -> Iterable[RequirementsItem]:
-        yield RequirementsItem.from_parent(parent=self, name=RequirementsPlugin.name)
+class RequirementsPlugin(FileCheckPlugin):
+    name = 'requirements'
+    item = RequirementsItem
+
+    def check_file(self, file_path: Path) -> bool:
+        relative_file_path = file_path.relative_to(self.config.invocation_params.dir)
+        return (
+            bool(re.match(r'reqirements\.txt$|requirements/.+\.txt$', str(relative_file_path)))
+            and file_path.with_suffix(file_path.suffix + '.lock').exists()
+        )

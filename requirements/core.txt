@@ -7,7 +7,7 @@ pip-licenses==3.5.4
 Pygments==2.13.0  # pytest code highlighting
 pycodestyle==2.9.1
 pydocstyle[toml]==6.1.1
-pylint==2.15.3
+pylint==2.15.4
 pyorbs==1.6.1
 pytest==7.1.3
 pytest-cov==4.0.0

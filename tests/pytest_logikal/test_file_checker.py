@@ -4,21 +4,15 @@ from pytest import raises
 from pytest_mock import MockerFixture
 
 from pytest_logikal import file_checker
-from pytest_logikal.plugin import Item, ItemRunError
+from pytest_logikal.plugin import ItemRunError
 
 
-class ItemlessPlugin(file_checker.FileCheckPlugin):
-    name = 'itemless'
-
-
-class ValidPlugin(file_checker.FileCheckPlugin):
+class ValidPlugin(file_checker.CachedFileCheckPlugin):
     name = 'valid'
-    item = Item
+    item = file_checker.CachedFileCheckItem
 
 
 def test_invalid_arguments(mocker: MockerFixture) -> None:
-    with raises(AttributeError):
-        ItemlessPlugin(config=mocker.Mock())
     with raises(RuntimeError, match='without a cache'):
         ValidPlugin(config=mocker.Mock(cache=None))
 
@@ -46,7 +40,7 @@ def test_modification_times(mocker: MockerFixture) -> None:
 
 
 def test_check_item(tmp_path: Path, mocker: MockerFixture) -> None:
-    class ValidItem(file_checker.CheckItem):
+    class ValidItem(file_checker.CachedFileCheckItem):
         def run(self) -> None:
             pass
 
