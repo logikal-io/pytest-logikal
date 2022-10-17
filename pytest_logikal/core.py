@@ -15,7 +15,9 @@ PYPROJECT = (
     tomli.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
     if Path('pyproject.toml').exists() else {}
 )
-PLUGINS = ['mypy', 'bandit', 'build', 'isort', 'licenses', 'pylint', 'requirements', 'style']
+PLUGINS = [
+    'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
+]
 
 ReportInfoType = Tuple[Union[os.PathLike, str], Optional[int], str]
 
@@ -28,6 +30,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-mypy', action='store_true', help='do not use mypy')
     group.addoption('--no-bandit', action='store_true', help='do not use bandit')
     group.addoption('--no-build', action='store_true', help='do not run build checks')
+    group.addoption('--no-docs', action='store_true', help='do not run documentation checks')
     group.addoption('--no-isort', action='store_true', help='do not use isort')
     group.addoption('--no-licenses', action='store_true', help='do not check licenses')
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
@@ -137,4 +140,5 @@ def pytest_collection_modifyitems(items: List[pytest.Item]) -> None:
             header = f'[{item.name}] {item.path.relative_to(item.config.invocation_params.dir)}'
             setattr(item, 'reportinfo', unified_reportinfo(item=item, header=header))
         if source == 'mypy-status':
+            setattr(item, '_nodeid', '::check::mypy-status')
             setattr(item, 'reportinfo', unified_reportinfo(item=item, header='[mypy-status]'))

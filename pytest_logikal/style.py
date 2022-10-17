@@ -4,7 +4,7 @@ import pydocstyle
 import pytest
 
 from pytest_logikal.core import PYPROJECT
-from pytest_logikal.file_checker import CheckItem, FileCheckPlugin
+from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
 
@@ -20,7 +20,7 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(StylePlugin(config=config))
 
 
-class StyleItem(CheckItem):
+class StyleItem(CachedFileCheckItem):
     def run(self) -> None:
         call = py.io.StdCapture.call  # pylint: disable=no-member
 
@@ -54,6 +54,6 @@ class StyleItem(CheckItem):
             raise ItemRunError('\n'.join(messages))
 
 
-class StylePlugin(FileCheckPlugin):
+class StylePlugin(CachedFileCheckPlugin):
     name = 'style'
     item = StyleItem

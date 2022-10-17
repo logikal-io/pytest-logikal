@@ -1,19 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from pathlib import Path
+from typing import Any, Iterable, Type
 
 import pytest
 
 from pytest_logikal.core import ReportInfoType
-
-
-class Plugin:
-    name: str
-
-    def __init__(self, config: pytest.Config):
-        if not hasattr(self, 'name'):
-            raise AttributeError('You must provide a plugin name')
-
-        self.config = config
 
 
 class ItemRunError(Exception):
@@ -30,8 +21,11 @@ class Item(pytest.Item, metaclass=AbstractItemMeta):
         self.add_marker(self.name)
 
     def reportinfo(self) -> ReportInfoType:
-        relative_path = self.path.relative_to(self.config.invocation_params.dir)
-        return (self.path, None, f'[{self.name}] {relative_path}')
+        info = f'[{self.name}]'
+        if self.path:
+            relative_path = self.path.relative_to(self.config.invocation_params.dir)
+            info += f' {relative_path}'
+        return (self.path, None, info)
 
     def repr_failure(
         self, excinfo: pytest.ExceptionInfo[BaseException], *args: Any, **kwargs: Any,
@@ -43,3 +37,28 @@ class Item(pytest.Item, metaclass=AbstractItemMeta):
     @abstractmethod
     def runtest(self) -> None:
         ...
+
+
+class Plugin:
+    name: str
+    item: Type[Item]
+
+    def __init__(self, config: pytest.Config):
+        if not hasattr(self, 'name'):
+            raise AttributeError('You must provide a plugin name')
+        if not hasattr(self, 'item'):
+            raise AttributeError('You must provide an item type')
+
+        self.config = config
+
+    def pytest_collect_file(self, parent: pytest.Collector) -> Any:
+        """
+        Run a single test.
+        """
+        plugin = self
+
+        class File(pytest.File):
+            def collect(self) -> Iterable[Item]:
+                if not any(isinstance(item, type(item)) for item in self.session.items):
+                    yield plugin.item.from_parent(parent=self, name=plugin.name)
+        return File.from_parent(parent, path=Path('check'))

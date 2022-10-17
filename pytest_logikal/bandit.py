@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from pytest_logikal.file_checker import CheckItem, FileCheckPlugin
+from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
 
@@ -20,7 +20,7 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(BanditPlugin(config=config))
 
 
-class BanditItem(CheckItem):
+class BanditItem(CachedFileCheckItem):
     def run(self) -> None:
         severity = {'LOW': 'warning', 'MEDIUM': 'error', 'HIGH': 'critical'}
         config_file = (
@@ -48,6 +48,6 @@ class BanditItem(CheckItem):
             raise ItemRunError(f'Error: {process.stdout or process.stderr}') from error
 
 
-class BanditPlugin(FileCheckPlugin):
+class BanditPlugin(CachedFileCheckPlugin):
     name = 'bandit'
     item = BanditItem

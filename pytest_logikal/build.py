@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from pytest_logikal.core import PYPROJECT
-from pytest_logikal.file_checker import CheckItem, FileCheckPlugin
+from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
 
@@ -20,7 +20,7 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(BuildPlugin(config=config))
 
 
-class BuildItem(CheckItem):
+class BuildItem(CachedFileCheckItem):
     def run(self) -> None:
         # Deleting existing distributions
         shutil.rmtree('dist', ignore_errors=True)
@@ -47,7 +47,7 @@ class BuildItem(CheckItem):
             raise ItemRunError(process.stdout or process.stderr)
 
 
-class BuildPlugin(FileCheckPlugin):
+class BuildPlugin(CachedFileCheckPlugin):
     name = 'build'
     item = BuildItem
 

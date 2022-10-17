@@ -35,8 +35,10 @@ which automatically runs a broad range of checks:
   and `pytest-cov <https://pytest-cov.readthedocs.io/>`_)
 - Security checks (via `Bandit <https://bandit.readthedocs.io/>`_)
 - License checks (via `pip-licenses <https://github.com/raimon49/pip-licenses>`_)
-- Requirements lockfile checks (via `pyorbs <https://pyorbs.readthedocs.io/>`_)
-- Package build checks (when applicable)
+- Requirements lockfile checks (via `pyorbs <https://pyorbs.readthedocs.io/>`_, when applicable)
+- Documentation checks (via `logikal-docs <https://docs.logikal.io/logikal-docs/>`_, when
+  applicable)
+- Package build checks (via `build <https://pypa-build.readthedocs.io/>`_, when applicable)
 
 The checks are configured to be strict, and all checks and tests are distributed across multiple
 CPUs by default (via `pytest-xdist <https://pytest-xdist.readthedocs.io/>`_).
