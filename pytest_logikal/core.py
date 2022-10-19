@@ -41,6 +41,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
+    if not find_spec('selenium'):
+        pluginmanager.set_blocked('logikal_browser')
     if not find_spec('pytest_django'):
         pluginmanager.set_blocked('logikal_django')
 

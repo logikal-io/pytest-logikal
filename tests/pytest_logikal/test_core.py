@@ -66,8 +66,14 @@ def test_clear(mocker: MockerFixture) -> None:
     assert shutil.rmtree.called
 
 
-def test_run_without_django(pytester: pytest.Pytester, mocker: MockerFixture) -> None:
-    mocker.patch('pytest_logikal.core.find_spec', return_value=False)
+def test_run_without_extras(pytester: pytest.Pytester, mocker: MockerFixture) -> None:
+    find_spec = mocker.patch('pytest_logikal.core.find_spec')
+
+    find_spec.side_effect = lambda module: module != 'selenium'  # selenium extra missing
+    result = pytester.runpytest('--no-cov', *PYTEST_ARGS)
+    assert result.parseoutcomes() == {}
+
+    find_spec.side_effect = lambda module: module != 'pytest_django'  # django extra missing
     result = pytester.runpytest('--no-cov', *PYTEST_ARGS)
     assert result.parseoutcomes() == {}
 
