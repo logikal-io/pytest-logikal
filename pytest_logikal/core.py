@@ -122,7 +122,6 @@ def pytest_configure(config: pytest.Config) -> None:
         '--no-error-summary',
         '--strict',
         '--show-column-numbers',
-        '--show-error-codes',
         '--warn-unreachable',
     ]
 

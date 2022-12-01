@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Iterable, Type
 
@@ -11,11 +11,7 @@ class ItemRunError(Exception):
     """An item run error."""
 
 
-class AbstractItemMeta(type(ABC), type(pytest.Item)):  # type: ignore[misc]
-    """Abstract metaclass of the Item class."""
-
-
-class Item(pytest.Item, metaclass=AbstractItemMeta):
+class Item(pytest.Item):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.add_marker(self.name)
