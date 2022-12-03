@@ -16,6 +16,8 @@ ALLOWED_LICENSES = [
     'BSD 3-Clause',
     'BSD License',
     'GNU Lesser General Public License v2 (LGPLv2)',
+    'GNU Lesser General Public License v2 or later (LGPLv2+)',
+    'ISC',
     'ISC License (ISCL)',
     'MIT',
     'MIT License',
@@ -27,6 +29,7 @@ ALLOWED_LICENSES = [
 
 ALLOWED_PACKAGES = {
     'facebook-business': 'LICENSE.txt',  # only used as a connector
+    'pkg_resources': 'UNKNOWN',  # caused by an Ubuntu bug, see [1]
     'pkg-resources': 'UNKNOWN',  # caused by an Ubuntu bug, see [1]
     'Pillow': 'Historical Permission Notice and Disclaimer (HPND)',  # license is BSD-like
     'pylint': 'GNU General Public License v2 (GPLv2)',  # only used as a local tool
