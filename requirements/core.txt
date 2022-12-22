@@ -1,17 +1,17 @@
 bandit==1.7.4
-coverage[toml]==6.5.0
-isort[colors]==5.10.1
+coverage[toml]==7.0.0
+isort[colors]==5.11.4
 mypy==0.991
 Pillow==9.3.0
-pip-licenses==4.0.1
+pip-licenses==4.0.3
 Pygments==2.13.0  # pytest code highlighting
 pycodestyle==2.10.0
 pydocstyle[toml]==6.1.1
-pylint==2.15.7
+pylint==2.15.9
 pyorbs==1.6.1
 pytest==7.2.0
 pytest-cov==4.0.0
 pytest-mock==3.10.0
-pytest-mypy==0.10.2
+pytest-mypy==0.10.3
 pytest-xdist[psutil]==3.1.0
 tomli==2.0.1
