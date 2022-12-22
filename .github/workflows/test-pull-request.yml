@@ -7,3 +7,6 @@ jobs:
     uses: logikal-io/github-workflows/.github/workflows/run-python-tests.yml@v3
     with:
       chrome-version: 108.0.5359.94-1
+    permissions:
+      contents: read
+      id-token: write
