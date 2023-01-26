@@ -25,6 +25,7 @@ ReportInfoType = Tuple[Union[os.PathLike, str], Optional[int], str]
 def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup('logikal')
     group.addoption('--live', action='store_true', help='run live tests')
+    group.addoption('--fast', action='store_true', help='do not run any additional checks')
     group.addoption('--clear', action='store_true', help='clear cache before running tests')
     group.addoption('--no-defaults', action='store_true', help='do not use our own defaults')
     group.addoption('--no-mypy', action='store_true', help='do not use mypy')
@@ -67,11 +68,12 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
     if '-n' not in args:
         args.extend(['-n', 'auto' if '--live' not in args else '0'])
         namespace.dist = 'load' if '--live' not in args else 'no'
-    for plugin in PLUGINS:
-        if f'--no-{plugin}' not in args:
-            args.append(f'--{plugin}')
-            setattr(namespace, plugin, True)
-    if '--no-cov' not in args and '--live' not in args and '--cov' not in args:
+    if '--fast' not in args:
+        for plugin in PLUGINS:
+            if f'--no-{plugin}' not in args:
+                args.append(f'--{plugin}')
+                setattr(namespace, plugin, True)
+    if all(arg not in args for arg in ['--cov', '--no-cov', '--live', '--fast']):
         args.extend(['--cov', '--no-cov-on-fail'])
         namespace.no_cov_on_fail = True
 
