@@ -111,3 +111,8 @@ def test_live(mocker: MockerFixture) -> None:
         '--live', '--strict-config', '--strict-markers', '--capture=no', '-r', 'fExX', '-n', '0',
         *[f'--{plugin}' for plugin in core.PLUGINS],
     ]
+
+
+def test_fast(mocker: MockerFixture) -> None:
+    _, args = load_initial_conftests(mocker.Mock(inicfg={}), ['--fast'])
+    assert all(f'--{plugin}' not in args for plugin in core.PLUGINS)

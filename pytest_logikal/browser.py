@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from operator import itemgetter
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, Iterable, Optional, cast
+from typing import Any, Callable, Dict, Iterable, Iterator, Optional, cast
 
 import pytest
 from selenium.common.exceptions import SessionNotCreatedException
@@ -104,7 +104,7 @@ class Browser:
         return getattr(self.driver, name)
 
     @contextmanager
-    def auto_height(self) -> Generator[None, None, None]:
+    def auto_height(self) -> Iterator[None]:
         if self.settings.height:
             yield
             return

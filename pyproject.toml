@@ -33,8 +33,8 @@ entry-points = {file = 'entry_points.ini'}
 dependencies = {file = 'requirements/core.txt'}
 
 [tool.setuptools.dynamic.optional-dependencies]
-browser = {file = 'requirements/browser.txt'}
-django = {file = 'requirements/django.txt'}
+browser = {file = 'requirements/extras/browser.txt'}
+django = {file = 'requirements/extras/django.txt'}
 
 [tool.setuptools.package-data]
 pytest_logikal = ['py.typed', 'bandit_config.yml']

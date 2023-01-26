@@ -20,6 +20,7 @@ ALLOWED_LICENSES = [
     'ISC License (ISCL)',
     'ISC',
     'MIT License',
+    'MIT No Attribution License (MIT-0)'
     'MIT',
     'Mozilla Public License 2.0 (MPL 2.0)',
     'Public Domain',
