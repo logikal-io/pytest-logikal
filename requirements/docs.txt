@@ -1,4 +1,5 @@
 -e .
+-r core.txt
 -r extras/browser.txt
 
 logikal-docs==1.1.3
