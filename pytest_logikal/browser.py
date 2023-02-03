@@ -191,8 +191,7 @@ def set_browser(*args: Dict[str, Any], **kwargs: Any) -> Fixture[Any]:
         )
 
     def parametrized_test_function(function: Function) -> Any:
-        source_file = inspect.getsourcefile(function)
-        if not source_file:
+        if not (source_file := inspect.getsourcefile(function)):
             raise RuntimeError(f'Source file cannot be found for "{function}"')
         source_file_path = Path(source_file)
 

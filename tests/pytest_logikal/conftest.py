@@ -57,14 +57,17 @@ def plugin_item(
         """
         if isinstance(file_contents, dict):
             for name, contents in file_contents.items():
-                if name == 'pyproject.toml':
-                    path = pytester.makepyprojecttoml(file_contents[name])
-                else:
-                    path = pytester.makefile(Path(name).suffix, **{name: contents})
+                pyproject = 'pyproject.toml'
+                path = (
+                    pytester.makepyprojecttoml(file_contents[name]) if name == pyproject else
+                    pytester.makefile(Path(name).suffix, **{name: contents})
+                )
         else:
             path = makepyfile(file_contents)
 
-        inicfg: Dict[str, Union[str, int]] = {'max_line_length': 99, 'cov_fail_under': 100}
+        inicfg: Dict[str, Union[str, int]] = {
+            'max_line_length': 99, 'max_complexity': 10, 'cov_fail_under': 100,
+        }
         if set_django_settings_module:
             inicfg['DJANGO_SETTINGS_MODULE'] = 'tests.dummy_django_settings'
         config = mocker.Mock(inicfg=inicfg)

@@ -38,6 +38,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
     parser.addini('max_line_length', default='99', help='the maximum line length to use')
+    parser.addini('max_complexity', default='10', help='the maximum complexity to allow')
     parser.addini('cov_fail_under', default='100', help='target coverage percentage')
 
 
@@ -68,11 +69,10 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
     if '-n' not in args:
         args.extend(['-n', 'auto' if '--live' not in args else '0'])
         namespace.dist = 'load' if '--live' not in args else 'no'
-    if '--fast' not in args:
-        for plugin in PLUGINS:
-            if f'--no-{plugin}' not in args:
-                args.append(f'--{plugin}')
-                setattr(namespace, plugin, True)
+    for plugin in PLUGINS:
+        if '--fast' not in args and f'--no-{plugin}' not in args:
+            args.append(f'--{plugin}')
+            setattr(namespace, plugin, True)
     if all(arg not in args for arg in ['--cov', '--no-cov', '--live', '--fast']):
         args.extend(['--cov', '--no-cov-on-fail'])
         namespace.no_cov_on_fail = True
