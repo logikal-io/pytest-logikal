@@ -22,7 +22,7 @@ class FileCheckItem(Item):
 class FileCheckPlugin(Plugin):
     item: Type[FileCheckItem]
 
-    def check_file(self, file_path: Path) -> bool:
+    def check_file(self, file_path: Path) -> bool:  # pylint: disable=no-self-use
         return file_path.suffix == '.py'
 
     # Note: the arguments change but that is fine because pytest dynamically prunes them

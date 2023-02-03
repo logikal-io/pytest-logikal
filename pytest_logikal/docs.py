@@ -23,7 +23,7 @@ class DocsItem(FileCheckItem):
         process = subprocess.run(  # nosec: secure, not using untrusted input
             ['docs', '--build', '--clear'], capture_output=True, text=True, check=False,
         )
-        if process.returncode != 0:
+        if process.returncode:
             raise ItemRunError(process.stderr or process.stdout)
 
 

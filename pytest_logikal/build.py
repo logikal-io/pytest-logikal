@@ -30,7 +30,7 @@ class BuildItem(CachedFileCheckItem):
             ['python3', '-m', 'build', '--sdist', '--wheel'],
             capture_output=True, text=True, check=False,
         )
-        errors = (process.stderr or process.stdout) if process.returncode != 0 else process.stderr
+        errors = (process.stderr or process.stdout) if process.returncode else process.stderr
         cleaned_errors = [
             error for error in (errors.strip().split('\n') if errors else [])
             if '_BetaConfiguration' not in error and 'warnings.warn(' not in error
@@ -43,7 +43,7 @@ class BuildItem(CachedFileCheckItem):
         process = subprocess.run(  # nosec: secure, not using untrusted input
             ['twine', 'check', '--strict', 'dist/*'], capture_output=True, text=True, check=False,
         )
-        if process.returncode != 0:
+        if process.returncode:
             raise ItemRunError(process.stdout or process.stderr)
 
 

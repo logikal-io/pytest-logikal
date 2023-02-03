@@ -78,11 +78,11 @@ def save_image_prompt(
     print(short_destination)
 
     response = input('> Press "enter" to open or type "s" to skip or "c" to cancel: ')
-    if response == '':
+    if response == 's':
+        logger.info('Image opening skipped')
+    elif not response:
         # This subprocess call is secure as it is not using untrusted input
         run(['/usr/bin/xdg-open', str(source)], check=False)  # nosec
-    elif response == 's':
-        logger.info('Image opening skipped')
     else:
         raise AssertionError('Image opening cancelled')
 
