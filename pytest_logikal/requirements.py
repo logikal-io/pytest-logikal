@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 import pytest
-from pyorbs.orbs import Orbs
+from pyorbs.orb import Orb
 
 from pytest_logikal.file_checker import FileCheckItem, FileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
@@ -22,7 +22,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 class RequirementsItem(FileCheckItem):
     def runtest(self) -> None:
-        if Orbs.test(str(self.path), quiet=True):
+        if Orb().test(path=self.path, quiet=True):
             relative_path = self.path.relative_to(self.config.invocation_params.dir)
             raise ItemRunError(f'Requirements lockfile "{relative_path}.lock" is outdated')
 

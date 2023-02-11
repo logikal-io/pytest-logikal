@@ -10,8 +10,8 @@ pytest==7.2.1
 pytest-cov==4.0.0
 pytest-mock==3.10.0
 pytest-mypy==0.10.3
-pytest-xdist[psutil]==3.1.0
+pytest-xdist[psutil]==3.2.0
 Pillow~=9.4
 Pygments~=2.14  # pytest code highlighting
-pyorbs~=1.6
+pyorbs~=2.0
 tomli~=2.0
