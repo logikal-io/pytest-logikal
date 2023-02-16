@@ -12,13 +12,14 @@ authors = [{name = 'Logikal GmbH', email = 'contact@logikal.io'}]
 keywords = ['pytest']
 classifiers = [
   'Development Status :: 5 - Production/Stable',
-  'Framework :: Pytest',
   'Intended Audience :: Developers',
   'License :: OSI Approved :: MIT License',
   'Operating System :: POSIX :: Linux',
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3.8',
+  'Framework :: Pytest',
   'Topic :: Software Development',
+  'Typing :: Typed',
 ]
 dynamic = ['version', 'entry-points', 'dependencies', 'optional-dependencies']
 
