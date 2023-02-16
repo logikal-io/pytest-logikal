@@ -1,7 +1,7 @@
 bandit==1.7.4
 coverage[toml]==7.1.0
 isort[colors]==5.12.0
-mypy==0.991
+mypy==0.991  # pinned because mypy does not follow semantic versioning
 pip-licenses==4.0.3
 pycodestyle==2.10.0
 pydocstyle[toml]==6.3.0
