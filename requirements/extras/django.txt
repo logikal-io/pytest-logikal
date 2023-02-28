@@ -1,4 +1,4 @@
-django-stubs==1.14.0
+django-stubs==1.15.0
 pylint-django==2.5.3
 pytest-django==4.5.2
 pytest-factoryboy==2.5.1
