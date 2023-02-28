@@ -1,11 +1,11 @@
 bandit==1.7.4
-coverage[toml]==7.1.0
+coverage[toml]==7.2.1
 isort[colors]==5.12.0
-mypy==0.991  # pinned because mypy does not follow semantic versioning
+mypy==1.0.1
 pip-licenses==4.0.3
 pycodestyle==2.10.0
 pydocstyle[toml]==6.3.0
-pylint==2.16.1
+pylint==2.16.2
 pytest==7.2.1
 pytest-cov==4.0.0
 pytest-mock==3.10.0

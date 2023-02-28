@@ -130,7 +130,11 @@ class Browser:
         full_name = '_'.join(part for part in name_parts if part is not None)
         expected = self.screenshot_path.with_name(full_name).with_suffix('.png')
         with self.auto_height():
+            # Note: we are disabling debug remote logs because they contain the verbose image data
+            logger.debug('Taking screenshot')
+            logging.getLogger('selenium.webdriver.remote').setLevel(logging.INFO)
             screenshot = self.driver.get_screenshot_as_png()
+            logging.getLogger('selenium.webdriver.remote').setLevel(logging.DEBUG)
         assert_image_equal(actual=screenshot, expected=expected, temp_path=self.temp_path)
 
 
