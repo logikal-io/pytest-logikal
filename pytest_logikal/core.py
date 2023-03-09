@@ -18,6 +18,9 @@ PYPROJECT = (
 PLUGINS = [
     'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
 ]
+DEFAULT_MAX_LINE_LENGTH = 99
+DEFAULT_MAX_COMPLEXITY = 10
+DEFAULT_MIN_COVERAGE = 100
 
 ReportInfoType = Tuple[Union[os.PathLike, str], Optional[int], str]
 
@@ -37,9 +40,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
-    parser.addini('max_line_length', default='99', help='the maximum line length to use')
-    parser.addini('max_complexity', default='10', help='the maximum complexity to allow')
-    parser.addini('cov_fail_under', default='100', help='target coverage percentage')
+    parser.addini('max_line_length', default=str(DEFAULT_MAX_LINE_LENGTH),
+                  help='the maximum line length to use')
+    parser.addini('max_complexity', default=str(DEFAULT_MAX_COMPLEXITY),
+                  help='the maximum complexity to allow')
+    parser.addini('cov_fail_under', default=str(DEFAULT_MIN_COVERAGE),
+                  help='target coverage percentage')
 
 
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:

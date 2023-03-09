@@ -10,9 +10,16 @@ from typing import Any, Callable, Optional, Type, TypeVar
 
 from PIL import Image, ImageChops
 
+from pytest_logikal.core import DEFAULT_MAX_LINE_LENGTH, PYPROJECT
+
 logger = getLogger(__name__)
 
 Function = TypeVar('Function', bound=Callable[..., Any])
+
+
+def get_max_line_length() -> int:
+    ini_options = PYPROJECT.get('tool', {}).get('pytest', {}).get('ini_options', {})
+    return int(ini_options.get('max_line_length', DEFAULT_MAX_LINE_LENGTH))
 
 
 def hide_traceback(function: Function, error: Type[Exception] = AssertionError) -> Function:
