@@ -6,8 +6,20 @@ from pytest import raises
 from pytest_mock import MockerFixture
 
 from pytest_logikal import utils
+from pytest_logikal.core import DEFAULT_MAX_LINE_LENGTH, PYPROJECT
 
 utils = reload(utils)  # ensures coverage captures definitions
+
+
+def test_max_line_length(mocker: MockerFixture) -> None:
+    mocker.patch.dict(PYPROJECT, clear=True)
+    assert utils.get_max_line_length() == DEFAULT_MAX_LINE_LENGTH
+
+    test_length = 78
+    mocker.patch.dict(PYPROJECT, {'tool': {'pytest': {'ini_options': {
+        'max_line_length': test_length,
+    }}}})
+    assert utils.get_max_line_length() == test_length
 
 
 def test_expected_not_found(tmp_path: Path, mocker: MockerFixture) -> None:
