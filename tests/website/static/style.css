@@ -1,0 +1,53 @@
+/* Fonts */
+@font-face {
+  font-family: 'lato';
+  src: url('/static/fonts/Lato-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Variables */
+:root {
+  --font-sans-serif: 'lato', sans-serif;
+  --font-weight-sans-serif: 400;
+  --font-size-sans-serif-normal: 1.5rem; /* 24px at medium font size (16px) */
+  --font-size-sans-serif-small: 1.25rem; /* 20px at medium font size (16px) */
+  --font-size-sans-serif-big: 2.25rem; /* 36px at medium font size (16px) */
+  --font-line-height: 1.5;
+
+  --theme-background: #ffffff;
+  --theme-text: #000000;
+}
+
+/* Page */
+body {
+  /* Layout */
+  box-sizing: border-box;
+  margin: 0;
+  padding: 3.25rem 4rem;
+
+  /* Typography */
+  font-family: var(--font-sans-serif);
+  font-weight: var(--font-weight-sans-serif);
+  font-size: var(--font-size-sans-serif-normal);
+  font-variant-numeric: lining-nums;
+  font-feature-settings: 'liga', 'kern';
+  line-height: var(--font-line-height);
+
+  /* Colors */
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Text */
+h1 {
+  font-family: var(--font-sans-serif);
+  font-weight: var(--font-weight-sans-serif);
+  font-size: var(--font-size-sans-serif-big);
+  margin-top: 3rem;
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+p { margin: 1em 0; }

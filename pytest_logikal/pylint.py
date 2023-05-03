@@ -70,7 +70,7 @@ class PylintItem(CachedFileCheckItem):
                 'too-few-public-methods',  # common error with some Django classes
                 'unsubscriptable-object',  # common error with generic types in django-stubs
             ]
-            plugins += ['pylint_django', 'pylint_django.checkers.migrations']
+            plugins += ['pylint_django']
             command += [
                 f'--django-settings-module={self.config.inicfg["DJANGO_SETTINGS_MODULE"]}',
                 r'--module-rgx=[^\WA-Z]*$',  # allow (migration) modules to start with digits

@@ -10,6 +10,7 @@ from pytest_logikal.plugin import Item, ItemRunError, Plugin
 ALLOWED_LICENSES = [
     '3-Clause BSD License',
     'Apache 2.0',
+    'Apache License 2.0',
     'Apache Software License',
     'BSD 3-Clause',
     'BSD License',
@@ -17,6 +18,8 @@ ALLOWED_LICENSES = [
     'BSD-3-Clause',
     'GNU Lesser General Public License v2 (LGPLv2)',
     'GNU Lesser General Public License v2 or later (LGPLv2+)',
+    'GNU Lesser General Public License v3 (LGPLv3)',
+    'GNU Library or Lesser General Public License (LGPL)',
     'ISC License (ISCL)',
     'ISC',
     'MIT License',
@@ -31,6 +34,9 @@ ALLOWED_LICENSES = [
 
 ALLOWED_PACKAGES = {
     'facebook-business': 'LICENSE.txt',  # only used as a connector
+    'djlint': 'GNU General Public License v3 or later (GPLv3+)',  # only used as a local tool
+    'html-tag-names': 'GNU General Public License v3 or later (GPLv3+)',  # djlint dependency
+    'html-void-elements': 'GNU General Public License v3 or later (GPLv3+)',  # djlint dependency
     'pkg_resources': 'UNKNOWN',  # caused by an Ubuntu bug, see [1]
     'pkg-resources': 'UNKNOWN',  # caused by an Ubuntu bug, see [1]
     'Pillow': 'Historical Permission Notice and Disclaimer (HPND)',  # license is BSD-like

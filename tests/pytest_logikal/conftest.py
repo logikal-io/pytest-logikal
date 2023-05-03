@@ -1,28 +1,21 @@
-from importlib import reload
+from importlib import import_module, reload
+from itertools import chain
 from pathlib import Path
 from typing import Callable, Dict, Type, Union, cast
 
 import pytest
 from pytest_mock import MockerFixture
 
-from pytest_logikal import (
-    bandit, build, core, docs, file_checker, isort, licenses,
-    plugin as pytest_logikal_plugin, pylint, requirements, style,
-)
+from pytest_logikal import core, file_checker, plugin as pytest_logikal_plugin
 
-# Reload plugins to ensure coverage captures definitions (order is important)
-reload(core)
-reload(pytest_logikal_plugin)
-reload(file_checker)
+FILES_DIR = Path(__file__).parent / 'files'
 
-reload(bandit)
-reload(build)
-reload(docs)
-reload(isort)
-reload(licenses)
-reload(pylint)
-reload(requirements)
-reload(style)
+# Reload modules to ensure coverage captures definitions (order is important)
+MODULES = ['core', 'file_checker', 'plugin', 'django', 'browser', 'docker', 'utils', 'validator']
+for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):
+    if submodule == 'mypy':
+        continue
+    reload(import_module(f'pytest_logikal.{submodule}'))
 
 
 @pytest.fixture
@@ -42,6 +35,7 @@ def makepyfile(pytester: pytest.Pytester) -> Callable[[str], Path]:
 @pytest.fixture
 def plugin_item(
     pytester: pytest.Pytester,
+    pytestconfig: pytest.Config,
     makepyfile: Callable[[str], Path],  # pylint: disable=redefined-outer-name
     mocker: MockerFixture,
 ) -> Callable[..., pytest_logikal_plugin.Item]:
@@ -66,13 +60,14 @@ def plugin_item(
             path = makepyfile(file_contents)
 
         inicfg: Dict[str, Union[str, int]] = {
-            'max_line_length': 99, 'max_complexity': 10, 'cov_fail_under': 100,
+            option: entry['value'] for option, entry in core.DEFAULT_INI_OPTIONS.items()
         }
         if set_django_settings_module:
-            inicfg['DJANGO_SETTINGS_MODULE'] = 'tests.dummy_django_settings'
+            inicfg['DJANGO_SETTINGS_MODULE'] = 'tests.website.settings'
         config = mocker.Mock(inicfg=inicfg)
         config.getini = inicfg.get
         config.invocation_params.dir = path.parent
+        config.rootpath = pytestconfig.rootpath
 
         plugin_obj = plugin(config=config)
         parent = mocker.Mock(nodeid='parent', config=plugin_obj.config, path=path)
@@ -80,6 +75,7 @@ def plugin_item(
         if issubclass(item, file_checker.FileCheckItem):
             args['plugin'] = plugin_obj
         item_obj = item.from_parent(**args)
+        item_obj.setup()
         return cast(pytest_logikal_plugin.Item, item_obj)
 
     return plugin_item_wrapper

@@ -40,6 +40,16 @@ which automatically runs a broad range of checks:
   applicable)
 - Package build checks (via `build <https://pypa-build.readthedocs.io/>`_, when applicable)
 
+The ``django`` extra provides additional checks:
+
+- HTML template checks (via `djLint <https://www.djlint.com/>`_)
+- CSS validation, style checks and linting (via `v.Nu <https://validator.github.io/validator/>`_
+  and `Stylelint <https://stylelint.io/>`_)
+- SVG validation (via `v.Nu <https://validator.github.io/validator/>`_)
+- JavaScript style checks and linting (via `ESLint <https://eslint.org/>`_)
+- Django migration linting (via `Django migration linter
+  <https://github.com/3YOURMIND/django-migration-linter>`_)
+
 The checks are configured to be strict, and all checks and tests are distributed across multiple
 CPUs by default (via `pytest-xdist <https://pytest-xdist.readthedocs.io/>`_).
 
@@ -80,6 +90,21 @@ This will additionally install and configure
 `pylint-django <https://github.com/PyCQA/pylint-django>`_,
 `pytest-django <https://pytest-django.readthedocs.io/>`_
 and `pytest-factoryboy <https://github.com/pytest-dev/pytest-factoryboy>`_.
+
+.. note:: Your system must have a working `Node.js <https://nodejs.org/en>`_ and `npm
+    <https://www.npmjs.com/>`_ installation that can be used to install and run Stylelint and
+    ESLint.
+
+.. note:: The `v.Nu <https://validator.github.io/validator/>`_ `Docker Compose
+    <https://docs.docker.com/compose/>`_ service must be available for the CSS and SVG validation
+    to work. We recommend adding the following service to your project's ``compose.yml`` file:
+
+    .. code-block:: yaml
+
+        services:
+          validator:
+            image: ghcr.io/validator/validator:23.4.11
+            ports: [{target: 8888}]
 
 When using the ``django`` extra you must also specify the Django settings module and mypy plugin
 path in your ``pyproject.toml`` file as follows:

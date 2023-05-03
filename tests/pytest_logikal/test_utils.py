@@ -1,4 +1,3 @@
-from importlib import reload
 from pathlib import Path
 
 from PIL import Image
@@ -6,20 +5,17 @@ from pytest import raises
 from pytest_mock import MockerFixture
 
 from pytest_logikal import utils
-from pytest_logikal.core import DEFAULT_MAX_LINE_LENGTH, PYPROJECT
-
-utils = reload(utils)  # ensures coverage captures definitions
+from pytest_logikal.core import DEFAULT_INI_OPTIONS, PYPROJECT
 
 
-def test_max_line_length(mocker: MockerFixture) -> None:
+def test_ini_option(mocker: MockerFixture) -> None:
+    option = 'max_line_length'
     mocker.patch.dict(PYPROJECT, clear=True)
-    assert utils.get_max_line_length() == DEFAULT_MAX_LINE_LENGTH
+    assert utils.get_ini_option(option) == DEFAULT_INI_OPTIONS[option]['value']
 
-    test_length = 78
-    mocker.patch.dict(PYPROJECT, {'tool': {'pytest': {'ini_options': {
-        'max_line_length': test_length,
-    }}}})
-    assert utils.get_max_line_length() == test_length
+    test_value = 78
+    mocker.patch.dict(PYPROJECT, {'tool': {'pytest': {'ini_options': {option: test_value}}}})
+    assert utils.get_ini_option(option) == test_value
 
 
 def test_expected_not_found(tmp_path: Path, mocker: MockerFixture) -> None:
