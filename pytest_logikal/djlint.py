@@ -1,28 +1,18 @@
 import subprocess
-from contextlib import redirect_stdout
-from io import StringIO
 from pathlib import Path
-from typing import Optional
 
 import pytest
-from django.conf import settings
-from django_migration_linter import MigrationLinter
-from django_migration_linter.management.commands import lintmigrations
-from pytest_django.plugin import _blocking_manager  # pylint: disable=import-private-name
 from termcolor import colored
 
-from pytest_logikal.core import PYPROJECT, ReportInfoType
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
-from pytest_logikal.plugin import Item, ItemRunError, Plugin
+from pytest_logikal.plugin import ItemRunError
 from pytest_logikal.utils import get_ini_option
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    config.addinivalue_line('markers', 'htmlj: checks Django HTML Jinja templates.')
-    config.addinivalue_line('markers', 'migrations: checks Django migrations.')
+    config.addinivalue_line('markers', 'djlint: checks HTML templates.')
     if config.option.djlint:
-        config.pluginmanager.register(HTMLJTemplatePlugin(config=config))
-        config.pluginmanager.register(MigrationPlugin(config=config))
+        config.pluginmanager.register(DjLintTemplatePlugin(config=config))
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -30,7 +20,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--djlint', action='store_true', default=False, help='run djlint')
 
 
-class HTMLJTemplateItem(CachedFileCheckItem):
+class DjLintTemplateItem(CachedFileCheckItem):
     @staticmethod
     def _color_diff(line: str) -> str:
         if line.startswith('@@'):
@@ -80,35 +70,9 @@ class HTMLJTemplateItem(CachedFileCheckItem):
             raise ItemRunError(f'\n\n{separator}\n'.join(messages))
 
 
-class MigrationItem(Item):
-    def runtest(self, migrations_file_path: Optional[Path] = None) -> None:
-        # We cannot request a fixture here, so we use the blocking manager directly
-        # See https://github.com/pytest-dev/pytest/discussions/10915
-        with _blocking_manager.unblock():
-            linter = MigrationLinter(**{
-                'all_warnings_as_errors': True,
-                **getattr(settings, 'MIGRATION_LINTER_OPTIONS', {}),
-                **PYPROJECT.get('tool', {}).get(lintmigrations.CONFIG_NAME, {}),
-            })
-            with redirect_stdout(StringIO()) as code_stdout:
-                linter.lint_all_migrations(migrations_file_path=migrations_file_path)
-            migrations = 'migration' if linter.nb_total == 1 else 'migrations'
-            print(f'Checked {linter.nb_total} {migrations} ({linter.nb_ignored} ignored)')
-            if linter.nb_warnings or linter.nb_erroneous:
-                raise ItemRunError(code_stdout.getvalue().rstrip())
-
-    def reportinfo(self) -> ReportInfoType:
-        return (self.path, None, f'[{MigrationPlugin.name}]')
-
-
-class HTMLJTemplatePlugin(CachedFileCheckPlugin):
-    name = 'htmlj'
-    item = HTMLJTemplateItem
+class DjLintTemplatePlugin(CachedFileCheckPlugin):
+    name = 'djlint'
+    item = DjLintTemplateItem
 
     def check_file(self, file_path: Path) -> bool:
         return str(file_path).endswith('.html.j')
-
-
-class MigrationPlugin(Plugin):
-    name = 'migrations'
-    item = MigrationItem

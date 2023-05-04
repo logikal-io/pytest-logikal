@@ -22,7 +22,7 @@ PLUGINS = {
     'core': [
         'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
     ],
-    'django': ['djlint', 'css', 'svg', 'js'],
+    'django': ['django', 'djlint', 'css', 'svg', 'js'],
 }
 DEFAULT_INI_OPTIONS: Dict[str, Any] = {
     'max_line_length': {'value': 99, 'help': 'the maximum line length to use'},
@@ -48,6 +48,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
+    group.addoption('--no-django', action='store_true', help='do not run django migration checks')
     group.addoption('--no-djlint', action='store_true', help='do not use djlint')
     group.addoption('--no-css', action='store_true', help='do not run css checks')
     group.addoption('--no-svg', action='store_true', help='do not run svg checks')
@@ -61,7 +62,6 @@ def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
     if not find_spec('selenium'):
         pluginmanager.set_blocked('logikal_browser')
     if not find_spec('pytest_django'):
-        pluginmanager.set_blocked('logikal_django')
         for plugin in PLUGINS['django']:
             pluginmanager.set_blocked(f'logikal_{plugin}')
 

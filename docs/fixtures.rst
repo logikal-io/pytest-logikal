@@ -19,3 +19,10 @@ You may control browser settings for a specific test with the
 :func:`~pytest_logikal.browser.set_browser` decorator:
 
 .. autodecorator:: pytest_logikal.browser.set_browser
+
+live_url
+--------
+The :ref:`django extra <index:django>` provides a new :func:`live_url
+<pytest_logikal.django.live_url>` fixture:
+
+.. autodecorator:: pytest_logikal.django.live_url
