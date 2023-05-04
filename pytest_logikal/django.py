@@ -55,7 +55,7 @@ def factory_seed() -> None:
 
 
 @pytest.fixture
-def live_url(live_server: LiveServer) -> LiveURL:
+def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400,D402,D415,D417
     """
     live_url(name: str) -> str
 

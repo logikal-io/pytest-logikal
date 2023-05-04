@@ -2,15 +2,15 @@ from typing import Callable
 
 from pytest import raises
 
-from pytest_logikal import djlint
+from pytest_logikal import html
 from pytest_logikal.plugin import Item, ItemRunError
 from tests.pytest_logikal.conftest import FILES_DIR
 
 
 def test_htmlj_template_item_run(plugin_item: Callable[..., Item]) -> None:
     item = plugin_item(
-        plugin=djlint.DjLintTemplatePlugin,
-        item=djlint.DjLintTemplateItem,
+        plugin=html.HTMLTemplatePlugin,
+        item=html.HTMLTemplateItem,
         file_contents={'invalid.html.j': (FILES_DIR / 'invalid.html.j').read_text()},
     )
     with raises(ItemRunError) as error:

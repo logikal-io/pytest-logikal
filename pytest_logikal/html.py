@@ -10,17 +10,17 @@ from pytest_logikal.utils import get_ini_option
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    config.addinivalue_line('markers', 'djlint: checks HTML templates.')
-    if config.option.djlint:
-        config.pluginmanager.register(DjLintTemplatePlugin(config=config))
+    config.addinivalue_line('markers', 'html: checks HTML templates.')
+    if config.option.html:
+        config.pluginmanager.register(HTMLTemplatePlugin(config=config))
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
-    group = parser.getgroup('djlint')
-    group.addoption('--djlint', action='store_true', default=False, help='run djlint')
+    group = parser.getgroup('html')
+    group.addoption('--html', action='store_true', default=False, help='run html template checks')
 
 
-class DjLintTemplateItem(CachedFileCheckItem):
+class HTMLTemplateItem(CachedFileCheckItem):
     @staticmethod
     def _color_diff(line: str) -> str:
         if line.startswith('@@'):
@@ -70,9 +70,9 @@ class DjLintTemplateItem(CachedFileCheckItem):
             raise ItemRunError(f'\n\n{separator}\n'.join(messages))
 
 
-class DjLintTemplatePlugin(CachedFileCheckPlugin):
-    name = 'djlint'
-    item = DjLintTemplateItem
+class HTMLTemplatePlugin(CachedFileCheckPlugin):
+    name = 'html'
+    item = HTMLTemplateItem
 
     def check_file(self, file_path: Path) -> bool:
         return str(file_path).endswith('.html.j')

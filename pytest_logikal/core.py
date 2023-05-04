@@ -22,7 +22,7 @@ PLUGINS = {
     'core': [
         'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
     ],
-    'django': ['django', 'djlint', 'css', 'svg', 'js'],
+    'django': ['django', 'html', 'css', 'svg', 'js'],
 }
 DEFAULT_INI_OPTIONS: Dict[str, Any] = {
     'max_line_length': {'value': 99, 'help': 'the maximum line length to use'},
@@ -49,7 +49,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
     group.addoption('--no-django', action='store_true', help='do not run django migration checks')
-    group.addoption('--no-djlint', action='store_true', help='do not use djlint')
+    group.addoption('--no-html', action='store_true', help='do not run html template checks')
     group.addoption('--no-css', action='store_true', help='do not run css checks')
     group.addoption('--no-svg', action='store_true', help='do not run svg checks')
     group.addoption('--no-js', action='store_true', help='do not run js checks')

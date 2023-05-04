@@ -214,7 +214,7 @@ class Browser:
 
 
 @pytest.fixture
-def browser(tmp_path: Path, request: Any) -> Iterable[Browser]:
+def browser(tmp_path: Path, request: Any) -> Iterable[Browser]:  # noqa: D400,D402,D415
     """
     browser() -> Browser
 
