@@ -1,3 +1,4 @@
+import os
 import subprocess
 from time import sleep, time
 from typing import Optional
@@ -36,6 +37,7 @@ class Service:
         print(colored('Starting Docker Compose services', 'yellow', attrs=['bold']))
         command = [
             'docker', 'compose', 'up', '--detach',
+            *(['--quiet-pull'] if 'GITHUB_ACTIONS' in os.environ else []),
             '--wait', '--wait-timeout', str(self.start_timeout_seconds),
         ]
         subprocess.run(command, text=True, check=True)  # nosec: secure, not using untrusted input
