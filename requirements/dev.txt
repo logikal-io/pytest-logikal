@@ -2,5 +2,3 @@
 -r build.txt
 -r docs.txt
 -r extras/django.txt
-
-Django==4.2.0

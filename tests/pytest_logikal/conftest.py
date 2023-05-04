@@ -11,7 +11,7 @@ from pytest_logikal import core, file_checker, plugin as pytest_logikal_plugin
 FILES_DIR = Path(__file__).parent / 'files'
 
 # Reload modules to ensure coverage captures definitions (order is important)
-MODULES = ['core', 'file_checker', 'plugin', 'django', 'browser', 'docker', 'utils', 'validator']
+MODULES = ['core', 'file_checker', 'plugin', 'browser', 'docker', 'utils', 'validator']
 for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):
     if submodule == 'mypy':
         continue
