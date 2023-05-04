@@ -1,13 +1,16 @@
 import logging
 import os
 import shutil
+import subprocess
 import sys
 from importlib.util import find_spec
+from itertools import chain
 from pathlib import Path
-from typing import Callable, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
 import pytest
 import tomli
+from termcolor import colored
 
 sys.path.insert(0, os.getcwd())
 
@@ -15,12 +18,17 @@ PYPROJECT = (
     tomli.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
     if Path('pyproject.toml').exists() else {}
 )
-PLUGINS = [
-    'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
-]
-DEFAULT_MAX_LINE_LENGTH = 99
-DEFAULT_MAX_COMPLEXITY = 10
-DEFAULT_MIN_COVERAGE = 100
+PLUGINS = {
+    'core': [
+        'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
+    ],
+    'django': ['django', 'html', 'css', 'svg', 'js'],
+}
+DEFAULT_INI_OPTIONS: Dict[str, Any] = {
+    'max_line_length': {'value': 99, 'help': 'the maximum line length to use'},
+    'max_complexity': {'value': 10, 'help': 'the maximum complexity to allow'},
+    'cov_fail_under': {'value': 100, 'help': 'target coverage percentage'},
+}
 
 ReportInfoType = Tuple[Union[os.PathLike, str], Optional[int], str]
 
@@ -40,19 +48,22 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
-    parser.addini('max_line_length', default=str(DEFAULT_MAX_LINE_LENGTH),
-                  help='the maximum line length to use')
-    parser.addini('max_complexity', default=str(DEFAULT_MAX_COMPLEXITY),
-                  help='the maximum complexity to allow')
-    parser.addini('cov_fail_under', default=str(DEFAULT_MIN_COVERAGE),
-                  help='target coverage percentage')
+    group.addoption('--no-django', action='store_true', help='do not run django migration checks')
+    group.addoption('--no-html', action='store_true', help='do not run html template checks')
+    group.addoption('--no-css', action='store_true', help='do not run css checks')
+    group.addoption('--no-svg', action='store_true', help='do not run svg checks')
+    group.addoption('--no-js', action='store_true', help='do not run js checks')
+    group.addoption('--no-install', action='store_true', help='do not install packages')
+    for option, entry in DEFAULT_INI_OPTIONS.items():
+        parser.addini(option, default=str(entry['value']), help=entry['help'])
 
 
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
     if not find_spec('selenium'):
         pluginmanager.set_blocked('logikal_browser')
     if not find_spec('pytest_django'):
-        pluginmanager.set_blocked('logikal_django')
+        for plugin in PLUGINS['django']:
+            pluginmanager.set_blocked(f'logikal_{plugin}')
 
 
 # Untyped decorator (see https://github.com/pytest-dev/pytest/issues/7469)
@@ -75,7 +86,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
     if '-n' not in args:
         args.extend(['-n', 'auto' if '--live' not in args else '0'])
         namespace.dist = 'load' if '--live' not in args else 'no'
-    for plugin in PLUGINS:
+    for plugin in chain.from_iterable(PLUGINS.values()):
         if '--fast' not in args and f'--no-{plugin}' not in args:
             args.append(f'--{plugin}')
             setattr(namespace, plugin, True)
@@ -105,20 +116,39 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
     yield
 
 
+def install_packages(node_prefix: Optional[Path] = None) -> None:
+    node_prefix = node_prefix or Path(__file__).parent
+    if not (node_prefix / 'node_modules').exists():
+        print(colored('Installing Node.js packages', attrs=['bold']))
+        command = ['npm', 'install', '--no-save', '--prefix', str(node_prefix)]
+        subprocess.run(command, text=True, check=True)  # nosec: secure, not using untrusted input
+
+
 def pytest_configure(config: pytest.Config) -> None:
+    # Installing Node.js packages
+    if find_spec('pytest_django') and not config.getoption('no_install'):
+        install_packages()
+
     # Clearing cache
     if config.getoption('clear'):
-        print('Clearing cache')
+        print(colored('Clearing cache', 'yellow', attrs=['bold']))
         Path('.coverage').unlink(missing_ok=True)
         shutil.rmtree('.pytest_cache', ignore_errors=True)
         shutil.rmtree('.mypy_cache', ignore_errors=True)
 
     # Hiding overly verbose debug and info log messages
-    logging.getLogger('faker').setLevel(logging.INFO)
-    logging.getLogger('filelock').setLevel(logging.WARNING)
-    logging.getLogger('PIL').setLevel(logging.INFO)
-    logging.getLogger('pydocstyle').setLevel(logging.WARNING)
-    logging.getLogger('matplotlib').setLevel(logging.INFO)
+    if not config.getoption('verbose'):
+        logging.getLogger('faker').setLevel(logging.INFO)
+        logging.getLogger('filelock').setLevel(logging.WARNING)
+        logging.getLogger('PIL').setLevel(logging.INFO)
+        logging.getLogger('pydocstyle').setLevel(logging.WARNING)
+        logging.getLogger('matplotlib').setLevel(logging.INFO)
+        logging.getLogger('django_migration_linter').setLevel(logging.WARNING)
+
+        # Hiding validator log messages
+        logging.getLogger('docker').setLevel(logging.INFO)
+        logging.getLogger('urllib3').setLevel(logging.INFO)
+        logging.getLogger('pytest_logikal.validator').setLevel(logging.INFO)
 
     # Hiding worker information lines
     if not config.getoption('verbose'):

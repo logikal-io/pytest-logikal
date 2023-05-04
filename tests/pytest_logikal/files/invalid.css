@@ -1,0 +1,30 @@
+/* Fonts */
+@font-face {
+  font-family: 'lato';
+  src:
+    url('/static/fonts/Lato-Regular.woff2') format('woff2'),
+    url('/static/fonts/Lato-Regular.woff') format('woff'),
+    url('/static/fonts/Lato-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Variables */
+:root {
+  --font-sans-serif: 'lato', sans-serif;
+}
+
+/* Page */
+a:active { color: var(--theme-text); }
+p, ul, ol { margin: 1em 0; }
+
+/* Mobile */
+@media (width <= 75rem) { /* 1200px at medium font size (16px) */
+  nav { flex-wrap: wrap; }
+}
+
+/* Errors */
+unknown {
+  unknown-property: unknown-value;
+    margin: 0
+}

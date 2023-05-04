@@ -33,8 +33,11 @@ class BuildItem(CachedFileCheckItem):
         errors = (process.stderr or process.stdout) if process.returncode else process.stderr
         cleaned_errors = [
             error for error in (errors.strip().split('\n') if errors else [])
-            if '_BetaConfiguration' not in error and 'warnings.warn(' not in error
+            # Remove unnecessary warnings from output
+            if '_BetaConfiguration' not in error
+            and 'warnings.warn(' not in error
             and 'shallow and may cause errors' not in error
+            and 'config = read_configuration' not in error
         ]
         if cleaned_errors:
             raise ItemRunError('\n'.join(cleaned_errors))

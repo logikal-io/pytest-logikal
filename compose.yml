@@ -1,0 +1,7 @@
+name: pytest-logikal
+
+services:
+  validator:
+    # Note: make sure to update the version in the docs/index.rst as well when changing it here!
+    image: ghcr.io/validator/validator:23.4.11
+    ports: [{target: 8888}]

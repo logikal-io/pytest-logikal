@@ -48,13 +48,11 @@ class Plugin:
         self.config = config
 
     def pytest_collect_file(self, parent: pytest.Collector) -> Any:
-        """
-        Run a single test.
-        """
         plugin = self
 
         class File(pytest.File):
             def collect(self) -> Iterable[Item]:
-                if not any(isinstance(item, type(item)) for item in self.session.items):
+                # Ensure that a plugin item is added once and only once per session
+                if not any(isinstance(item, plugin.item) for item in self.session.items):
                     yield plugin.item.from_parent(parent=self, name=plugin.name)
         return File.from_parent(parent, path=Path('check'))

@@ -1,4 +1,5 @@
 import sys
+from contextlib import contextmanager
 from io import BytesIO
 from logging import getLogger
 from operator import methodcaller
@@ -6,25 +7,36 @@ from os import getcwd
 from pathlib import Path
 from shutil import copy
 from subprocess import run
-from typing import Any, Callable, Optional, Type, TypeVar
+from tempfile import TemporaryDirectory
+from typing import Any, Callable, Dict, Generator, Optional, Type, TypeVar
 
 from PIL import Image, ImageChops
 
-from pytest_logikal.core import DEFAULT_MAX_LINE_LENGTH, PYPROJECT
+from pytest_logikal.core import DEFAULT_INI_OPTIONS, PYPROJECT
 
 logger = getLogger(__name__)
 
 Function = TypeVar('Function', bound=Callable[..., Any])
 
 
-def get_max_line_length() -> int:
+def get_ini_option(name: str) -> Any:
     ini_options = PYPROJECT.get('tool', {}).get('pytest', {}).get('ini_options', {})
-    return int(ini_options.get('max_line_length', DEFAULT_MAX_LINE_LENGTH))
+    default = DEFAULT_INI_OPTIONS[name]['value']
+    return type(default)(ini_options.get(name, default))
 
 
 def hide_traceback(function: Function, error: Type[Exception] = AssertionError) -> Function:
     getattr(function, '__globals__')['__tracebackhide__'] = methodcaller('errisinstance', error)
     return function
+
+
+@contextmanager
+def render_template(path: Path, context: Dict[str, Any]) -> Generator[Path, None, None]:
+    with TemporaryDirectory(prefix='pytest_logikal_') as tmp_dir:
+        rendered = path.read_text(encoding='utf-8').format(**context)
+        config_path = Path(tmp_dir) / path.name
+        config_path.write_text(rendered)
+        yield config_path
 
 
 @hide_traceback

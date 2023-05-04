@@ -14,5 +14,5 @@ def test_run(mocker: MockerFixture, plugin_item: Callable[..., Item]) -> None:
         from pathlib import Path, PosixPath
         import re
     """)
-    with raises(ItemRunError, match='\\+from pathlib import \\(\n.* Path'):
+    with raises(ItemRunError, match='\n\\x1b\\[32m\\+from pathlib import \\(\n.* Path'):
         item.runtest()

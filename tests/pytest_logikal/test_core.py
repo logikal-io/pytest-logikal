@@ -1,4 +1,6 @@
+from itertools import chain
 from pathlib import Path
+from shutil import copy
 from typing import Callable, List, Tuple
 
 import pytest
@@ -7,10 +9,16 @@ from pytest_mock.plugin import MockerFixture
 from pytest_logikal import core
 
 pytest_plugins = ['pytester']
-PYTEST_ARGS = ['--no-licenses', '-p', 'no:django', '--assert', 'plain']
+PYTEST_ARGS = [
+    '--assert', 'plain',  # modules are already imported so assertions cannot be rewritten
+    '--no-licenses',  # no need to check licenses here again
+    '--no-install',  # do not install packages
+    '-p', 'no:django', '--no-django', '--no-html',  # settings module is not available
+]
 
 
 def test_run_errors(makepyfile: Callable[[str], Path], pytester: pytest.Pytester) -> None:
+    pytester.makepyprojecttoml("[project]\nname = 'pytest-logikal'")
     makepyfile("""
         import pickle  # triggers a bandit error
         import re  # triggers a pylint error
@@ -28,6 +36,7 @@ def test_run_errors(makepyfile: Callable[[str], Path], pytester: pytest.Pytester
         r'.*\[isort\] test_run_errors\.py.*',
         r'.*\[style\] test_run_errors\.py.*',
         r'.*\[mypy\] test_run_errors\.py.*',
+        r'.*\[mypy-status\].*',
     ])
     result.stdout.no_re_match_line(r'.*\(filelock:\d+\)')
     result.stdout.no_re_match_line('.*coverage: platform.*')
@@ -35,6 +44,7 @@ def test_run_errors(makepyfile: Callable[[str], Path], pytester: pytest.Pytester
 
 
 def test_run_success(makepyfile: Callable[[str], Path], pytester: pytest.Pytester) -> None:
+    pytester.makepyprojecttoml("[project]\nname = 'pytest-logikal'")
     makepyfile("""
         def test_success() -> None:
             \"\"\"A test that will succeed.\"\"\"
@@ -66,15 +76,23 @@ def test_clear(mocker: MockerFixture) -> None:
     assert shutil.rmtree.called
 
 
+def test_install_packages(tmp_path: Path) -> None:
+    for file in ['package.json', 'package-lock.json']:
+        copy(Path(core.__file__).parent / file, tmp_path)
+    core.install_packages(node_prefix=tmp_path)
+    assert (tmp_path / 'node_modules/stylelint').exists()
+
+
 def test_run_without_extras(pytester: pytest.Pytester, mocker: MockerFixture) -> None:
+    args = PYTEST_ARGS + ['--no-cov']  # avoids coverage "no data to report" warning
     find_spec = mocker.patch('pytest_logikal.core.find_spec')
 
     find_spec.side_effect = lambda module: module != 'selenium'  # selenium extra missing
-    result = pytester.runpytest('--no-cov', *PYTEST_ARGS)
+    result = pytester.runpytest(*args)
     assert result.parseoutcomes() == {}
 
     find_spec.side_effect = lambda module: module != 'pytest_django'  # django extra missing
-    result = pytester.runpytest('--no-cov', *PYTEST_ARGS)
+    result = pytester.runpytest(*args, *[f'--no-{plugin}' for plugin in core.PLUGINS['django']])
     assert result.parseoutcomes() == {}
 
 
@@ -92,7 +110,8 @@ def test_defaults(mocker: MockerFixture) -> None:
     early_config, args = load_initial_conftests(early_config=config, args=[])
     assert args == [
         '--strict-config', '--strict-markers', '-r', 'fExX', '-n', 'auto',
-        *[f'--{plugin}' for plugin in core.PLUGINS], '--cov', '--no-cov-on-fail',
+        *[f'--{plugin}' for plugin in chain.from_iterable(core.PLUGINS.values())],
+        '--cov', '--no-cov-on-fail',
     ]
     assert early_config.inicfg['log_level'] == 'INFO'
     assert early_config.inicfg['console_output_style'] == 'classic'
@@ -109,10 +128,10 @@ def test_live(mocker: MockerFixture) -> None:
     _, args = load_initial_conftests(mocker.Mock(inicfg={}), ['--live'])
     assert args == [
         '--live', '--strict-config', '--strict-markers', '--capture=no', '-r', 'fExX', '-n', '0',
-        *[f'--{plugin}' for plugin in core.PLUGINS],
+        *[f'--{plugin}' for plugin in chain.from_iterable(core.PLUGINS.values())],
     ]
 
 
 def test_fast(mocker: MockerFixture) -> None:
     _, args = load_initial_conftests(mocker.Mock(inicfg={}), ['--fast'])
-    assert all(f'--{plugin}' not in args for plugin in core.PLUGINS)
+    assert all(f'--{plugin}' not in args for plugin in chain.from_iterable(core.PLUGINS.values()))

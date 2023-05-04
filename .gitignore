@@ -3,6 +3,7 @@ __pycache__
 .coverage*
 .mypy_cache/
 .pytest_cache/
+node_modules/
 
 # Build artifacts
 /build/

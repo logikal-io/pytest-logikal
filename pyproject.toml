@@ -29,6 +29,9 @@ dynamic = ['version', 'entry-points', 'dependencies', 'optional-dependencies']
 'Issue tracker' = 'https://github.com/logikal-io/pytest-logikal/issues'
 'Source code' = 'https://github.com/logikal-io/pytest-logikal'
 
+[tool.setuptools]
+packages = ['pytest_logikal']
+
 [tool.setuptools.dynamic]
 entry-points = {file = 'entry_points.ini'}
 dependencies = {file = 'requirements/core.txt'}
@@ -38,12 +41,23 @@ browser = {file = 'requirements/extras/browser.txt'}
 django = {file = 'requirements/extras/django.txt'}
 
 [tool.setuptools.package-data]
-pytest_logikal = ['py.typed', 'bandit_config.yml']
+pytest_logikal = [
+  'py.typed', 'package.json', 'package-lock.json',
+  'bandit_config.yml', 'css_config.yml', 'js_config.yml',
+]
 
 [tool.setuptools_scm]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = 'tests.dummy_django_settings'
+DJANGO_SETTINGS_MODULE = 'tests.website.settings'
+norecursedirs = [
+  '*.egg', '.*', 'build', 'dist', 'node_modules',  # standard folders
+  'tests/pytest_logikal/files',  # ignore files used inside plugin runs
+]
+filterwarnings = [
+  # Can be removed with the next release of django-migration-linter
+  "ignore:unclosed file .* name='/dev/null':ResourceWarning",
+]
 
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issues/11667
@@ -51,13 +65,28 @@ plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issu
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
 module = [
-  'PIL',  # see https://github.com/python-pillow/Pillow/issues/2625
-  'pyorbs.orbs',
+  'PIL',  # https://github.com/python-pillow/Pillow/issues/2625
+  'django_migration_linter.*',  # https://github.com/3YOURMIND/django-migration-linter/issues/238
+  'docker.*',
+  'factory.*',
   'pycodestyle',
   'pydocstyle',
   'xdist.*',
 ]
 
+[tool.browser.settings]
+desktop-docs = {width = 1024, height = 768}
+mobile-xl = {width = 480, frame_height = 768, mobile = true}
+
+[tool.isort]
+known_first_party = ['pytest_logikal']
+
 [tool.coverage.report]
-omit = ['/tmp/*']  # ignore temporary files created during testing
-exclude_lines = ['\.\.\.']  # exclude abstract methods
+omit = [
+  '/tmp/*',  # ignore temporary files created during testing
+  'tests/pytest_logikal/files/*',  # ignore files used inside plugin runs
+]
+exclude_lines = [
+  'pragma: no cover',
+  '\.\.\.',  # exclude abstract methods
+]
