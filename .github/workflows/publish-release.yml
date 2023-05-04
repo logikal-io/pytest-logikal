@@ -6,9 +6,12 @@ on:
 jobs:
   publish-release:
     name: Publish release
-    uses: logikal-io/github-workflows/.github/workflows/publish-release.yml@v4
+    uses: logikal-io/github-workflows/.github/workflows/publish-release.yml@v5
     with:
       name: pytest-logikal
+    environment:
+      name: release
+      url: https://pypi.org/project/pytest-logikal/
     permissions:
       contents: read
       id-token: write
