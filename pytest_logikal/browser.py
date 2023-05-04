@@ -216,6 +216,8 @@ class Browser:
 @pytest.fixture
 def browser(tmp_path: Path, request: Any) -> Iterable[Browser]:
     """
+    browser() -> Browser
+
     Yield a :class:`Browser` instance.
     """
     function = request.node.obj

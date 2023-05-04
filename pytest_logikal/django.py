@@ -57,7 +57,13 @@ def factory_seed() -> None:
 @pytest.fixture
 def live_url(live_server: LiveServer) -> LiveURL:
     """
+    live_url(name: str) -> str
+
     Return the path to a URL.
+
+    Args:
+        name: The URL pattern name.
+
     """
     def live_url_path(name: str) -> str:
         return live_server.url + reverse(name)
