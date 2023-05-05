@@ -1,5 +1,6 @@
 -e .
 -r core.txt
 -r extras/browser.txt
+-r extras/django.txt
 
 logikal-docs==1.1.3
