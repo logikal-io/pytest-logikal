@@ -2,6 +2,7 @@ from itertools import chain
 from pathlib import Path
 from shutil import copy
 from typing import Callable, List, Tuple
+from unittest.mock import patch
 
 import pytest
 from pytest_mock.plugin import MockerFixture
@@ -83,17 +84,12 @@ def test_install_packages(tmp_path: Path) -> None:
     assert (tmp_path / 'node_modules/stylelint').exists()
 
 
-def test_run_without_extras(pytester: pytest.Pytester, mocker: MockerFixture) -> None:
-    args = PYTEST_ARGS + ['--no-cov']  # avoids coverage "no data to report" warning
-    find_spec = mocker.patch('pytest_logikal.core.find_spec')
-
-    find_spec.side_effect = lambda module: module != 'selenium'  # selenium extra missing
-    result = pytester.runpytest(*args)
-    assert result.parseoutcomes() == {}
-
-    find_spec.side_effect = lambda module: module != 'pytest_django'  # django extra missing
-    result = pytester.runpytest(*args, *[f'--no-{plugin}' for plugin in core.PLUGINS['django']])
-    assert result.parseoutcomes() == {}
+def test_run_without_extras(mocker: MockerFixture) -> None:
+    for extra in core.EXTRAS:
+        with patch.dict(core.EXTRAS, {extra: False}):
+            pluginmanager = mocker.Mock()
+            core.pytest_addhooks(pluginmanager)
+            assert pluginmanager.set_blocked.called
 
 
 def load_initial_conftests(

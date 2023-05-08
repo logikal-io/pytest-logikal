@@ -29,6 +29,10 @@ DEFAULT_INI_OPTIONS: Dict[str, Any] = {
     'max_complexity': {'value': 10, 'help': 'the maximum complexity to allow'},
     'cov_fail_under': {'value': 100, 'help': 'target coverage percentage'},
 }
+EXTRAS = {
+    'browser': bool(find_spec('selenium')),
+    'django': bool(find_spec('pytest_django')),
+}
 
 ReportInfoType = Tuple[Union[os.PathLike, str], Optional[int], str]
 
@@ -48,22 +52,23 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
-    group.addoption('--no-django', action='store_true', help='do not run django migration checks')
-    group.addoption('--no-html', action='store_true', help='do not run html template checks')
-    group.addoption('--no-css', action='store_true', help='do not run css checks')
-    group.addoption('--no-svg', action='store_true', help='do not run svg checks')
-    group.addoption('--no-js', action='store_true', help='do not run js checks')
-    group.addoption('--no-install', action='store_true', help='do not install packages')
+    if EXTRAS['django']:
+        group.addoption('--no-django', action='store_true', help='do not run django checks')
+        group.addoption('--no-html', action='store_true', help='do not run html template checks')
+        group.addoption('--no-css', action='store_true', help='do not run css checks')
+        group.addoption('--no-svg', action='store_true', help='do not run svg checks')
+        group.addoption('--no-js', action='store_true', help='do not run js checks')
+        group.addoption('--no-install', action='store_true', help='do not install packages')
+
     for option, entry in DEFAULT_INI_OPTIONS.items():
         parser.addini(option, default=str(entry['value']), help=entry['help'])
 
 
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
-    if not find_spec('selenium'):
-        pluginmanager.set_blocked('logikal_browser')
-    if not find_spec('pytest_django'):
-        for plugin in PLUGINS['django']:
-            pluginmanager.set_blocked(f'logikal_{plugin}')
+    for extra, installed in EXTRAS.items():
+        if not installed:
+            for plugin in PLUGINS.get(extra, [extra]):
+                pluginmanager.set_blocked(f'logikal_{plugin}')
 
 
 # Untyped decorator (see https://github.com/pytest-dev/pytest/issues/7469)
@@ -86,7 +91,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
     if '-n' not in args:
         args.extend(['-n', 'auto' if '--live' not in args else '0'])
         namespace.dist = 'load' if '--live' not in args else 'no'
-    for plugin in chain.from_iterable(PLUGINS.values()):
+    for plugin in chain(*(plugins for name, plugins in PLUGINS.items() if EXTRAS.get(name, True))):
         if '--fast' not in args and f'--no-{plugin}' not in args:
             args.append(f'--{plugin}')
             setattr(namespace, plugin, True)
@@ -126,7 +131,7 @@ def install_packages(node_prefix: Optional[Path] = None) -> None:
 
 def pytest_configure(config: pytest.Config) -> None:
     # Installing Node.js packages
-    if find_spec('pytest_django') and not config.getoption('no_install'):
+    if EXTRAS['django'] and not config.getoption('no_install'):
         install_packages()
 
     # Clearing cache
@@ -136,22 +141,20 @@ def pytest_configure(config: pytest.Config) -> None:
         shutil.rmtree('.pytest_cache', ignore_errors=True)
         shutil.rmtree('.mypy_cache', ignore_errors=True)
 
-    # Hiding overly verbose debug and info log messages
+    # Hiding information
     if not config.getoption('verbose'):
+        # Hiding overly verbose debug and info log messages
+        logging.getLogger('django_migration_linter').setLevel(logging.WARNING)
+        logging.getLogger('docker').setLevel(logging.INFO)
         logging.getLogger('faker').setLevel(logging.INFO)
         logging.getLogger('filelock').setLevel(logging.WARNING)
+        logging.getLogger('matplotlib').setLevel(logging.INFO)
         logging.getLogger('PIL').setLevel(logging.INFO)
         logging.getLogger('pydocstyle').setLevel(logging.WARNING)
-        logging.getLogger('matplotlib').setLevel(logging.INFO)
-        logging.getLogger('django_migration_linter').setLevel(logging.WARNING)
-
-        # Hiding validator log messages
-        logging.getLogger('docker').setLevel(logging.INFO)
-        logging.getLogger('urllib3').setLevel(logging.INFO)
         logging.getLogger('pytest_logikal.validator').setLevel(logging.INFO)
+        logging.getLogger('urllib3').setLevel(logging.INFO)
 
-    # Hiding worker information lines
-    if not config.getoption('verbose'):
+        # Hiding worker information lines
         config.pluginmanager.get_plugin('reports').getworkerinfoline = lambda *_args, **_kwargs: ''
 
     # Configuring mypy
