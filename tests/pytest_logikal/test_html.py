@@ -15,5 +15,6 @@ def test_htmlj_template_item_run(plugin_item: Callable[..., Item]) -> None:
     )
     with raises(ItemRunError) as error:
         item.runtest()
-    error.match('\n\\x1b\\[32m\\+  </html>')  # formatting error
+    # Note: format checking is disabled
+    # error.match('\n\\x1b\\[32m\\+  </html>')  # formatting error
     error.match('10:0: error: Tag seems to be an orphan\\. \\(H025\\)')  # linting error
