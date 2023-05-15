@@ -60,6 +60,7 @@ class HTMLTemplateItem(CachedFileCheckItem):
         # Lint
         ignore = [
             'H023',  # we allow some entity references (e.g. quotes, special spaces, dashes)
+            'H031',  # meta keywords are not that useful anymore
             'J004', 'J018',  # we have our own functions for Jinja environments
             'T002',  # we always use single quotes
             'T003',  # we don't mandate named end blocks
