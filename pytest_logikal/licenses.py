@@ -42,7 +42,7 @@ ALLOWED_PACKAGES = {
     'Pillow': 'Historical Permission Notice and Disclaimer (HPND)',  # license is BSD-like
     'pylint': 'GNU General Public License v2 (GPLv2)',  # only used as a local tool
     'pylint-django': 'GPLv2',  # only used as a local tool plugin
-    'pylint-plugin-utils': 'GPLv2',  # only used as a local tool plugin
+    'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local tool plugin
     'python-lsp-jsonrpc': 'UNKNOWN',  # license is MIT
 }
 # [1] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
