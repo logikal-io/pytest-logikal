@@ -17,6 +17,7 @@ from pytest_logikal.core import DEFAULT_INI_OPTIONS, PYPROJECT
 logger = getLogger(__name__)
 
 Function = TypeVar('Function', bound=Callable[..., Any])
+Fixture = Callable[[Function], Function]
 
 
 def get_ini_option(name: str) -> Any:

@@ -36,4 +36,10 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'website.User'
 
 # Internationalization
+LANGUAGES = [
+    ('en-us', 'English (United States)'),
+    ('en-gb', 'English (United Kingdom)'),
+]
+LANGUAGE_CODE = 'en-us'
 USE_TZ = True  # this can be removed in Django 5+
+TIME_ZONE = 'Europe/Zurich'
