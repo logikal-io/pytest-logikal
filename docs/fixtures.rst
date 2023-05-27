@@ -26,3 +26,29 @@ The :ref:`django extra <index:django>` provides a new :func:`live_url
 <pytest_logikal.django.live_url>` fixture:
 
 .. autofunction:: pytest_logikal.django.live_url
+
+language
+--------
+The :ref:`django extra <index:django>` also provides the :func:`language
+<pytest_logikal.django.language>` fixture:
+
+.. autofunction:: pytest_logikal.django.language
+
+You may control the language for a specific test with the :func:`set_language
+<pytest_logikal.django.set_language>` or :func:`all_languages
+<pytest_logikal.django.all_languages>` decorators:
+
+.. autodecorator:: pytest_logikal.django.set_language
+.. autodecorator:: pytest_logikal.django.all_languages
+
+timezone
+--------
+The :ref:`django extra <index:django>` also provides the :func:`timezone
+<pytest_logikal.django.timezone>` fixture:
+
+.. autofunction:: pytest_logikal.django.timezone
+
+You may control the time zone for a specific test with the :func:`set_timezone
+<pytest_logikal.django.set_timezone>` decorator:
+
+.. autodecorator:: pytest_logikal.django.set_timezone

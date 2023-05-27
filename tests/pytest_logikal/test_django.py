@@ -4,12 +4,16 @@ from typing import Callable, Type
 
 from django.apps import AppConfig, apps
 from django.conf import Settings
+from django.utils.timezone import get_current_timezone_name
+from django.utils.translation import get_language
 from faker.proxy import Faker
 from pytest import mark, raises
 from pytest_factoryboy import register
 from pytest_mock import MockerFixture
 
-from pytest_logikal import django
+from pytest_logikal.django import (
+    MigrationItem, MigrationPlugin, all_languages, set_language, set_timezone,
+)
 from pytest_logikal.plugin import Item, ItemRunError
 from tests.pytest_logikal import factories
 from tests.pytest_logikal.conftest import FILES_DIR
@@ -53,6 +57,29 @@ def test_factories_again(  # pylint: disable=unused-argument
     assert project_factory().name == 'Expedite Proactive Schemas'
 
 
+def test_language_fixture_without_decorator(language: str) -> None:
+    assert language == 'en-us'
+
+
+@set_language('en-us', 'en-gb')
+def test_set_language(language: str) -> None:
+    assert get_language() == language
+
+
+@all_languages()
+def test_all_languages(language: str) -> None:
+    assert get_language() == language
+
+
+def test_timezone_fixture_without_decorator(timezone: str) -> None:
+    assert timezone == 'Europe/Zurich'
+
+
+@set_timezone('Europe/London', 'America/New_York')
+def test_set_timezone(timezone: str) -> None:
+    assert get_current_timezone_name() == timezone
+
+
 def test_migration_item_run(
     mocker: MockerFixture,
     plugin_item: Callable[..., Item],
@@ -60,7 +87,7 @@ def test_migration_item_run(
 ) -> None:
     # Create migration file
     invalid_migration = (FILES_DIR / 'invalid_migration.py').read_text()
-    item = plugin_item(plugin=django.MigrationPlugin, item=django.MigrationItem, file_contents={
+    item = plugin_item(plugin=MigrationPlugin, item=MigrationItem, file_contents={
         'app/__init__.py': '',
         'app/migrations/__init__.py': '',
         'app/migrations/0001_invalid.py': invalid_migration,

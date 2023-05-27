@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from importlib import import_module
 from operator import itemgetter
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Iterator, Optional, TypeVar, Union, cast
+from typing import Any, Dict, Iterable, Iterator, Optional, TypeVar, Union, cast
 
 import pytest
 from selenium.common.exceptions import SessionNotCreatedException
@@ -14,11 +14,10 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as Chrome
 
 from pytest_logikal.core import PYPROJECT
-from pytest_logikal.utils import Function, assert_image_equal
+from pytest_logikal.utils import Fixture, Function, assert_image_equal
 
 logger = logging.getLogger(__name__)
 
-Fixture = Callable[[Function], Function]
 Setting = TypeVar('Setting')
 
 
