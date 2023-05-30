@@ -22,7 +22,7 @@ PLUGINS = {
     'core': [
         'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
     ],
-    'django': ['django', 'html', 'css', 'svg', 'js'],
+    'django': ['migration', 'translations', 'html', 'css', 'svg', 'js'],
 }
 DEFAULT_INI_OPTIONS: Dict[str, Any] = {
     'max_line_length': {'value': 99, 'help': 'the maximum line length to use'},
@@ -53,7 +53,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
     if EXTRAS['django']:
-        group.addoption('--no-django', action='store_true', help='do not run django checks')
+        group.addoption('--no-migration', action='store_true', help='do not check migrations')
+        group.addoption('--no-translations', action='store_true', help='do not check translations')
         group.addoption('--no-html', action='store_true', help='do not run html template checks')
         group.addoption('--no-css', action='store_true', help='do not run css checks')
         group.addoption('--no-svg', action='store_true', help='do not run svg checks')
@@ -67,6 +68,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
     for extra, installed in EXTRAS.items():
         if not installed:
+            pluginmanager.set_blocked(f'logikal_{extra}')
             for plugin in PLUGINS.get(extra, [extra]):
                 pluginmanager.set_blocked(f'logikal_{plugin}')
 

@@ -7,15 +7,15 @@ from pytest_logikal.plugin import ItemRunError
 from pytest_logikal.validator import Validator
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    group = parser.getgroup('svg')
+    group.addoption('--svg', action='store_true', default=False, help='run svg checks')
+
+
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line('markers', 'svg: checks SVG files.')
     if config.option.svg:
         config.pluginmanager.register(SVGPlugin(config=config))
-
-
-def pytest_addoption(parser: pytest.Parser) -> None:
-    group = parser.getgroup('svg')
-    group.addoption('--svg', action='store_true', default=False, help='run svg checks')
 
 
 class SVGItem(CachedFileCheckItem):

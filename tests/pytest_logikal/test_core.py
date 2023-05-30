@@ -14,7 +14,7 @@ PYTEST_ARGS = [
     '--assert', 'plain',  # modules are already imported so assertions cannot be rewritten
     '--no-licenses',  # no need to check licenses here again
     '--no-install',  # do not install packages
-    '-p', 'no:django', '--no-django', '--no-html',  # settings module is not available
+    '-p', 'no:django', '--no-migration', '--no-html',  # no settings module
 ]
 
 

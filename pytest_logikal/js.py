@@ -9,15 +9,15 @@ from pytest_logikal.plugin import ItemRunError
 from pytest_logikal.utils import get_ini_option
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    group = parser.getgroup('js')
+    group.addoption('--js', action='store_true', default=False, help='run js checks')
+
+
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line('markers', 'js: checks JS files.')
     if config.option.js:
         config.pluginmanager.register(JSPlugin(config=config))
-
-
-def pytest_addoption(parser: pytest.Parser) -> None:
-    group = parser.getgroup('js')
-    group.addoption('--js', action='store_true', default=False, help='run js checks')
 
 
 class JSItem(CachedFileCheckItem):
