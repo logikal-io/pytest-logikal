@@ -10,15 +10,15 @@ from pytest_logikal.utils import get_ini_option, render_template
 from pytest_logikal.validator import Validator
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    group = parser.getgroup('css')
+    group.addoption('--css', action='store_true', default=False, help='run css checks')
+
+
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line('markers', 'css: checks CSS files.')
     if config.option.css:
         config.pluginmanager.register(CSSPlugin(config=config))
-
-
-def pytest_addoption(parser: pytest.Parser) -> None:
-    group = parser.getgroup('css')
-    group.addoption('--css', action='store_true', default=False, help='run css checks')
 
 
 class CSSItem(CachedFileCheckItem):

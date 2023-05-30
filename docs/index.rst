@@ -49,6 +49,7 @@ The ``django`` extra provides additional checks:
 - JavaScript style checks and linting (via `ESLint <https://eslint.org/>`_)
 - Django migration linting (via `Django migration linter
   <https://github.com/3YOURMIND/django-migration-linter>`_)
+- Translation file checks (via `Babel <https://babel.pocoo.org/>`_)
 
 The checks are configured to be strict, and all checks and tests are distributed across multiple
 CPUs by default (via `pytest-xdist <https://pytest-xdist.readthedocs.io/>`_).

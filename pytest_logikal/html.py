@@ -9,19 +9,18 @@ from pytest_logikal.plugin import ItemRunError
 from pytest_logikal.utils import get_ini_option
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    group = parser.getgroup('html')
+    group.addoption('--html', action='store_true', default=False, help='run html template checks')
+
+
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line('markers', 'html: checks HTML templates.')
     if config.option.html:
         config.pluginmanager.register(HTMLTemplatePlugin(config=config))
 
 
-def pytest_addoption(parser: pytest.Parser) -> None:
-    group = parser.getgroup('html')
-    group.addoption('--html', action='store_true', default=False, help='run html template checks')
-
-
 # Note: we disabled format checking until some issues are resolved
-# (see https://github.com/Riverside-Healthcare/djLint/issues/635)
 # (see https://github.com/Riverside-Healthcare/djLint/issues/636)
 # (see https://github.com/Riverside-Healthcare/djLint/issues/637)
 # Note: the related test is also disabled (see tests/pytest_logikal/test_html.py
