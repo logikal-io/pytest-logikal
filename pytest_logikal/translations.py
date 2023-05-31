@@ -1,8 +1,9 @@
+from itertools import permutations
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Tuple, Union
 
 import pytest
-from babel.messages import mofile, pofile
+from babel.messages import Catalog, Message, mofile, pofile
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
@@ -20,6 +21,44 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(TranslationPlugin(config=config))
 
 
+def _get_message_context(message: Message) -> Optional[Union[str, bytes]]:
+    if isinstance(message.context, bytes):
+        return message.context.decode('utf-8')  # type: ignore[unreachable]
+    if isinstance(message.context, str):
+        return message.context.encode()
+    return message.context
+
+
+def _get_message_string(message: Message) -> Union[str, Tuple[str]]:
+    if isinstance(message.string, list):
+        return tuple(message.string)  # type: ignore[return-value]
+    return message.string  # type: ignore[return-value]
+
+
+def _message_in_catalog(message: Message, catalog: Catalog) -> bool:
+    catalog_message = catalog.get(
+        id=message.id,
+        context=_get_message_context(message),  # type: ignore[arg-type]
+    )
+    return (
+        catalog_message is not None
+        and _get_message_string(message) == _get_message_string(catalog_message)
+        and message.flags == catalog_message.flags
+    )
+
+
+def _catalogs_identical(catalog: Catalog, compiled_catalog: Catalog) -> bool:
+    if dict(catalog.mime_headers) != dict(compiled_catalog.mime_headers):
+        return False
+    for catalog_1, catalog_2 in permutations([catalog, compiled_catalog]):
+        for message in catalog_1:
+            if not message.id:
+                continue
+            if not _message_in_catalog(message, catalog_2):
+                return False
+    return True
+
+
 class TranslationItem(CachedFileCheckItem):
     plugin: 'TranslationPlugin'
 
@@ -34,7 +73,7 @@ class TranslationItem(CachedFileCheckItem):
         if compiled_path.exists():
             with open(compiled_path, mode='rb') as compiled_catalog_file:
                 compiled_catalog = mofile.read_mo(compiled_catalog_file)
-            if not compiled_catalog.is_identical(catalog):
+            if not _catalogs_identical(catalog, compiled_catalog):
                 errors.append(f'error: Compiled translation file "{compiled_path}" is outdated')
         else:
             errors.append(f'error: Compiled translation file "{compiled_path}" does not exist')

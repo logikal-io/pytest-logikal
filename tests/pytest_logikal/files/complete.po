@@ -1,12 +1,10 @@
-# Outdated translation file
-# Outdated header: used PO-Revision-Date: 2023-05-26
-# Outdated message: used msgstr "translated old"
+# Incomplete translation file
 msgid ""
 msgstr ""
 "Project-Id-Version: project v1.0.0\n"
 "Report-Msgid-Bugs-To: Gergely Kalmár <contact@logikal.io>\n"
 "POT-Creation-Date: 2023-05-25 22:33+0200\n"
-"PO-Revision-Date: 2023-05-28 11:22+0200\n"
+"PO-Revision-Date: 2023-05-26 11:22+0200\n"
 "Last-Translator: Gergely Kalmár <contact@logikal.io>\n"
 "Language: en_GB\n"
 "Language-Team: en_GB <en-gb@example.org>\n"
@@ -16,5 +14,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
 
-msgid "translated"
-msgstr "translated"
+msgid "color"
+msgstr "colour"
+
+#. This is a translator comment
+#: project/localization.html.j:42
+#, python-format
+msgctxt "test"
+msgid "%(num)d color"
+msgid_plural "%(num)d colors"
+msgstr[0] "%(num)d colour"
+msgstr[1] "%(num)d colours"
