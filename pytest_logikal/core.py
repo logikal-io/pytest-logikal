@@ -155,6 +155,7 @@ def pytest_configure(config: pytest.Config) -> None:
         logging.getLogger('pydocstyle').setLevel(logging.WARNING)
         logging.getLogger('pytest_logikal.validator').setLevel(logging.INFO)
         logging.getLogger('urllib3').setLevel(logging.INFO)
+        logging.getLogger('pydocstyle').setLevel(logging.ERROR)
 
         # Hiding worker information lines
         config.pluginmanager.get_plugin('reports').getworkerinfoline = lambda *_args, **_kwargs: ''

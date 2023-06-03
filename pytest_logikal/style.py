@@ -49,7 +49,11 @@ class StyleItem(CachedFileCheckItem):
         if code_errors:
             messages.append(code_stdout.getvalue().rstrip())
         if doc_errors:
-            messages.extend(f'{e.line}: error: {e.short_desc} ({e.code})' for e in doc_errors)
+            messages.extend(
+                f'{error.line}: error: {error.short_desc} ({error.code})'
+                if isinstance(error, pydocstyle.violations.Error) else f'error: {error}'
+                for error in doc_errors
+            )
         if messages:
             raise ItemRunError('\n'.join(messages))
 

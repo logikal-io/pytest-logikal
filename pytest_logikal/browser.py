@@ -12,6 +12,7 @@ import pytest
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as Chrome
+from selenium.webdriver.common.by import By
 
 from pytest_logikal.core import PYPROJECT
 from pytest_logikal.utils import Fixture, Function, assert_image_equal
@@ -155,7 +156,19 @@ class Browser:
             return
         logger.debug('Using full page height')
         original_size = self.driver.get_window_size()
-        script = 'return document.body.parentNode.scrollHeight'
+        # We make sure html and body are there before running the height retrieval script
+        self.driver.find_element(by=By.TAG_NAME, value='html')
+        self.driver.find_element(by=By.TAG_NAME, value='body')
+        script = """
+            return Math.max(
+                document.body.clientHeight,
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.clientHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight,
+            );
+        """
         height = self.driver.execute_script(script)  # type: ignore[no-untyped-call]
         self.driver.set_window_size(original_size['width'], height)
         try:
