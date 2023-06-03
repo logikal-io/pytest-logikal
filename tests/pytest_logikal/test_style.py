@@ -19,3 +19,9 @@ def test_run(plugin_item: Callable[..., Item]) -> None:
     )
     with raises(ItemRunError, match=error):
         item.runtest()
+
+
+def test_parse_error(plugin_item: Callable[..., Item]) -> None:
+    item = plugin_item(plugin=StylePlugin, item=StyleItem, file_contents='Syntax error')
+    with raises(ItemRunError, match='error: Cannot parse file'):
+        item.runtest()

@@ -38,7 +38,8 @@ class JSItem(CachedFileCheckItem):
             if report['messages']:
                 raise ItemRunError('\n'.join(
                     f'{error["line"]}:{error["column"]}: {severity[error["severity"]]}: '
-                    f'{error["message"]} ({error["ruleId"]})'
+                    + f'{error["message"]}'
+                    + (f' ({error["ruleId"]})' if error['ruleId'] else '')
                     for error in report['messages']
                 ))
         except json.decoder.JSONDecodeError as error:
