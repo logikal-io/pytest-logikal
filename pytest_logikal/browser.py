@@ -6,13 +6,13 @@ from contextlib import contextmanager
 from importlib import import_module
 from operator import itemgetter
 from pathlib import Path
+from time import sleep
 from typing import Any, Dict, Iterable, Iterator, Optional, TypeVar, Union, cast
 
 import pytest
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as Chrome
-from selenium.webdriver.common.by import By
 
 from pytest_logikal.core import PYPROJECT
 from pytest_logikal.utils import Fixture, Function, assert_image_equal
@@ -150,46 +150,52 @@ class Browser:
         return getattr(self.driver, name)
 
     @contextmanager
-    def auto_height(self) -> Iterator[None]:
+    def auto_height(self, wait_milliseconds: Optional[int]) -> Iterator[None]:
         if self.settings.height != BrowserSettings.UNLIMITED_HEIGHT:
             yield
             return
         logger.debug('Using full page height')
         original_size = self.driver.get_window_size()
-        # We make sure html and body are there before running the height retrieval script
-        self.driver.find_element(by=By.TAG_NAME, value='html')
-        self.driver.find_element(by=By.TAG_NAME, value='body')
-        script = """
-            return Math.max(
-                document.body.clientHeight,
-                document.body.scrollHeight,
-                document.body.offsetHeight,
-                document.documentElement.clientHeight,
-                document.documentElement.scrollHeight,
-                document.documentElement.offsetHeight,
-            );
-        """
+        if wait_milliseconds:  # we use a small delay to mitigate height flakiness
+            logger.debug(f'Waiting {wait_milliseconds} ms')
+            sleep(wait_milliseconds / 1000)
+        elements = [
+            'document.body.clientHeight',
+            'document.body.scrollHeight',
+            'document.body.offsetHeight',
+            'document.documentElement.clientHeight',
+            'document.documentElement.scrollHeight',
+            'document.documentElement.offsetHeight',
+        ]
+        script = f'return Math.max({",".join(elements)});'
         height = self.driver.execute_script(script)  # type: ignore[no-untyped-call]
+        logger.debug(f'Calculated page height: {height}')
         self.driver.set_window_size(original_size['width'], height)
         try:
             yield
         finally:
             self.driver.set_window_size(**original_size)
 
-    def check(self, name: Optional[str] = None) -> None:
+    def check(self, name: Optional[str] = None, wait_milliseconds: Optional[int] = 100) -> None:
         """
         Create a screenshot and check it against an expected version.
 
         Args:
             name: The name of the expected screenshot.
+            wait_milliseconds: The milliseconds to wait before calculating the screenshot height
+                for unlimited height checks.
 
         """
         name_parts = [self.screenshot_path.name, self.name, name]
         full_name = '_'.join(part for part in name_parts if part is not None)
         expected = self.screenshot_path.with_name(full_name).with_suffix('.png')
-        with self.auto_height():
-            # Note: we are disabling debug remote logs because they contain the verbose image data
+
+        script = 'document.body.style.caretColor = "transparent";'  # hide the blinking caret
+        self.driver.execute_script(script)  # type: ignore[no-untyped-call]
+
+        with self.auto_height(wait_milliseconds=wait_milliseconds):
             logger.debug('Taking screenshot')
+            # Note: we are disabling debug remote logs because they contain the verbose image data
             logging.getLogger('selenium.webdriver.remote').setLevel(logging.INFO)
             screenshot = self.driver.get_screenshot_as_png()
             logging.getLogger('selenium.webdriver.remote').setLevel(logging.DEBUG)

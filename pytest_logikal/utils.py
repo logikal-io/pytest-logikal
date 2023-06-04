@@ -82,11 +82,11 @@ def save_image_prompt(
     if not sys.stdin.isatty():
         error_lines = [
             f'{message} and this is not an interactive session (consider using --live)',
-            f'  Actual: {source}',
-            f'  Expected: {destination}',
+            f'  Actual: file://{source}',
+            f'  Expected: file://{destination}',
         ]
         if difference:
-            error_lines.append(f'  Difference: {difference}')
+            error_lines.append(f'  Difference: file://{difference}')
         raise AssertionError('\n'.join(error_lines))
     try:
         short_destination = destination.relative_to(getcwd())
@@ -97,7 +97,8 @@ def save_image_prompt(
     print(f'\n{colors["red"]}{message}!{colors["reset"]}')
     print(short_destination)
 
-    response = input('> Press "enter" to open or type "s" to skip or "c" to cancel: ')
+    prompt = f'{colors["red"]}>{colors["reset"]} '
+    response = input(f'{prompt}Press "enter" to open or type "s" to skip or "c" to cancel: ')
     if response == 's':
         logger.info('Image opening skipped')
     elif not response:
@@ -106,10 +107,10 @@ def save_image_prompt(
     else:
         raise AssertionError('Image opening cancelled')
 
-    response = input('> Type "accept" to accept this version or press "enter" to reject: ')
+    response = input(f'{prompt}Type "accept" to accept this version or press "enter" to reject: ')
     if response == 'accept':
         destination.parent.mkdir(parents=True, exist_ok=True)
         copy(source, destination)
         logger.info(f'Image saved at "{short_destination}"')
     else:
-        raise AssertionError('Image rejected')
+        raise AssertionError(f'Image rejected (file://{source})')
