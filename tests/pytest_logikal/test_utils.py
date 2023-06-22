@@ -1,11 +1,12 @@
 from pathlib import Path
 
+from logikal_utils.project import PYPROJECT
 from PIL import Image
 from pytest import raises
 from pytest_mock import MockerFixture
 
 from pytest_logikal import utils
-from pytest_logikal.core import DEFAULT_INI_OPTIONS, PYPROJECT
+from pytest_logikal.core import DEFAULT_INI_OPTIONS
 
 
 def test_ini_option(mocker: MockerFixture) -> None:

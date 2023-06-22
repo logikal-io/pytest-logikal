@@ -7,9 +7,10 @@ import pytest
 from django.conf import settings
 from django_migration_linter import MigrationLinter
 from django_migration_linter.management.commands import lintmigrations
+from logikal_utils.project import PYPROJECT
 from pytest_django.plugin import _blocking_manager  # pylint: disable=import-private-name
 
-from pytest_logikal.core import PYPROJECT, ReportInfoType
+from pytest_logikal.core import ReportInfoType
 from pytest_logikal.plugin import Item, ItemRunError, Plugin
 
 

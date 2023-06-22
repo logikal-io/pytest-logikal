@@ -67,7 +67,6 @@ ignore_missing_imports = true
 module = [
   'PIL',  # https://github.com/python-pillow/Pillow/issues/2625
   'django_migration_linter.*',  # https://github.com/3YOURMIND/django-migration-linter/issues/238
-  'docker.*',
   'factory.*',
   'pycodestyle',
   'pydocstyle',

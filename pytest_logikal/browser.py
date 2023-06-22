@@ -10,11 +10,11 @@ from time import sleep
 from typing import Any, Dict, Iterable, Iterator, Optional, TypeVar, Union, cast
 
 import pytest
+from logikal_utils.project import PYPROJECT
 from selenium.common.exceptions import SessionNotCreatedException
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as Chrome
 
-from pytest_logikal.core import PYPROJECT
 from pytest_logikal.utils import Fixture, Function, assert_image_equal
 
 logger = logging.getLogger(__name__)

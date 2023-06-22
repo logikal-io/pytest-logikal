@@ -4,8 +4,8 @@ from io import StringIO
 import pycodestyle
 import pydocstyle
 import pytest
+from logikal_utils.project import PYPROJECT
 
-from pytest_logikal.core import PYPROJECT
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
