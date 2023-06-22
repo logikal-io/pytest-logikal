@@ -2,10 +2,10 @@ import json
 from subprocess import CompletedProcess
 from typing import Callable
 
+from logikal_utils.project import PYPROJECT
 from pytest import raises
 from pytest_mock import MockerFixture
 
-from pytest_logikal.core import PYPROJECT
 from pytest_logikal.licenses import LicenseItem, LicensePlugin
 from pytest_logikal.plugin import ItemRunError
 

@@ -6,7 +6,7 @@ jobs:
     name: Run Python tests
     uses: logikal-io/github-workflows/.github/workflows/run-python-tests.yml@v4
     with:
-      chrome-version: 108.0.5359.94-1
+      chrome-version: 114.0.5735.133-1
     permissions:
       contents: read
       id-token: write

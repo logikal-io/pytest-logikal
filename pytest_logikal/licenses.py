@@ -3,8 +3,9 @@ import subprocess
 from typing import List
 
 import pytest
+from logikal_utils.project import PYPROJECT
 
-from pytest_logikal.core import PYPROJECT, ReportInfoType
+from pytest_logikal.core import ReportInfoType
 from pytest_logikal.plugin import Item, ItemRunError, Plugin
 
 ALLOWED_LICENSES = [

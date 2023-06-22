@@ -10,9 +10,10 @@ from subprocess import run
 from tempfile import TemporaryDirectory
 from typing import Any, Callable, Dict, Generator, Optional, Type, TypeVar
 
+from logikal_utils.project import PYPROJECT
 from PIL import Image, ImageChops
 
-from pytest_logikal.core import DEFAULT_INI_OPTIONS, PYPROJECT
+from pytest_logikal.core import DEFAULT_INI_OPTIONS
 
 logger = getLogger(__name__)
 

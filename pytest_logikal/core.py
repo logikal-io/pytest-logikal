@@ -9,15 +9,10 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
 
 import pytest
-import tomli
 from termcolor import colored
 
 sys.path.insert(0, os.getcwd())
 
-PYPROJECT = (
-    tomli.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
-    if Path('pyproject.toml').exists() else {}
-)
 PLUGINS = {
     'core': [
         'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',

@@ -5,8 +5,7 @@ from typing import List, Optional
 import requests
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-
-from pytest_logikal.docker import Service
+from logikal_utils.docker import Service
 
 logger = getLogger(__name__)
 
