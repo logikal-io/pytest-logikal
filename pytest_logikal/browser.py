@@ -80,7 +80,7 @@ class BrowserSettings:  # pylint: disable=too-many-instance-attributes
     def _setting(
         self, value: Optional[Setting], name: str, default: Optional[Setting] = None,
     ) -> Setting:
-        setting = value if value is not None else self.settings.get(name, default)  # type: ignore
+        setting = value if value is not None else self.settings.get(name, default)
         if default is None and setting is None:
             raise ValueError(f'The browser setting "{name}" must be specified')
         return setting  # type: ignore
