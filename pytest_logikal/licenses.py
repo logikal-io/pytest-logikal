@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 from typing import List
 
@@ -9,42 +10,45 @@ from pytest_logikal.core import ReportInfoType
 from pytest_logikal.plugin import Item, ItemRunError, Plugin
 
 ALLOWED_LICENSES = [
-    '3-Clause BSD License',
-    'Apache 2.0',
-    'Apache License 2.0',
-    'Apache Software License',
-    'BSD 3-Clause',
-    'BSD License',
-    'BSD',
-    'BSD-3-Clause',
-    'GNU Lesser General Public License v2 (LGPLv2)',
-    'GNU Lesser General Public License v2 or later (LGPLv2+)',
-    'GNU Lesser General Public License v3 (LGPLv3)',
-    'GNU Library or Lesser General Public License (LGPL)',
-    'ISC License (ISCL)',
-    'ISC',
-    'MIT License',
-    'MIT No Attribution License (MIT-0)',
-    'MIT',
-    'Mozilla Public License 2.0 (MPL 2.0)',
-    'Public Domain',
-    'Python Software Foundation License',
-    'The MIT License (MIT)',
-    'The Unlicense (Unlicense)',
+    r'^3-Clause BSD License$',
+    r'^Apache 2\.0$',
+    r'^Apache License 2\.0$',
+    r'^Apache License Version 2\.0$',
+    r'^Apache License, Version 2\.0$',
+    r'^Apache Software License$',
+    r'^BSD 3-Clause$',
+    r'^BSD License$',
+    r'^BSD$',
+    r'^BSD-3-Clause$',
+    r'^CC0 1.0 Universal \(CC0 1\.0\) Public Domain Dedication$',
+    r'^GNU Lesser General Public License v2 \(LGPLv2\)$',
+    r'^GNU Lesser General Public License v2 or later \(LGPLv2\+\)$',
+    r'^GNU Lesser General Public License v3 \(LGPLv3\)$',
+    r'^GNU Library or Lesser General Public License \(LGPL\)$',
+    r'^ISC License \(ISCL\)$',
+    r'^ISC$',
+    r'^MIT License$',
+    r'^MIT No Attribution License \(MIT-0\)$',
+    r'^MIT$',
+    r'^Mozilla Public License 2\.0 \(MPL 2\.0\)$',
+    r'^Public Domain$',
+    r'^Python Software Foundation License$',
+    r'^The MIT License \(MIT\)$',
+    r'^The Unlicense \(Unlicense\)$',
 ]
 
 ALLOWED_PACKAGES = {
-    'facebook-business': 'LICENSE.txt',  # only used as a connector
-    'djlint': 'GNU General Public License v3 or later (GPLv3+)',  # only used as a local tool
-    'html-tag-names': 'GNU General Public License v3 or later (GPLv3+)',  # djlint dependency
-    'html-void-elements': 'GNU General Public License v3 or later (GPLv3+)',  # djlint dependency
-    'pkg_resources': 'UNKNOWN',  # caused by an Ubuntu bug, see [1]
-    'pkg-resources': 'UNKNOWN',  # caused by an Ubuntu bug, see [1]
-    'Pillow': 'Historical Permission Notice and Disclaimer (HPND)',  # license is BSD-like
-    'pylint': 'GNU General Public License v2 (GPLv2)',  # only used as a local tool
-    'pylint-django': 'GPLv2',  # only used as a local tool plugin
-    'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local tool plugin
-    'python-lsp-jsonrpc': 'UNKNOWN',  # license is MIT
+    'facebook-business': r'^LICENSE\.txt$',  # only used as a connector
+    'djlint': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # only used as a local tool
+    'html-tag-names': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
+    'html-void-elements': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
+    'pkg-resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [1]
+    'pkg_resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [1]
+    'pillow': r'^Historical Permission Notice and Disclaimer \(HPND\)$',  # license is BSD-like
+    'pylint': r'^GNU General Public License v2 \(GPLv2\)$',  # only used as a local tool
+    'pylint-django': r'^GNU General Public License v2 or later \(GPLv2\+\)$',  # local plugin
+    'pylint-plugin-utils': r'^GNU General Public License v2 or later \(GPLv2\+\)$',  # local plugin
+    'python-lsp-jsonrpc': r'^UNKNOWN$',  # license is MIT
 }
 # [1] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
 
@@ -78,8 +82,17 @@ class LicenseItem(Item):
         for package in sorted(packages, key=lambda item: (item['License'], item['Name'].lower())):
             name, version, url = package['Name'], package.get('Version'), package.get('URL')
             licenses = [license.strip() for license in package['License'].split(';')]
-            allowed_package_license = allowed_packages.get(name) in licenses
-            allowed_license = any(license in allowed_licenses for license in licenses)
+
+            allowed_package_license = any(
+                re.match(allowed_packages[name], license)
+                for license in licenses
+            ) if name in allowed_packages else False
+            allowed_license = any(
+                re.match(allowed_license, license)
+                for license in licenses
+                for allowed_license in allowed_licenses
+            )
+
             if (not allowed_package_license and not allowed_license):
                 url = f' ({url})' if url not in ('UNKNOWN', None) else ''
                 warnings.append(f'Warning: {package["License"]}: {name}=={version}{url}')

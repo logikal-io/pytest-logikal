@@ -1,5 +1,5 @@
 try:
-    import zoneinfo  # type: ignore[import]
+    import zoneinfo  # type: ignore[import-not-found]
 except ImportError:
     from backports import zoneinfo  # note: this is built-in after Python 3.9+
 from typing import Any, Callable, Iterable

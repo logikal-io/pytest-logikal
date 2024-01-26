@@ -11,7 +11,7 @@ from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlug
 from pytest_logikal.plugin import ItemRunError
 
 
-def get_config(max_line_length: int) -> Dict[str, Any]:
+def get_config(max_line_length: int, black_compatible: bool = False) -> Dict[str, Any]:
     config = {
         'py_version': 'auto',
         'line_length': max_line_length,
@@ -22,6 +22,14 @@ def get_config(max_line_length: int) -> Dict[str, Any]:
         'include_trailing_comma': True,
         'color_output': True,
     }
+    if black_compatible:
+        config.update({
+            # See https://pycqa.github.io/isort/docs/configuration/profiles.html
+            # See https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html
+            'multi_line_output': WrapModes.VERTICAL_HANGING_INDENT,  # type: ignore[attr-defined]
+            'ensure_newline_before_comments': True,
+            'split_on_trailing_comma': True,
+        })
     if 'tool' in PYPROJECT and 'isort' in PYPROJECT['tool']:
         for option in config:
             if option in PYPROJECT['tool']['isort']:
@@ -42,7 +50,10 @@ def pytest_configure(config: pytest.Config) -> None:
 
 class IsortItem(CachedFileCheckItem):
     def run(self) -> None:
-        config = get_config(max_line_length=int(self.config.getini('max_line_length')))
+        config = get_config(
+            max_line_length=int(self.config.getini('max_line_length')),
+            black_compatible=getattr(self.config.option, 'black', False),
+        )
         stdout = StringIO()
         if not isort.check_file(filename=str(self.path), show_diff=stdout, **config):
             diff = stdout.getvalue()

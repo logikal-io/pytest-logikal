@@ -24,17 +24,22 @@ def pytest_configure(config: pytest.Config) -> None:
 
 class StyleItem(CachedFileCheckItem):
     def run(self) -> None:
+        messages = []
+
         # Run pycodestyle
-        ignore = ['E133', 'W503']  # mutually exclusive checks with E123 and W504
-        max_line_length = int(self.config.getini('max_line_length'))
-        with redirect_stdout(StringIO()) as code_stdout:
-            code_errors = pycodestyle.Checker(
-                filename=self.path,
-                max_line_length=max_line_length,
-                max_doc_length=max_line_length,
-                format='%(row)s:%(col)s: error: %(text)s (%(code)s)',
-                ignore=PYPROJECT.get('tool', {}).get('pycodestyle', {}).get('ignore', ignore),
-            ).check_all()
+        if not getattr(self.config.option, 'black', False):
+            ignore = ['E133', 'W503']  # mutually exclusive checks with E123 and W504
+            max_line_length = int(self.config.getini('max_line_length'))
+            with redirect_stdout(StringIO()) as code_stdout:
+                code_errors = pycodestyle.Checker(
+                    filename=self.path,
+                    max_line_length=max_line_length,
+                    max_doc_length=max_line_length,
+                    format='%(row)s:%(col)s: error: %(text)s (%(code)s)',
+                    ignore=PYPROJECT.get('tool', {}).get('pycodestyle', {}).get('ignore', ignore),
+                ).check_all()
+            if code_errors:
+                messages.append(code_stdout.getvalue().rstrip())
 
         # Run pydocstyle
         select = pydocstyle.violations.all_errors - {
@@ -42,18 +47,14 @@ class StyleItem(CachedFileCheckItem):
             'D200', 'D203', 'D204', 'D212', 'D406', 'D407', 'D408', 'D409',
         }
         select = PYPROJECT.get('tool', {}).get('pydocstyle', {}).get('select', select)
-        doc_errors = list(pydocstyle.check(filenames=[str(self.path)], select=select))
-
-        # Report errors
-        messages = []
-        if code_errors:
-            messages.append(code_stdout.getvalue().rstrip())
-        if doc_errors:
+        if doc_errors := list(pydocstyle.check(filenames=[str(self.path)], select=select)):
             messages.extend(
                 f'{error.line}: error: {error.short_desc} ({error.code})'
                 if isinstance(error, pydocstyle.violations.Error) else f'error: {error}'
                 for error in doc_errors
             )
+
+        # Report errors
         if messages:
             raise ItemRunError('\n'.join(messages))
 

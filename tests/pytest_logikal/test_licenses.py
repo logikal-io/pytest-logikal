@@ -12,8 +12,8 @@ from pytest_logikal.plugin import ItemRunError
 
 def test_run(plugin_item: Callable[..., LicenseItem], mocker: MockerFixture) -> None:
     mocker.patch.dict(PYPROJECT, {'tool': {'licenses': {
-        'allowed_licenses': ['MIT License'],
-        'allowed_packages': {'pylint': 'GNU General Public License v2 (GPLv2)'},
+        'allowed_licenses': [r'^MIT License$', r'^Partial License v[0-9]+$'],
+        'allowed_packages': {'pylint': r'^GNU General Public License v2 \(GPLv2\)$'},
     }}})
     packages = [
         {'License': 'Other', 'Name': 'other', 'Version': '1.0.0', 'URL': 'https://example.com'},
@@ -21,6 +21,7 @@ def test_run(plugin_item: Callable[..., LicenseItem], mocker: MockerFixture) -> 
         {'License': 'GNU General Public License v2 (GPLv2)', 'Name': 'pylint'},
         {'License': 'GPLv2', 'Name': 'pylint-django'},
         {'License': 'MIT License', 'Name': 'allowed'},
+        {'License': 'Partial License v1', 'Name': 'partial'},
     ]
     result = CompletedProcess(args=[], returncode=0, stdout=json.dumps(packages))
     mocker.patch('pytest_logikal.licenses.subprocess.run', return_value=result)
