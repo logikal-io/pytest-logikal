@@ -49,9 +49,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
 
-    if EXTRAS['black']:
-        group.addoption('--no-black', action='store_true', help='do not run black')
-
     if EXTRAS['django']:
         group.addoption('--no-migration', action='store_true', help='do not check migrations')
         group.addoption('--no-translations', action='store_true', help='do not check translations')
