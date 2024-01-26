@@ -3,6 +3,7 @@ coverage[toml]==7.4.0
 isort[colors]==5.13.2
 mypy==1.8.0
 pip-licenses==4.3.4
+pluggy==1.3.0  # see https://github.com/realpython/pytest-mypy/issues/161
 pycodestyle==2.11.1
 pydocstyle[toml]==6.3.0
 pylint==3.0.3
