@@ -25,11 +25,12 @@ DEFAULT_INI_OPTIONS: Dict[str, Any] = {
     'cov_fail_under': {'value': 100, 'help': 'target coverage percentage'},
 }
 EXTRAS = {
+    'black': bool(find_spec('black')),
     'browser': bool(find_spec('selenium')),
     'django': bool(find_spec('pytest_django')),
 }
 
-ReportInfoType = Tuple[Union[os.PathLike, str], Optional[int], str]
+ReportInfoType = Tuple[Union[Any, str], Optional[int], str]
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -47,6 +48,10 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
+
+    if EXTRAS['black']:
+        group.addoption('--no-black', action='store_true', help='do not run black')
+
     if EXTRAS['django']:
         group.addoption('--no-migration', action='store_true', help='do not check migrations')
         group.addoption('--no-translations', action='store_true', help='do not check translations')
@@ -61,6 +66,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
+    # Block uninstalled extra plugins
     for extra, installed in EXTRAS.items():
         if not installed:
             pluginmanager.set_blocked(f'logikal_{extra}')
@@ -68,8 +74,7 @@ def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
                 pluginmanager.set_blocked(f'logikal_{plugin}')
 
 
-# Untyped decorator (see https://github.com/pytest-dev/pytest/issues/7469)
-@pytest.hookimpl(hookwrapper=True)  # type: ignore[misc]
+@pytest.hookimpl(hookwrapper=True)
 def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) -> Iterator[None]:
     if '--no-defaults' in args:
         yield
@@ -151,13 +156,15 @@ def pytest_configure(config: pytest.Config) -> None:
         logging.getLogger('pytest_logikal.validator').setLevel(logging.INFO)
         logging.getLogger('urllib3').setLevel(logging.INFO)
         logging.getLogger('pydocstyle').setLevel(logging.ERROR)
+        logging.getLogger('blib2to3').setLevel(logging.WARNING)  # used by Black
 
         # Hiding worker information lines
-        config.pluginmanager.get_plugin('reports').getworkerinfoline = lambda *_args, **_kwargs: ''
+        reports = config.pluginmanager.get_plugin('reports')
+        reports.getworkerinfoline = lambda *_args, **_kwargs: ''  # type: ignore[union-attr]
 
     # Configuring mypy
     mypy = config.pluginmanager.get_plugin('mypy')
-    mypy.mypy_argv = [
+    mypy.mypy_argv = [  # type: ignore[union-attr]
         '--no-error-summary',
         '--strict',
         '--show-column-numbers',
@@ -171,8 +178,7 @@ def unified_reportinfo(item: pytest.Item, header: str) -> Callable[[], ReportInf
     return reportinfo
 
 
-# Untyped decorator (see https://github.com/pytest-dev/pytest/issues/7469)
-@pytest.hookimpl(trylast=True)  # type: ignore[misc]
+@pytest.hookimpl(trylast=True)
 def pytest_collection_modifyitems(items: List[pytest.Item]) -> None:
     for item in items:
         source = item.nodeid.split('::')[-1].lower()

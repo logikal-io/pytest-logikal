@@ -37,6 +37,7 @@ entry-points = {file = 'entry_points.ini'}
 dependencies = {file = 'requirements/core.txt'}
 
 [tool.setuptools.dynamic.optional-dependencies]
+black = {file = 'requirements/extras/black.txt'}
 browser = {file = 'requirements/extras/browser.txt'}
 django = {file = 'requirements/extras/django.txt'}
 
@@ -55,6 +56,7 @@ norecursedirs = [
   'tests/pytest_logikal/files',  # ignore files used inside plugin runs
 ]
 filterwarnings = [
+  'error',
   # Can be removed with the next release of django-migration-linter
   "ignore:unclosed file .* name='/dev/null':ResourceWarning",
 ]

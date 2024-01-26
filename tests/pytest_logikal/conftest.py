@@ -11,7 +11,12 @@ from pytest_logikal import core, file_checker, plugin as pytest_logikal_plugin
 FILES_DIR = Path(__file__).parent / 'files'
 
 # Reload modules to ensure coverage captures definitions (order is important)
-MODULES = ['core', 'file_checker', 'plugin', 'browser', 'utils', 'validator']
+MODULES = [
+    # Core modules
+    'core', 'file_checker', 'plugin',
+    # Additional modules
+    'black', 'browser', 'utils', 'validator',
+]
 for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):
     if submodule == 'mypy':
         continue
@@ -68,6 +73,8 @@ def plugin_item(
         config.getini = inicfg.get
         config.invocation_params.dir = path.parent
         config.rootpath = pytestconfig.rootpath
+        config.stash = pytestconfig.stash
+        config.option = pytestconfig.option
 
         plugin_obj = plugin(config=config)
         parent = mocker.Mock(nodeid='parent', config=plugin_obj.config, path=path)

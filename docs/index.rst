@@ -51,6 +51,10 @@ The ``django`` extra provides additional checks:
   <https://github.com/3YOURMIND/django-migration-linter>`_)
 - Translation file checks (via `Babel <https://babel.pocoo.org/>`_)
 
+The ``black`` extra provides even further checks:
+
+- Standardized code style and formatting checks (via `Black <https://black.readthedocs.io/>`_)
+
 The checks are configured to be strict, and all checks and tests are distributed across multiple
 CPUs by default (via `pytest-xdist <https://pytest-xdist.readthedocs.io/>`_).
 
@@ -67,6 +71,20 @@ various pytest plugins more consistent.
 
 Extras
 ------
+black
+~~~~~
+The ``black`` extra adds code style and formatting checks:
+
+.. code-block:: shell
+
+    pip install pytest-logikal[black]
+
+.. note:: We don't use the Black standard style at Logikal because it forces function arguments to
+    be overly terse occasionally, and because it prefers to enforce a double-quoted style for
+    strings. We prefer using single quotes as they typically put less strain on the hand during
+    typing, and as strings are typed and edited very often we believe this process should be as
+    seamless as possible.
+
 browser
 ~~~~~~~
 The ``browser`` extra installs `Selenium <https://www.selenium.dev/>`_ and provides the
@@ -128,10 +146,12 @@ the license checker plugin as follows:
 .. code-block:: toml
 
     [tool.licenses]
-    extend_allowed_licenses = ['Allowed License']
+    extend_allowed_licenses = ['^Allowed License$']
 
     [tool.licenses.extend_allowed_packages]
-    package = 'Package License'
+    package = '^Package License$'
 
-You can also override the default licenses and packages (instead of extending them) via the
-``tool.licenses.allowed_licenses`` and ``tool.licenses.allowed_packages`` options.
+Note that the licenses are Python regular expressions that are matched from the beginning of the
+actual license string. You can also override the default licenses and packages (instead of
+extending them) via the ``tool.licenses.allowed_licenses`` and ``tool.licenses.allowed_packages``
+options.

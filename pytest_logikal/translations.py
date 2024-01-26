@@ -31,7 +31,7 @@ def _get_message_context(message: Message) -> Optional[Union[str, bytes]]:
 
 def _get_message_string(message: Message) -> Union[str, Tuple[str]]:
     if isinstance(message.string, list):
-        return tuple(message.string)  # type: ignore[return-value]
+        return tuple(message.string)
     return message.string  # type: ignore[return-value]
 
 

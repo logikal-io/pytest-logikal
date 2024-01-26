@@ -8,7 +8,7 @@ from django.conf import settings
 from django_migration_linter import MigrationLinter
 from django_migration_linter.management.commands import lintmigrations
 from logikal_utils.project import PYPROJECT
-from pytest_django.plugin import _blocking_manager  # pylint: disable=import-private-name
+from pytest_django.plugin import blocking_manager_key
 
 from pytest_logikal.core import ReportInfoType
 from pytest_logikal.plugin import Item, ItemRunError, Plugin
@@ -28,9 +28,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 class MigrationItem(Item):
     def runtest(self, migrations_file_path: Optional[Path] = None) -> None:
-        # We cannot request a fixture here, so we use the blocking manager directly
-        # See https://github.com/pytest-dev/pytest/discussions/10915
-        with _blocking_manager.unblock():
+        with self.config.stash[blocking_manager_key].unblock():
             linter = MigrationLinter(**{
                 'all_warnings_as_errors': True,
                 **getattr(settings, 'MIGRATION_LINTER_OPTIONS', {}),

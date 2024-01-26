@@ -23,8 +23,6 @@ class PylintItem(CachedFileCheckItem):
     def run(self) -> None:
         plugins = [
             'pylint.extensions.code_style',
-            'pylint.extensions.emptystring',
-            'pylint.extensions.comparetozero',
             'pylint.extensions.comparison_placement',
             'pylint.extensions.confusing_elif',
             'pylint.extensions.for_any_all',
@@ -50,13 +48,21 @@ class PylintItem(CachedFileCheckItem):
             '--init-hook=import sys; sys.path.append(".")',
             f'--max-line-length={self.config.getini("max_line_length")}',
             '--include-naming-hint=y',
-            '--output-format=json',
+            '--output-format=json2',
             f'--max-complexity={self.config.getini("max_complexity")}',
         ]
-        enable = ['useless-suppression', 'use-symbolic-message-instead']
+        enable = [
+            'useless-suppression',
+            'use-symbolic-message-instead',
+            'use-implicit-booleaness-not-comparison-to-zero',
+            'use-implicit-booleaness-not-comparison-to-string',
+            'prefer-typing-namedtuple',
+        ]
         disable = [
             # checks covered by pycodestyle
             'line-too-long', 'trailing-newlines', 'trailing-whitespace', 'missing-final-newline',
+            # checks covered by isort
+            'wrong-import-order',
             # other checks
             'duplicate-code',  # not working with distributed exeuction
             'logging-fstring-interpolation',  # we are mostly using f-strings in logging
@@ -89,7 +95,7 @@ class PylintItem(CachedFileCheckItem):
         # untrusted input.
         process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
         try:
-            if messages := json.loads(process.stdout):
+            if messages := json.loads(process.stdout).get('messages'):
                 formatter = '{line}:{column}: {type}: {message} ({symbol})'
                 raise ItemRunError('\n'.join(formatter.format(**message) for message in messages))
         except json.decoder.JSONDecodeError as error:
