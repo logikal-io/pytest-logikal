@@ -59,11 +59,11 @@ class PylintItem(CachedFileCheckItem):
             'prefer-typing-namedtuple',
         ]
         disable = [
-            # checks covered by pycodestyle
+            # Checks covered by pycodestyle
             'line-too-long', 'trailing-newlines', 'trailing-whitespace', 'missing-final-newline',
-            # checks covered by isort
+            # Checks covered by isort
             'wrong-import-order',
-            # other checks
+            # Other checks
             'duplicate-code',  # not working with distributed exeuction
             'logging-fstring-interpolation',  # we are mostly using f-strings in logging
             'missing-docstring',  # we are less strict about class and function docstrings
