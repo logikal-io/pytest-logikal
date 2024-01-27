@@ -39,6 +39,7 @@ ALLOWED_LICENSES = [
 
 ALLOWED_PACKAGES = {
     'facebook-business': r'^LICENSE\.txt$',  # only used as a connector
+    'facebook_business': r'^LICENSE\.txt$',  # only used as a connector
     'djlint': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # only used as a local tool
     'html-tag-names': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
     'html-void-elements': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
