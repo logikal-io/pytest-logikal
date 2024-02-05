@@ -4,7 +4,7 @@ django-stubs~=4.2
 django-migration-linter~=5.0
 djlint==1.34.1
 pylint-django==2.5.5
-pytest-django==4.7.0
+pytest-django==4.8.0
 pytest-factoryboy==2.6.0
 
 # Validator

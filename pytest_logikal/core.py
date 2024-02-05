@@ -71,7 +71,7 @@ def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
                 pluginmanager.set_blocked(f'logikal_{plugin}')
 
 
-@pytest.hookimpl(hookwrapper=True)
+@pytest.hookimpl(wrapper=True)
 def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) -> Iterator[None]:
     if '--no-defaults' in args:
         yield
