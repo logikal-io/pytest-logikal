@@ -9,6 +9,11 @@ from pytest_logikal import utils
 from pytest_logikal.core import DEFAULT_INI_OPTIONS
 
 
+def test_tmp_path(tmp_path: Path, mocker: MockerFixture) -> None:
+    mocker.patch('pytest_logikal.utils.mkdtemp', return_value=str(tmp_path))
+    assert utils.tmp_path('test_tmp_path').exists()
+
+
 def test_ini_option(mocker: MockerFixture) -> None:
     option = 'max_line_length'
     mocker.patch.dict(PYPROJECT, clear=True)
@@ -27,7 +32,7 @@ def test_expected_not_found(tmp_path: Path, mocker: MockerFixture) -> None:
     # Non-interactive
     tty.return_value = False
     with raises(AssertionError, match='file does not exist'):
-        utils.assert_image_equal(b'', tmp_path / 'non_interactive', temp_path=tmp_path)
+        utils.assert_image_equal(b'', tmp_path / 'non_interactive', image_tmp_path=tmp_path)
     assert (tmp_path / 'expected.png').is_file()
 
     # Interactive
@@ -36,30 +41,30 @@ def test_expected_not_found(tmp_path: Path, mocker: MockerFixture) -> None:
 
     input_keys.side_effect = 'c'  # opening cancelled
     with raises(AssertionError, match='cancelled'):
-        utils.assert_image_equal(b'', expected, temp_path=tmp_path)
+        utils.assert_image_equal(b'', expected, image_tmp_path=tmp_path)
     assert not run.called
     assert not expected.is_file()
 
     input_keys.side_effect = ['s', '']  # opening skipped, rejected
     with raises(AssertionError, match='rejected'):
-        utils.assert_image_equal(b'', expected, temp_path=tmp_path)
+        utils.assert_image_equal(b'', expected, image_tmp_path=tmp_path)
     assert not run.called
     assert not expected.is_file()
 
     input_keys.side_effect = ['', 'accept']  # opened and accepted
-    utils.assert_image_equal(b'', expected, temp_path=tmp_path)
+    utils.assert_image_equal(b'', expected, image_tmp_path=tmp_path)
     assert expected.is_file()
     assert run.called
 
 
 def test_difference(tmp_path: Path, mocker: MockerFixture) -> None:
     mocker.patch('pytest_logikal.utils.sys.stdin.isatty', return_value=False)
-    screenshots = Path(__file__).parent / 'screenshots/test_browser'
+    screenshots = Path(__file__).parent / 'browser/screenshots/test_browser'
 
-    actual = screenshots / 'test_browser_check_desktop_perennrose.png'
-    expected = screenshots / 'test_browser_check_desktop_nincs-ido.png'
+    actual = screenshots / 'test_browser_check_chrome_desktop_perennrose.png'
+    expected = screenshots / 'test_browser_check_chrome_desktop_nincs-ido.png'
     with raises(AssertionError, match='differs'):
-        utils.assert_image_equal(actual.read_bytes(), expected, temp_path=tmp_path)
+        utils.assert_image_equal(actual.read_bytes(), expected, image_tmp_path=tmp_path)
 
     actual = tmp_path / 'diff.png'
     expected = screenshots / 'difference.png'

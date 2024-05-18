@@ -7,7 +7,7 @@ from os import getcwd
 from pathlib import Path
 from shutil import copy
 from subprocess import run
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, mkdtemp
 from typing import Any, Callable, Dict, Generator, Optional, Type, TypeVar
 
 from logikal_utils.project import PYPROJECT
@@ -19,6 +19,13 @@ logger = getLogger(__name__)
 
 Function = TypeVar('Function', bound=Callable[..., Any])
 Fixture = Callable[[Function], Function]
+
+
+def tmp_path(suffix: str) -> Path:
+    path = Path(mkdtemp(prefix='pytest_logikal_', suffix=f'_{suffix}'))
+    path.mkdir(parents=True, exist_ok=True)
+    logger.debug(f'Using temporary path "{path}/"')
+    return path
 
 
 def get_ini_option(name: str) -> Any:
@@ -34,7 +41,7 @@ def hide_traceback(function: Function, error: Type[Exception] = AssertionError) 
 
 @contextmanager
 def render_template(path: Path, context: Dict[str, Any]) -> Generator[Path, None, None]:
-    with TemporaryDirectory(prefix='pytest_logikal_') as tmp_dir:
+    with TemporaryDirectory(prefix='pytest_logikal_', suffix='_template') as tmp_dir:
         rendered = path.read_text(encoding='utf-8').format(**context)
         config_path = Path(tmp_dir) / path.name
         config_path.write_text(rendered)
@@ -42,10 +49,10 @@ def render_template(path: Path, context: Dict[str, Any]) -> Generator[Path, None
 
 
 @hide_traceback
-def assert_image_equal(actual: bytes, expected: Path, temp_path: Path) -> None:
-    temp_actual_path = temp_path / 'actual.png'
-    temp_expected_path = temp_path / 'expected.png'
-    temp_diff_path = temp_path / 'diff.png'
+def assert_image_equal(actual: bytes, expected: Path, image_tmp_path: Path) -> None:
+    tmp_actual_path = image_tmp_path / 'actual.png'
+    tmp_expected_path = image_tmp_path / 'expected.png'
+    tmp_diff_path = image_tmp_path / 'diff.png'
 
     logger.info(f'Checking expected image in "{expected}"')
     if expected.is_file():
@@ -54,23 +61,23 @@ def assert_image_equal(actual: bytes, expected: Path, temp_path: Path) -> None:
                 logger.info('The actual image matches the expected image')
                 return
 
-            temp_actual_path.write_bytes(actual)  # saving the temporary actual image
-            copy(expected, temp_expected_path)  # saving the temporary expected image
+            tmp_actual_path.write_bytes(actual)  # saving the temporary actual image
+            copy(expected, tmp_expected_path)  # saving the temporary expected image
             diff_image = ImageChops.invert(ImageChops.difference(
                 expected_image.convert('RGB'),
                 actual_image.convert('RGB'),
             ))
-            diff_image.save(str(temp_diff_path))  # saving the temporary diff image
+            diff_image.save(str(tmp_diff_path))  # saving the temporary diff image
             save_image_prompt(
                 message='Actual image differs from the expected image',
-                source=temp_actual_path, destination=expected, difference=temp_diff_path,
+                source=tmp_actual_path, destination=expected, difference=tmp_diff_path,
             )
     else:
         logger.info('Expected image not found')
-        temp_expected_path.write_bytes(actual)  # saving the temporary actual image as expected
+        tmp_expected_path.write_bytes(actual)  # saving the temporary actual image as expected
         save_image_prompt(
             message='Expected image file does not exist',
-            source=temp_expected_path, destination=expected,
+            source=tmp_expected_path, destination=expected,
         )
 
 

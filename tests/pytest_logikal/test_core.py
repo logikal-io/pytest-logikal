@@ -1,25 +1,34 @@
 from itertools import chain
 from pathlib import Path
-from shutil import copy
 from typing import Callable, List, Tuple
 from unittest.mock import patch
 
 import pytest
+import tomli_w
+from logikal_utils.project import PYPROJECT
 from pytest_mock.plugin import MockerFixture
 
 from pytest_logikal import core
 
 pytest_plugins = ['pytester']
+
 PYTEST_ARGS = [
     '--assert', 'plain',  # modules are already imported so assertions cannot be rewritten
     '--no-licenses',  # no need to check licenses here again
     '--no-install',  # do not install packages
     '-p', 'no:django', '--no-migration', '--no-html',  # no settings module
 ]
+PYPROJECT = tomli_w.dumps({
+    'project': {'name': 'pytest-logikal'},
+    'tool': {'browser': {'versions': PYPROJECT['tool']['browser']['versions']}},
+})
 
 
-def test_run_errors(makepyfile: Callable[[str], Path], pytester: pytest.Pytester) -> None:
-    pytester.makepyprojecttoml("[project]\nname = 'pytest-logikal'")
+def test_run_errors(
+    makepyfile: Callable[[str], Path],
+    pytester: pytest.Pytester,
+) -> None:  # pragma: no cover, coverage does not measure after runpytest
+    pytester.makepyprojecttoml(PYPROJECT)
     makepyfile("""
         import pickle  # triggers a bandit error
         import re  # triggers a pylint error
@@ -45,7 +54,7 @@ def test_run_errors(makepyfile: Callable[[str], Path], pytester: pytest.Pytester
 
 
 def test_run_success(makepyfile: Callable[[str], Path], pytester: pytest.Pytester) -> None:
-    pytester.makepyprojecttoml("[project]\nname = 'pytest-logikal'")
+    pytester.makepyprojecttoml(PYPROJECT)
     makepyfile("""
         def test_success() -> None:
             \"\"\"A test that will succeed.\"\"\"
@@ -69,19 +78,12 @@ def test_clear(mocker: MockerFixture) -> None:
     path = mocker.patch('pytest_logikal.core.Path')
     shutil = mocker.patch('pytest_logikal.core.shutil')
 
-    config = mocker.Mock()
-    config.getoption.return_value = True
-    core.pytest_configure(config)
+    session = mocker.Mock()
+    session.config.getoption.return_value = True
+    core.pytest_sessionstart(session)
 
     assert path.return_value.unlink.called
     assert shutil.rmtree.called
-
-
-def test_install_packages(tmp_path: Path) -> None:
-    for file in ['package.json', 'package-lock.json']:
-        copy(Path(core.__file__).parent / file, tmp_path)
-    core.install_packages(node_prefix=tmp_path)
-    assert (tmp_path / 'node_modules/stylelint').exists()
 
 
 def test_run_without_extras(mocker: MockerFixture) -> None:

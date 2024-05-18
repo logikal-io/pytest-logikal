@@ -1,3 +1,5 @@
 -r core.txt
 -r build.txt
 -r docs.txt
+
+tomli-w==1.0.0

@@ -8,17 +8,39 @@ The default installation provides the :doc:`mocker <pytest_mock:usage>` fixture 
 
 browser
 -------
-The :ref:`browser extra <index:browser>` provides a new :func:`browser
-<pytest_logikal.browser.browser>` fixture:
+The :ref:`browser extra <index:browser>` provides a new
+:func:`~pytest_logikal.browser.plugin.browser` fixture:
 
-.. autofunction:: pytest_logikal.browser.browser
+.. autofunction:: pytest_logikal.browser.plugin.browser
 .. autoclass:: pytest_logikal.browser.Browser()
-.. autoclass:: pytest_logikal.browser.BrowserSettings
+   :show-inheritance:
+   :no-inherited-members:
 
-You may control browser settings for a specific test with the
-:func:`~pytest_logikal.browser.set_browser` decorator:
+Browser settings must be specified via the :func:`~pytest_logikal.browser.set_browser` decorator:
 
 .. autodecorator:: pytest_logikal.browser.set_browser
+
+You can specify browser scenarios with this decorator as follows:
+
+.. literalinclude:: ../tests/pytest_logikal/browser/examples/test_single_scenario.py
+   :language: python
+
+You can also run your test in multiple scenarios:
+
+.. literalinclude:: ../tests/pytest_logikal/browser/examples/test_multiple_scenarios.py
+   :language: python
+
+Custom scenarios can be specified via the :class:`~pytest_logikal.browser.Scenario` class:
+
+.. autoclass:: pytest_logikal.browser.Scenario
+.. autoclass:: pytest_logikal.browser.Settings
+
+Built-in Scenarios
+~~~~~~~~~~~~~~~~~~
+Currently the following built-in scenarios are available:
+
+.. automodule:: pytest_logikal.browser.scenarios
+   :exclude-members: Scenario, Settings
 
 live_url
 --------

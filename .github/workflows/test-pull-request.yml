@@ -5,9 +5,6 @@ jobs:
   run-python-tests:
     name: Run Python tests
     uses: logikal-io/github-workflows/.github/workflows/run-python-tests.yml@v5
-    with:
-      playbook-roles: chromedriver
-      playbook-vars: '{"chrome_package_version": "117.0.5938.88-1"}'
     permissions:
       contents: read
       id-token: write

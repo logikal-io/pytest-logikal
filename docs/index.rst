@@ -88,12 +88,21 @@ The ``black`` extra adds code style and formatting checks:
 browser
 ~~~~~~~
 The ``browser`` extra installs `Selenium <https://www.selenium.dev/>`_ and provides the
-:func:`browser <pytest_logikal.browser.browser>` fixture for convenient browser automation in
-tests:
+:func:`browser <pytest_logikal.browser.plugin.browser>` fixture for convenient browser automation
+in tests:
 
 .. code-block:: shell
 
     pip install pytest-logikal[browser]
+
+When using the ``browser`` extra you must specify the browser versions in your ``pyproject.toml``
+file as follows:
+
+.. code-block:: toml
+
+    [tool.browser.versions]
+    chrome = '124.0.6367.91'
+    edge = '124.0.2478.80'
 
 django
 ~~~~~~
