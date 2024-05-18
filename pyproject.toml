@@ -30,7 +30,7 @@ dynamic = ['version', 'entry-points', 'dependencies', 'optional-dependencies']
 'Source code' = 'https://github.com/logikal-io/pytest-logikal'
 
 [tool.setuptools]
-packages = ['pytest_logikal']
+packages = ['pytest_logikal', 'pytest_logikal.browser']
 
 [tool.setuptools.dynamic]
 entry-points = {file = 'entry_points.ini'}

@@ -1,3 +1,4 @@
+import os
 import shutil
 import stat
 from pathlib import Path
@@ -15,6 +16,7 @@ def download(url: str, output: Path) -> Path:
     with tqdm(
         total=total_size, leave=False,
         unit='iB', unit_scale=True, unit_divisor=1024,
+        disable='GITHUB_ACTIONS' in os.environ,
     ) as progress_bar:
         with open(output, 'wb') as output_file:
             for data in data_stream.iter_content(chunk_size=1024):
