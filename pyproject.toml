@@ -30,7 +30,7 @@ dynamic = ['version', 'entry-points', 'dependencies', 'optional-dependencies']
 'Source code' = 'https://github.com/logikal-io/pytest-logikal'
 
 [tool.setuptools]
-packages = ['pytest_logikal']
+packages = ['pytest_logikal', 'pytest_logikal.browser']
 
 [tool.setuptools.dynamic]
 entry-points = {file = 'entry_points.ini'}
@@ -55,11 +55,6 @@ norecursedirs = [
   '*.egg', '.*', 'build', 'dist', 'node_modules',  # standard folders
   'tests/pytest_logikal/files',  # ignore files used inside plugin runs
 ]
-filterwarnings = [
-  'error',
-  # Can be removed with the next release of django-migration-linter
-  "ignore:unclosed file .* name='/dev/null':ResourceWarning",
-]
 
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issues/11667
@@ -75,9 +70,11 @@ module = [
   'xdist.*',
 ]
 
-[tool.browser.settings]
-desktop-docs = {width = 1024, height = 768}
-mobile-xl = {width = 480, frame_height = 768, mobile = true}
+[tool.browser.versions]
+# See https://googlechromelabs.github.io/chrome-for-testing/#stable
+chrome = '124.0.6367.91'
+# See https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel
+edge = '124.0.2478.80'
 
 [tool.isort]
 known_first_party = ['pytest_logikal']

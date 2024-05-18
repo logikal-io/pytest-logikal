@@ -12,10 +12,21 @@ from factory import random as factory_random
 from mypy_django_plugin import config as mypy_django_plugin_config
 from pytest_django.live_server_helper import LiveServer
 
+from pytest_logikal.node_install import install_node_packages
 from pytest_logikal.utils import Fixture, Function
+from pytest_logikal.validator import Validator
 
 DEFAULT_RANDOM_SEED = 42
 LiveURL = Callable[[str], str]
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    if not session.config.getoption('no_install'):
+        install_node_packages()
+
+    if not session.config.getoption('no_css') and not session.config.getoption('no_svg'):
+        # We start the validator service here to avoid pytest's output capturing
+        Validator.start_service()
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -44,7 +55,7 @@ def factory_seed() -> None:
 
 
 @pytest.fixture
-def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400,D402,D415,D417
+def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400, D402, D415, D417
     """
     live_url(name: str) -> str
 

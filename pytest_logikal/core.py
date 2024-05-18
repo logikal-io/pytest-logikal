@@ -1,7 +1,6 @@
 import logging
 import os
 import shutil
-import subprocess
 import sys
 from importlib.util import find_spec
 from itertools import chain
@@ -120,26 +119,16 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
     yield
 
 
-def install_packages(node_prefix: Optional[Path] = None) -> None:
-    node_prefix = node_prefix or Path(__file__).parent
-    if not (node_prefix / 'node_modules').exists():
-        print(colored('Installing Node.js packages', attrs=['bold']))
-        command = ['npm', 'install', '--no-save', '--prefix', str(node_prefix)]
-        subprocess.run(command, text=True, check=True)  # nosec: secure, not using untrusted input
-
-
-def pytest_configure(config: pytest.Config) -> None:
-    # Installing Node.js packages
-    if EXTRAS['django'] and not config.getoption('no_install'):
-        install_packages()
-
+def pytest_sessionstart(session: pytest.Session) -> None:
     # Clearing cache
-    if config.getoption('clear'):
+    if session.config.getoption('clear'):
         print(colored('Clearing cache', 'yellow', attrs=['bold']))
         Path('.coverage').unlink(missing_ok=True)
         shutil.rmtree('.pytest_cache', ignore_errors=True)
         shutil.rmtree('.mypy_cache', ignore_errors=True)
 
+
+def pytest_configure(config: pytest.Config) -> None:
     # Hiding information
     if not config.getoption('verbose'):
         # Hiding overly verbose debug and info log messages
