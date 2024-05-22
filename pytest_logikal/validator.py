@@ -1,4 +1,6 @@
+import os
 from dataclasses import dataclass
+from functools import lru_cache
 from logging import getLogger
 from typing import List, Optional
 
@@ -20,34 +22,15 @@ class ValidationError:
 
 
 class Validator:
-    _SERVICE_NAME = 'validator'
-    _SERVICE_PORT = '8888/tcp'
-    _service: Optional[Service] = None
-    _service_url: Optional[str] = None
-
     @staticmethod
-    def service() -> Service:
-        if not Validator._service:
-            Validator._service = Service(
-                name=Validator._SERVICE_NAME,
-                ready_log_text='Checker service started',
-            )
-        return Validator._service
-
-    @staticmethod
+    @lru_cache(maxsize=None)
     def service_url() -> str:
-        if not Validator._service_url:
-            port = Validator.service().container_port(Validator._SERVICE_PORT)
-            Validator._service_url = f'http://127.0.0.1:{port}'
-            logger.debug(
-                f'Using HTML/CSS/SVG validator service running at {Validator._service_url} '
-                f'(container: {Validator.service().container.short_id})'
-            )
-        return Validator._service_url
+        if not (service_url := os.environ.get('VALIDATOR_SERVICE_URL')):
+            service = Service(name='validator', ready_log_text='Checker service started')
+            service_url = f'http://127.0.0.1:{service.container_port("8888/tcp")}'
 
-    @staticmethod
-    def start_service() -> None:
-        Validator.service()
+        logger.debug(f'Using HTML/CSS/SVG validator service running at "{service_url}"')
+        return service_url
 
     def errors(self, content: str, content_type: str = 'text/html') -> List[ValidationError]:
         # Checking content

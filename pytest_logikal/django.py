@@ -26,7 +26,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 
     if not session.config.getoption('no_css') and not session.config.getoption('no_svg'):
         # We start the validator service here to avoid pytest's output capturing
-        Validator.start_service()
+        Validator.service_url()
 
 
 def pytest_configure(config: pytest.Config) -> None:

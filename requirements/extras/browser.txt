@@ -1,5 +1,5 @@
-requests~=2.31
-types-requests~=2.31
+requests<2.32  # see https://github.com/docker/docker-py/issues/3256
+types-requests<2.32  # see https://github.com/docker/docker-py/issues/3256
 tqdm~=4.66
 types-tqdm~=4.66
 selenium==4.21.0
