@@ -1,3 +1,4 @@
+import os
 from abc import abstractmethod
 from typing import Any, Dict, Type
 
@@ -33,6 +34,7 @@ class ChromiumBrowser(Browser):
             '--disable-search-engine-choice-screen',
             # Web platform behavior
             f'--js-flags=--random-seed={DEFAULT_JS_RANDOM_SEED}',
+            *(['--no-sandbox'] if os.getenv('DOCKER_RUN') == '1' else [])
         ]
 
         options = self.options_class()
