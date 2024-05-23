@@ -72,3 +72,11 @@ def test_difference(tmp_path: Path, mocker: MockerFixture) -> None:
         assert actual_image == expected_image, '\n'.join([
             'Incorrect difference', f'  Actual: {actual}', f'  Expected: {expected}',
         ])
+
+
+def test_no_opener(tmp_path: Path, mocker: MockerFixture) -> None:
+    mocker.patch('pytest_logikal.utils.Path.exists', return_value=False)
+    mocker.patch('pytest_logikal.utils.sys.stdin.isatty', return_value=True)
+    mocker.patch('pytest_logikal.utils.input', return_value='reject')
+    with raises(AssertionError, match='rejected'):
+        utils.save_image_prompt(message='Test message', source=tmp_path, destination=tmp_path)

@@ -106,14 +106,17 @@ def save_image_prompt(
     print(short_destination)
 
     prompt = f'{colors["red"]}>{colors["reset"]} '
-    response = input(f'{prompt}Press "enter" to open or type "s" to skip or "c" to cancel: ')
-    if response == 's':
-        logger.info('Image opening skipped')
-    elif not response:
-        # This subprocess call is secure as it is not using untrusted input
-        run(['/usr/bin/xdg-open', str(source)], check=False)  # nosec
+    if (opener := Path('/usr/bin/xdg-open')).exists():
+        response = input(f'{prompt}Press "enter" to open or type "s" to skip or "c" to cancel: ')
+        if response == 's':
+            logger.info('Image opening skipped')
+        elif not response:
+            # This subprocess call is secure as it is not using untrusted input
+            run([str(opener), str(source)], check=False)  # nosec
+        else:
+            raise AssertionError('Image opening cancelled')
     else:
-        raise AssertionError('Image opening cancelled')
+        print(f'{prompt}See file://{source}')
 
     response = input(f'{prompt}Type "accept" to accept this version or press "enter" to reject: ')
     if response == 'accept':
