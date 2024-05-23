@@ -9,5 +9,4 @@ pytest-factoryboy==2.7.0
 
 # Validator
 requests~=2.32
-types-requests~=2.32
 logikal-utils[docker]~=1.1
