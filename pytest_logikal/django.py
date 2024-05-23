@@ -24,7 +24,8 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     if not session.config.getoption('no_install'):
         install_node_packages()
 
-    if not session.config.getoption('no_css') and not session.config.getoption('no_svg'):
+    css_or_svg = not session.config.getoption('no_css') or not session.config.getoption('no_svg')
+    if not session.config.getoption('fast') and css_or_svg:
         # We start the validator service here to avoid pytest's output capturing
         Validator.service_url()
 

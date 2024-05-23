@@ -8,6 +8,6 @@ pytest-django==4.8.0
 pytest-factoryboy==2.7.0
 
 # Validator
-requests<2.32  # see https://github.com/docker/docker-py/issues/3256
-types-requests<2.32  # see https://github.com/docker/docker-py/issues/3256
+requests~=2.32
+types-requests~=2.32
 logikal-utils[docker]~=1.1

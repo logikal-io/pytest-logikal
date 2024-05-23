@@ -47,6 +47,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
+    group.addoption('--no-install', action='store_true', help='do not install packages')
 
     if EXTRAS['django']:
         group.addoption('--no-migration', action='store_true', help='do not check migrations')
@@ -55,7 +56,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         group.addoption('--no-css', action='store_true', help='do not run css checks')
         group.addoption('--no-svg', action='store_true', help='do not run svg checks')
         group.addoption('--no-js', action='store_true', help='do not run js checks')
-        group.addoption('--no-install', action='store_true', help='do not install packages')
 
     for option, entry in DEFAULT_INI_OPTIONS.items():
         parser.addini(option, default=str(entry['value']), help=entry['help'])
