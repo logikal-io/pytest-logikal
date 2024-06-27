@@ -74,10 +74,10 @@ def assert_image_equal(actual: bytes, expected: Path, image_tmp_path: Path) -> N
             )
     else:
         logger.info('Expected image not found')
-        tmp_expected_path.write_bytes(actual)  # saving the temporary actual image as expected
+        tmp_actual_path.write_bytes(actual)  # saving the temporary actual image
         save_image_prompt(
             message='Expected image file does not exist',
-            source=tmp_expected_path, destination=expected,
+            source=tmp_actual_path, destination=expected,
         )
 
 

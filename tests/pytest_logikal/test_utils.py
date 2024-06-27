@@ -33,7 +33,7 @@ def test_expected_not_found(tmp_path: Path, mocker: MockerFixture) -> None:
     tty.return_value = False
     with raises(AssertionError, match='file does not exist'):
         utils.assert_image_equal(b'', tmp_path / 'non_interactive', image_tmp_path=tmp_path)
-    assert (tmp_path / 'expected.png').is_file()
+    assert (tmp_path / 'actual.png').is_file()
 
     # Interactive
     tty.return_value = True
