@@ -2,12 +2,11 @@ import os
 from abc import abstractmethod
 from typing import Any, Dict, Type
 
+from logikal_utils.random import DEFAULT_RANDOM_SEED
 from selenium.webdriver.chromium.options import ChromiumOptions
 from selenium.webdriver.chromium.service import ChromiumService
 
 from pytest_logikal.browser.base import Browser
-
-DEFAULT_JS_RANDOM_SEED = 42
 
 
 class ChromiumBrowser(Browser):
@@ -33,7 +32,7 @@ class ChromiumBrowser(Browser):
             '--ash-no-nudges',
             '--disable-search-engine-choice-screen',
             # Web platform behavior
-            f'--js-flags=--random-seed={DEFAULT_JS_RANDOM_SEED}',
+            f'--js-flags=--random-seed={DEFAULT_RANDOM_SEED}',
             *(['--no-sandbox'] if os.getenv('DOCKER_RUN') == '1' else [])
         ]
 

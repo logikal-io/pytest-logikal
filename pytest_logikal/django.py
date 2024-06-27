@@ -9,6 +9,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone as django_timezone, translation
 from factory import random as factory_random
+from logikal_utils.random import DEFAULT_RANDOM_SEED
 from mypy_django_plugin import config as mypy_django_plugin_config
 from pytest_django.live_server_helper import LiveServer
 
@@ -16,7 +17,6 @@ from pytest_logikal.node_install import install_node_packages
 from pytest_logikal.utils import Fixture, Function
 from pytest_logikal.validator import Validator
 
-DEFAULT_RANDOM_SEED = 42
 LiveURL = Callable[[str], str]
 
 
