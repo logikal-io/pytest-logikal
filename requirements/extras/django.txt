@@ -1,4 +1,4 @@
-Babel~=2.14
+Babel~=2.15
 Django~=4.2
 django-stubs~=4.2
 django-migration-linter~=5.1
@@ -9,4 +9,4 @@ pytest-factoryboy==2.7.0
 
 # Validator
 requests~=2.32
-logikal-utils[docker]~=1.1
+logikal-utils[docker]~=1.2
