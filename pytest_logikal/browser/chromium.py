@@ -26,11 +26,28 @@ class ChromiumBrowser(Browser):
         args = [
             '--headless',
             f'--window-size={self.settings.width},{self.settings.height}',
+            '--in-process-gpu',  # memory saving
             # Unwanted features
             '--no-default-browser-check',
             '--no-first-run',
             '--ash-no-nudges',
             '--disable-search-engine-choice-screen',
+            # Deterministic rendering
+            # See https://issuetracker.google.com/issues/172339334
+            '--allow-pre-commit-input',
+            # See https://issues.chromium.org/issues/40039960#comment29
+            '--disable-partial-raster',
+            '--disable-skia-runtime-opts',
+            # Deterministic mode
+            # '--deterministic-mode',
+            '--run-all-compositor-stages-before-draw',
+            '--disable-new-content-rendering-timeout',
+            # See https://issues.chromium.org/issues/40288100
+            # '--enable-begin-frame-control',  # part of deterministic mode
+            '--disable-threaded-animation',
+            '--disable-threaded-scrolling',
+            '--disable-checker-imaging',
+            '--disable-image-animation-resync',
             # Web platform behavior
             f'--js-flags=--random-seed={DEFAULT_RANDOM_SEED}',
             *(['--no-sandbox'] if os.getenv('DOCKER_RUN') == '1' else [])
