@@ -72,9 +72,9 @@ module = [
 
 [tool.browser.versions]
 # See https://googlechromelabs.github.io/chrome-for-testing/#stable
-chrome = '124.0.6367.91'
+chrome = '127.0.6533.99'
 # See https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel
-edge = '124.0.2478.80'
+edge = '126.0.2592.113'
 
 [tool.isort]
 known_first_party = ['pytest_logikal']
