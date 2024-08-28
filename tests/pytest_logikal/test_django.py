@@ -1,3 +1,4 @@
+import re
 from typing import Type
 
 from django.utils.timezone import get_current_timezone_name
@@ -6,7 +7,7 @@ from faker.proxy import Faker
 from pytest import mark
 from pytest_factoryboy import register
 
-from pytest_logikal.django import all_languages, set_language, set_timezone
+from pytest_logikal.django import LiveURL, all_languages, set_language, set_timezone
 from tests.pytest_logikal import factories
 from tests.website.models import Project, User
 
@@ -20,7 +21,7 @@ def test_faker_seed(faker: Faker, run: int) -> None:  # pylint: disable=unused-a
     assert faker.name() == 'Noah Rhodes'
 
 
-@mark.parametrize('run', range(10))
+@mark.parametrize('run', range(10))  # we test multiple runs just to be sure
 def test_faker_seed_again(faker: Faker, run: int) -> None:  # pylint: disable=unused-argument
     assert faker.name() == 'Allison Hill'
     assert faker.name() == 'Noah Rhodes'
@@ -46,6 +47,15 @@ def test_factories_again(  # pylint: disable=unused-argument
     assert user_factory().first_name == 'Robert'
     assert project_factory().name == 'Architect Bleeding-Edge Mindshare'
     assert project_factory().name == 'Expedite Proactive Schemas'
+
+
+def test_live_url(live_url: LiveURL) -> None:
+    assert re.fullmatch('http://localhost:[0-9]+', live_url())
+    assert re.fullmatch('http://localhost:[0-9]+/internal/', live_url('internal'))
+    assert re.fullmatch(
+        'http://localhost:[0-9]+/internal/test/',
+        live_url('internal', kwargs={'parameter': 'test'}),
+    )
 
 
 def test_language_fixture_without_decorator(language: str) -> None:

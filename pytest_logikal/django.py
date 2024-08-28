@@ -2,7 +2,7 @@ try:
     import zoneinfo  # type: ignore[import-not-found]
 except ImportError:
     from backports import zoneinfo  # note: this is built-in after Python 3.9+
-from typing import Any, Callable, Iterable
+from typing import Any, Dict, Iterable, Optional, Protocol, Sequence
 
 import pytest
 from django.conf import settings
@@ -16,8 +16,6 @@ from pytest_django.live_server_helper import LiveServer
 from pytest_logikal.node_install import install_node_packages
 from pytest_logikal.utils import Fixture, Function
 from pytest_logikal.validator import Validator
-
-LiveURL = Callable[[str], str]
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
@@ -55,19 +53,35 @@ def factory_seed() -> None:
     factory_random.reseed_random(DEFAULT_RANDOM_SEED)
 
 
+class LiveURL(Protocol):
+    def __call__(
+        self,
+        name: Optional[str] = None,
+        args: Optional[Sequence[Any]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        ...
+
+
 @pytest.fixture
 def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400, D402, D415, D417
     """
-    live_url(name: str) -> str
+    live_url(name: str, args: Sequence[Any] | None, kwargs: Dict[str, Any] | None) -> str
 
     Return the path to a URL.
 
     Args:
         name: The URL pattern name.
+        args: The URL arguments to use.
+        kwargs: The URL keyword arguments to use.
 
     """
-    def live_url_path(name: str) -> str:
-        return live_server.url + reverse(name)
+    def live_url_path(
+        name: Optional[str] = None,
+        args: Optional[Sequence[Any]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        return live_server.url + (reverse(viewname=name, args=args, kwargs=kwargs) if name else '')
     return live_url_path
 
 

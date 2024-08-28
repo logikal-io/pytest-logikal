@@ -51,6 +51,9 @@ def test_login(live_url: LiveURL, browser: Browser, user: User) -> None:
     browser.get(live_url('internal'))
     browser.check('after_login')
 
+    browser.get(live_url('internal', kwargs={'parameter': 'test'}))
+    browser.check('after_login_parameter')
+
 
 @mark.django_db
 @set_browser(scenarios.desktop)
