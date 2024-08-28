@@ -4,4 +4,7 @@
 {% block body %}
   <h1>Internal Page</h1>
   <p>Hello {{ request.user.first_name }}.</p>
+  {% if parameter %}
+    <p>The provided parameter is “{{ parameter }}”.</p>
+  {% endif %}
 {% endblock %}
