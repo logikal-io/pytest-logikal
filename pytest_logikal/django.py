@@ -66,7 +66,7 @@ class LiveURL(Protocol):
 @pytest.fixture
 def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400, D402, D415, D417
     """
-    live_url(name: str, args: Sequence[Any] | None, kwargs: Dict[str, Any] | None) -> str
+    live_url(name: str | None, args: Sequence[Any] | None, kwargs: Dict[str, Any] | None) -> str
 
     Return the path to a URL.
 
