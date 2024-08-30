@@ -2,6 +2,7 @@ import os
 import shutil
 import stat
 from pathlib import Path
+from sys import stderr
 from zipfile import ZipFile
 
 import requests
@@ -9,7 +10,7 @@ from tqdm import tqdm
 
 
 def download(url: str, output: Path) -> Path:
-    print(f'Downloading "{url}"...')
+    print(f'Downloading "{url}"...', file=stderr)
     data_stream = requests.get(url, stream=True, timeout=30)
     total_size = int(data_stream.headers.get('content-length', 0))
 
