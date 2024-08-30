@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
+from sys import stderr
 from time import sleep
 from typing import Any, Dict, Iterator, Optional, Type
 
@@ -78,14 +79,14 @@ class BrowserVersion(ABC):
     @staticmethod
     def print(message: str) -> None:
         if not BrowserVersion._initial_info:
-            print(colored('Installing browsers', 'yellow', attrs=['bold']))
+            print(colored('Installing browsers', 'yellow', attrs=['bold']), file=stderr)
             BrowserVersion._initial_info = True
-        print(f'\n{colored(message, attrs=["bold"])}')
+        print(f'\n{colored(message, attrs=["bold"])}', file=stderr)
 
     @staticmethod
     def final_info() -> None:
         if BrowserVersion._initial_info:
-            print()  # trailing newline
+            print(file=stderr)  # trailing newline
 
 
 class Browser(ABC, WebDriver):
