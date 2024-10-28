@@ -3,5 +3,5 @@
 -r docs.txt
 
 tomli-w==1.1.0
-types-requests  # not specifying a version due to https://github.com/python/typeshed/issues/10825
+types-requests
 types-tqdm

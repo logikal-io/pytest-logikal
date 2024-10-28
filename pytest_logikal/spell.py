@@ -30,11 +30,11 @@ class SpellItem(CachedFileCheckItem):
         # Note that we are running codespell in a subprocess and process its output instead of
         # importing it due to its license (GPLv2). The subprocess call is secure as it is not using
         # untrusted input.
-        filename_regex = re.compile(r'^[^:]+:', re.MULTILINE)
         process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
         if process.returncode == 2:
             raise ItemRunError(f'Error: {(process.stdout or process.stderr).strip()}')
         if process.returncode:
+            filename_regex = re.compile(r'^[^:]+:', re.MULTILINE)
             raise ItemRunError('\n'.join(
                 filename_regex.sub('', line) for line in process.stdout.splitlines()
             ))
