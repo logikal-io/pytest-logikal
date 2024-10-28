@@ -46,10 +46,10 @@ class PylintItem(CachedFileCheckItem):
         command = [
             'pylint', str(self.path),
             '--init-hook=import sys; sys.path.append(".")',
-            f'--max-line-length={self.config.getini("max_line_length")}',
+            f'--max-line-length={self.config.getini('max_line_length')}',
             '--include-naming-hint=y',
             '--output-format=json2',
-            f'--max-complexity={self.config.getini("max_complexity")}',
+            f'--max-complexity={self.config.getini('max_complexity')}',
         ]
         enable = [
             'useless-suppression',
@@ -64,7 +64,7 @@ class PylintItem(CachedFileCheckItem):
             # Checks covered by isort
             'wrong-import-order',
             # Other checks
-            'duplicate-code',  # not working with distributed exeuction
+            'duplicate-code',  # not working with distributed execution
             'logging-fstring-interpolation',  # we are mostly using f-strings in logging
             'missing-docstring',  # we are less strict about class and function docstrings
             'consider-using-tuple',  # lists are often easier to read
@@ -78,7 +78,7 @@ class PylintItem(CachedFileCheckItem):
             ]
             plugins += ['pylint_django']
             command += [
-                f'--django-settings-module={self.config.inicfg["DJANGO_SETTINGS_MODULE"]}',
+                f'--django-settings-module={self.config.inicfg['DJANGO_SETTINGS_MODULE']}',
                 r'--module-rgx=[^\WA-Z]*$',  # allow (migration) modules to start with digits
             ]
 
@@ -86,8 +86,8 @@ class PylintItem(CachedFileCheckItem):
         enable = pyproject_pylint.get('enable', enable)
         disable = pyproject_pylint.get('disable', disable)
         command += [
-            f'--enable={",".join(enable)}', f'--disable={",".join(disable)}',
-            f'--load-plugins={",".join(plugins)}',
+            f'--enable={','.join(enable)}', f'--disable={','.join(disable)}',
+            f'--load-plugins={','.join(plugins)}',
         ]
 
         # Note that we are running Pylint in a subprocess and process its output instead of

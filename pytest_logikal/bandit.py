@@ -37,11 +37,11 @@ class BanditItem(CachedFileCheckItem):
             report = json.loads(process.stdout)
             if report.get('results'):
                 raise ItemRunError('\n\n'.join(
-                    f'{error["line_number"]}:{error["col_offset"]}: '
-                    f'{severity[error["issue_severity"]]}: {error["issue_text"]} '
-                    f'({error["test_id"]}: {error["test_name"]}, '
-                    f'confidence: {error["issue_confidence"].lower()})\n'
-                    f'More info: {error["more_info"]}'
+                    f'{error['line_number']}:{error['col_offset']}: '
+                    f'{severity[error['issue_severity']]}: {error['issue_text']} '
+                    f'({error['test_id']}: {error['test_name']}, '
+                    f'confidence: {error['issue_confidence'].lower()})\n'
+                    f'More info: {error['more_info']}'
                     for error in report['results']
                 ))
         except json.decoder.JSONDecodeError as error:

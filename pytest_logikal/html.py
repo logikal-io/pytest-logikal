@@ -21,8 +21,8 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 # Note: we disabled format checking until some issues are resolved
-# (see https://github.com/Riverside-Healthcare/djLint/issues/636)
-# (see https://github.com/Riverside-Healthcare/djLint/issues/637)
+# (see https://github.com/djlint/djLint/issues/636)
+# (see https://github.com/djlint/djLint/issues/637)
 # Note: the related test is also disabled (see tests/pytest_logikal/test_html.py
 class HTMLTemplateItem(CachedFileCheckItem):
     # @staticmethod

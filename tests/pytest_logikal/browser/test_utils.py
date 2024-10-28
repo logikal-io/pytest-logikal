@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -14,16 +13,11 @@ def test_unzip(tmp_path: Path) -> None:
     test_zip_path = tmp_path / 'test.zip'
     with ZipFile(test_zip_path, 'w') as test_zip:
         test_zip.writestr('test.txt', data='test')
+        test_zip.mkdir('test_dir')
 
     utils.unzip(test_zip_path)
     assert (tmp_path / 'test/test.txt').read_text() == 'test'
-
-
-def test_make_executable(tmp_path: Path) -> None:
-    test_file = tmp_path / 'test'
-    test_file.touch()
-    utils.make_executable(test_file)
-    assert os.access(test_file, os.X_OK)
+    assert (tmp_path / 'test/test_dir').is_dir()
 
 
 def test_move(tmp_path: Path) -> None:

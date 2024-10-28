@@ -1,6 +1,6 @@
 import os
 from abc import abstractmethod
-from typing import Any, Dict, Type
+from typing import Any
 
 from logikal_utils.random import DEFAULT_RANDOM_SEED
 from selenium.webdriver.chromium.options import ChromiumOptions
@@ -12,32 +12,45 @@ from pytest_logikal.browser.base import Browser
 class ChromiumBrowser(Browser):
     @property
     @abstractmethod
-    def options_class(self) -> Type[ChromiumOptions]:
+    def options_class(self) -> type[ChromiumOptions]:
         ...
 
     @property
     @abstractmethod
-    def service_class(self) -> Type[ChromiumService]:
+    def service_class(self) -> type[ChromiumService]:
         ...
 
     # See https://www.selenium.dev/documentation/webdriver/browsers/chrome/#options
     # See https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
-    def init_args(self) -> Dict[str, Any]:
+    def init_args(self) -> dict[str, Any]:
+        window_width = self.settings.width + self.width_offset
+        window_height = self.settings.height + self.height_offset
         args = [
-            '--headless',
-            f'--window-size={self.settings.width},{self.settings.height}',
+            '--headless=new',
+            '--new-window',
+            '--window-position=0,0',
+            f'--window-size={window_width},{window_height}',
             '--in-process-gpu',  # memory saving
             # Unwanted features
+            '--disable-client-side-phishing-detection',
+            '--disable-component-extensions-with-background-pages',
+            '--disable-default-apps',
+            '--disable-extensions',
+            '--disable-features=InterestFeedContentSuggestions',
+            '--disable-features=Translate',
+            '--mute-audio',
             '--no-default-browser-check',
             '--no-first-run',
             '--ash-no-nudges',
             '--disable-search-engine-choice-screen',
+            '--propagate-iph-for-testing',
             # Deterministic rendering
             # See https://issuetracker.google.com/issues/172339334
             '--allow-pre-commit-input',
             # See https://issues.chromium.org/issues/40039960#comment29
             '--disable-partial-raster',
             '--disable-skia-runtime-opts',
+            '--force-color-profile=srgb',
             # Deterministic mode
             # '--deterministic-mode',
             '--run-all-compositor-stages-before-draw',

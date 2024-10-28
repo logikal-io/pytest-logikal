@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Optional, Union
 
 
 @dataclass
@@ -32,8 +32,8 @@ class Scenario:
         browsers: Browsers to use. Defaults to using all registered browser versions.
 
     """
-    settings: Union[Settings, Iterable[Settings]]
-    browsers: Optional[Iterable[str]] = None
+    settings: Settings | Iterable[Settings]
+    browsers: Iterable[str] | None = None
 
 
 desktop_4k = Scenario(Settings('desktop_4k', width=2560, height=1440))  #:

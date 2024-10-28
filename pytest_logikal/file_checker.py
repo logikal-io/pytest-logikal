@@ -1,6 +1,7 @@
 from abc import abstractmethod
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, Iterable, Type, final
+from typing import Any, final
 
 import pytest
 from xdist import is_xdist_worker
@@ -20,7 +21,7 @@ class FileCheckItem(Item):
 
 
 class FileCheckPlugin(Plugin):
-    item: Type[FileCheckItem]
+    item: type[FileCheckItem]
 
     def check_file(self, file_path: Path) -> bool:  # pylint: disable=no-self-use
         return file_path.suffix == '.py'
@@ -64,7 +65,7 @@ class CachedFileCheckItem(FileCheckItem):
 
 
 class CachedFileCheckPlugin(FileCheckPlugin):
-    item: Type[CachedFileCheckItem]
+    item: type[CachedFileCheckItem]
 
     def __init__(self, config: pytest.Config):
         super().__init__(config=config)
@@ -75,7 +76,7 @@ class CachedFileCheckPlugin(FileCheckPlugin):
         self.cache = config.cache
         self.mtimes_path = f'{self.name}/mtimes'
         self.mtimes = self.cache.get(self.mtimes_path, {})
-        self.new_mtimes: Dict[str, float] = {}
+        self.new_mtimes: dict[str, float] = {}
 
     def pytest_testnodedown(self, node: WorkerController, *_args: Any, **_kwargs: Any) -> None:
         # Update the controller's file modification times with the values on the worker nodes

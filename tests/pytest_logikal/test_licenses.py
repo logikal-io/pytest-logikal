@@ -1,6 +1,6 @@
 import json
+from collections.abc import Callable
 from subprocess import CompletedProcess
-from typing import Callable
 
 from logikal_utils.project import PYPROJECT
 from pytest import raises

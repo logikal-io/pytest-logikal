@@ -1,6 +1,6 @@
 import re
 from io import StringIO
-from typing import Any, Dict
+from typing import Any
 
 import isort
 import pytest
@@ -11,7 +11,7 @@ from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlug
 from pytest_logikal.plugin import ItemRunError
 
 
-def get_config(max_line_length: int, black_compatible: bool = False) -> Dict[str, Any]:
+def get_config(max_line_length: int, black_compatible: bool = False) -> dict[str, Any]:
     config = {
         'py_version': 'auto',
         'line_length': max_line_length,

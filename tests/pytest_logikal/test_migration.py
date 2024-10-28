@@ -1,6 +1,6 @@
 import sys
+from collections.abc import Callable
 from importlib import import_module
-from typing import Callable
 
 from django.apps import AppConfig, apps
 from django.conf import Settings

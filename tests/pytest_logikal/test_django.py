@@ -1,5 +1,4 @@
 import re
-from typing import Type
 
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
@@ -30,7 +29,7 @@ def test_faker_seed_again(faker: Faker, run: int) -> None:  # pylint: disable=un
 @mark.parametrize('run', range(10))  # we test multiple runs just to be sure
 @mark.django_db
 def test_factories(  # pylint: disable=unused-argument
-    user_factory: Type[User], project_factory: Type[Project], run: int,
+    user_factory: type[User], project_factory: type[Project], run: int,
 ) -> None:
     assert user_factory().first_name == 'Jeffrey'
     assert user_factory().first_name == 'Robert'
@@ -41,7 +40,7 @@ def test_factories(  # pylint: disable=unused-argument
 @mark.parametrize('run', range(10))  # we test multiple runs just to be sure
 @mark.django_db
 def test_factories_again(  # pylint: disable=unused-argument
-    user_factory: Type[User], project_factory: Type[Project], run: int,
+    user_factory: type[User], project_factory: type[Project], run: int,
 ) -> None:
     assert user_factory().first_name == 'Jeffrey'
     assert user_factory().first_name == 'Robert'

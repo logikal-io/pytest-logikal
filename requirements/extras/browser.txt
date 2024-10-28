@@ -1,4 +1,4 @@
 requests~=2.32
 tqdm~=4.66
-selenium==4.23.1
-xdg~=5.1  # Python 3.10+ is required by xdg-base-dirs, which is the replacement library
+selenium==4.25.0
+xdg-base-dirs~=6.0

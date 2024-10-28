@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from pytest import raises
 from pytest_mock import MockerFixture
@@ -22,7 +22,7 @@ def test_run(plugin_item: Callable[..., Item]) -> None:
 
 def test_error(mocker: MockerFixture, plugin_item: Callable[..., Item]) -> None:
     run = mocker.patch('pytest_logikal.css.subprocess.run')
-    run.return_value.stdout = 'error'
+    run.return_value.stderr = 'error'
     item = plugin_item(plugin=CSSPlugin, item=CSSItem)
     with raises(ItemRunError, match='error'):
         item.runtest()

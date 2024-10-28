@@ -2,7 +2,6 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from logging import getLogger
-from typing import List, Optional
 
 import requests
 from django.utils.html import escape
@@ -16,7 +15,7 @@ logger = getLogger(__name__)
 class ValidationError:
     message: str
     severity: str
-    extract: Optional[str]
+    extract: str | None
     first_line: int
     last_line: int
 
@@ -27,12 +26,12 @@ class Validator:
     def service_url() -> str:
         if not (service_url := os.environ.get('VALIDATOR_SERVICE_URL')):
             service = Service(name='validator', ready_log_text='Checker service started')
-            service_url = f'http://127.0.0.1:{service.container_port("8888/tcp")}'
+            service_url = f'http://127.0.0.1:{service.container_port('8888/tcp')}'
 
         logger.debug(f'Using HTML/CSS/SVG validator service running at "{service_url}"')
         return service_url
 
-    def errors(self, content: str, content_type: str = 'text/html') -> List[ValidationError]:
+    def errors(self, content: str, content_type: str = 'text/html') -> list[ValidationError]:
         # Checking content
         if not content:
             raise RuntimeError('Empty content')
@@ -46,7 +45,7 @@ class Validator:
 
         # Parsing error messages
         source_lines = content.splitlines()
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         for message in response.json()['messages']:
             last_line = message.get('lastLine')

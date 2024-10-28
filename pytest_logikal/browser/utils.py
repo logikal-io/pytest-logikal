@@ -28,11 +28,15 @@ def download(url: str, output: Path) -> Path:
 
 def unzip(archive: Path) -> None:
     with ZipFile(archive) as archive_file:
-        archive_file.extractall(archive.parent / archive.stem)
+        for member_info in archive_file.infolist():
+            extracted_path = archive_file.extract(member_info, archive.parent / archive.stem)
 
-
-def make_executable(file: Path) -> None:
-    file.chmod(file.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+            attributes = member_info.external_attr >> 16
+            attributes &= stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO  # extract permission bits
+            if member_info.is_dir():
+                os.chmod(extracted_path, mode=0o755)
+            elif attributes:
+                os.chmod(extracted_path, mode=attributes)
 
 
 def move(source: Path, destination: Path) -> None:

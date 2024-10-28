@@ -1,5 +1,5 @@
+from collections.abc import Callable
 from shutil import copy
-from typing import Callable
 
 from pytest import Pytester, mark, raises
 

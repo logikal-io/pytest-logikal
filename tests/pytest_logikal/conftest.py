@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from importlib import import_module, reload
 from itertools import chain
 from pathlib import Path
-from typing import Callable, Dict, Type, Union, cast
 
 import pytest
 from pytest_mock import MockerFixture
@@ -46,9 +46,9 @@ def plugin_item(
 ) -> Callable[..., pytest_logikal_plugin.Item]:
 
     def plugin_item_wrapper(
-        plugin: Type[pytest_logikal_plugin.Plugin],
-        item: Type[pytest_logikal_plugin.Item],
-        file_contents: Union[str, Dict[str, str]] = '',
+        plugin: type[pytest_logikal_plugin.Plugin],
+        item: type[pytest_logikal_plugin.Item],
+        file_contents: str | dict[str, str] = '',
         set_django_settings_module: bool = True,
     ) -> pytest_logikal_plugin.Item:
         """
@@ -64,7 +64,7 @@ def plugin_item(
         else:
             path = makepyfile(file_contents)
 
-        inicfg: Dict[str, Union[str, int]] = {
+        inicfg: dict[str, str | int] = {
             option: entry['value'] for option, entry in core.DEFAULT_INI_OPTIONS.items()
         }
         if set_django_settings_module:
@@ -83,6 +83,6 @@ def plugin_item(
             args['plugin'] = plugin_obj
         item_obj = item.from_parent(**args)
         item_obj.setup()
-        return cast(pytest_logikal_plugin.Item, item_obj)
+        return item_obj
 
     return plugin_item_wrapper

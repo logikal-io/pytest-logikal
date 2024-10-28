@@ -1,6 +1,5 @@
 from itertools import permutations
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
 
 import pytest
 from babel.messages import Catalog, Message, mofile, pofile
@@ -21,7 +20,7 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(TranslationPlugin(config=config))
 
 
-def _get_message_context(message: Message) -> Optional[Union[str, bytes]]:
+def _get_message_context(message: Message) -> str | bytes | None:
     if isinstance(message.context, bytes):
         return message.context.decode('utf-8')  # type: ignore[unreachable]
     if isinstance(message.context, str):
@@ -29,9 +28,9 @@ def _get_message_context(message: Message) -> Optional[Union[str, bytes]]:
     return message.context
 
 
-def _get_message_string(message: Message) -> Union[str, Tuple[str]]:
+def _get_message_string(message: Message) -> str | tuple[str]:
     if isinstance(message.string, list):
-        return tuple(message.string)
+        return tuple(message.string)  # type: ignore[return-value]
     return message.string  # type: ignore[return-value]
 
 
@@ -63,7 +62,7 @@ class TranslationItem(CachedFileCheckItem):
     plugin: 'TranslationPlugin'
 
     def run(self) -> None:
-        errors: List[str] = []
+        errors: list[str] = []
 
         with open(self.path, encoding='utf-8') as catalog_file:
             catalog = pofile.read_po(catalog_file, abort_invalid=True)

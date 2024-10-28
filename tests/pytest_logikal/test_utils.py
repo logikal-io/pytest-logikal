@@ -39,8 +39,8 @@ def test_expected_not_found(tmp_path: Path, mocker: MockerFixture) -> None:
     tty.return_value = True
     expected = tmp_path / 'interactive.png'
 
-    input_keys.side_effect = 'c'  # opening cancelled
-    with raises(AssertionError, match='cancelled'):
+    input_keys.side_effect = 'c'  # opening canceled
+    with raises(AssertionError, match='canceled'):
         utils.assert_image_equal(b'', expected, image_tmp_path=tmp_path)
     assert not run.called
     assert not expected.is_file()
@@ -70,7 +70,7 @@ def test_difference(tmp_path: Path, mocker: MockerFixture) -> None:
     expected = screenshots / 'difference.png'
     with Image.open(actual) as actual_image, Image.open(expected) as expected_image:
         assert actual_image == expected_image, '\n'.join([
-            'Incorrect difference', f'  Actual: {actual}', f'  Expected: {expected}',
+            'Incorrect difference', f'  Actual: file://{actual}', f'  Expected: file://{expected}',
         ])
 
 
