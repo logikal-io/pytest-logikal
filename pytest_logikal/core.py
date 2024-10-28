@@ -48,8 +48,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-licenses', action='store_true', help='do not check licenses')
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
-    group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
     group.addoption('--no-spell', action='store_true', help='do not use codespell')
+    group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
     group.addoption('--no-install', action='store_true', help='do not install packages')
 
     if EXTRAS['django']:
