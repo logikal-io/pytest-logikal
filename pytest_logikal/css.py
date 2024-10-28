@@ -47,14 +47,14 @@ class CSSItem(CachedFileCheckItem):
                 command, capture_output=True, text=True, check=False, cwd=Path(__file__).parent,
             )
         try:
-            report = json.loads(process.stdout)[0]
+            report = json.loads(process.stderr)[0]
             if report['errored']:
                 messages.extend(
-                    f'{error["line"]}:{error["column"]}: {error["severity"]}: {error["text"]}'
+                    f'{error['line']}:{error['column']}: {error['severity']}: {error['text']}'
                     for error in report['warnings']
                 )
         except json.decoder.JSONDecodeError:
-            messages.append(process.stdout or process.stderr)
+            messages.append(process.stderr)
 
         # Report errors
         if messages:

@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from logikal_utils.project import PYPROJECT
 from pytest import raises

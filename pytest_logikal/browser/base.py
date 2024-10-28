@@ -1,16 +1,17 @@
 # pylint: disable=import-outside-toplevel
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
 from sys import stderr
 from time import sleep
-from typing import Any, Dict, Iterator, Optional, Type
+from typing import Any
 
 from selenium.webdriver.remote.webdriver import WebDriver
 from termcolor import colored
-from xdg import xdg_cache_home
+from xdg_base_dirs import xdg_cache_home
 
 from pytest_logikal.browser.scenarios import Settings
 from pytest_logikal.utils import assert_image_equal, hide_traceback, tmp_path
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class BrowserVersion(ABC):
-    created: Dict[str, 'BrowserVersion'] = {}
+    created: dict[str, 'BrowserVersion'] = {}
 
     _initial_info = False
 
@@ -30,7 +31,7 @@ class BrowserVersion(ABC):
 
     @property
     @abstractmethod
-    def driver_class(self) -> Type['Browser']:
+    def driver_class(self) -> type['Browser']:
         ...
 
     @property
@@ -49,7 +50,7 @@ class BrowserVersion(ABC):
     def driver_version(self) -> str:
         return self.version
 
-    def __init__(self, version: str, install: bool = True, install_path: Optional[Path] = None):
+    def __init__(self, version: str, install: bool = True, install_path: Path | None = None):
         install_path = install_path or (xdg_cache_home() / 'pytest_logikal')
 
         self.version = version
@@ -81,7 +82,7 @@ class BrowserVersion(ABC):
         if not BrowserVersion._initial_info:
             print(colored('Installing browsers', 'yellow', attrs=['bold']), file=stderr)
             BrowserVersion._initial_info = True
-        print(f'\n{colored(message, attrs=["bold"])}', file=stderr)
+        print(f'\n{colored(message, attrs=['bold'])}', file=stderr)
 
     @staticmethod
     def final_info() -> None:
@@ -93,13 +94,16 @@ class Browser(ABC, WebDriver):
     """
     Base class for browser-specific web drivers.
     """
+    height_offset = 0  # correction for https://github.com/SeleniumHQ/selenium/issues/14660
+    width_offset = 0  # correction for https://github.com/SeleniumHQ/selenium/issues/14660
+
     def __init__(
         self,
         *,
         version: BrowserVersion,
         settings: Settings,
         screenshot_path: Path = Path('screenshot'),
-        image_tmp_path: Optional[Path] = None,
+        image_tmp_path: Path | None = None,
         **kwargs: Any,
     ):
         self.version = version
@@ -114,16 +118,15 @@ class Browser(ABC, WebDriver):
         super().__init__(**{**kwargs, **self.init_args()})
 
     @abstractmethod
-    def init_args(self) -> Dict[str, Any]:
+    def init_args(self) -> dict[str, Any]:
         ...
 
     @contextmanager
-    def auto_height(self, wait_milliseconds: Optional[int]) -> Iterator[None]:
+    def auto_height(self, wait_milliseconds: int | None) -> Iterator[None]:
         if not self.settings.full_page_height:
             yield
             return
         logger.debug('Using full page height')
-        original_size = self.get_window_size()
         if wait_milliseconds:  # we use a small delay to mitigate height flakiness
             logger.debug(f'Waiting {wait_milliseconds} ms')
             sleep(wait_milliseconds / 1000)
@@ -135,17 +138,20 @@ class Browser(ABC, WebDriver):
             'document.documentElement.scrollHeight',
             'document.documentElement.offsetHeight',
         ]
-        script = f'return Math.max({",".join(elements)});'
+        script = f'return Math.max({','.join(elements)});'
         height = self.execute_script(script)  # type: ignore[no-untyped-call]
         logger.debug(f'Calculated page height: {height}')
-        self.set_window_size(original_size['width'], height)
+        self.set_window_size(self.settings.width + self.width_offset, height + self.height_offset)
         try:
             yield
         finally:
-            self.set_window_size(**original_size)
+            self.set_window_size(
+                self.settings.width + self.width_offset,
+                self.settings.height + self.height_offset,
+            )
 
     @hide_traceback
-    def check(self, name: Optional[str] = None, wait_milliseconds: Optional[int] = 100) -> None:
+    def check(self, name: str | None = None, wait_milliseconds: int | None = 100) -> None:
         """
         Create a screenshot and check it against an expected version.
 

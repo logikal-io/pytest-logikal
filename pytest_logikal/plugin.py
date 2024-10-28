@@ -1,6 +1,7 @@
 from abc import abstractmethod
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Iterable, Type
+from typing import Any
 
 import pytest
 
@@ -37,7 +38,7 @@ class Item(pytest.Item):
 
 class Plugin:
     name: str
-    item: Type[Item]
+    item: type[Item]
 
     def __init__(self, config: pytest.Config):
         if not hasattr(self, 'name'):

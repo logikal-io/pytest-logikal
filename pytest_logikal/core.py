@@ -2,10 +2,11 @@ import logging
 import os
 import shutil
 import sys
+from collections.abc import Callable, Iterator
 from importlib.util import find_spec
 from itertools import chain
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any
 
 import pytest
 from termcolor import colored
@@ -14,11 +15,12 @@ sys.path.insert(0, os.getcwd())
 
 PLUGINS = {
     'core': [
-        'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'style',
+        'mypy', 'bandit', 'build', 'docs', 'isort', 'licenses', 'pylint', 'requirements', 'spell',
+        'style',
     ],
     'django': ['migration', 'translations', 'html', 'css', 'svg', 'js'],
 }
-DEFAULT_INI_OPTIONS: Dict[str, Any] = {
+DEFAULT_INI_OPTIONS: dict[str, Any] = {
     'max_line_length': {'value': 99, 'help': 'the maximum line length to use'},
     'max_complexity': {'value': 10, 'help': 'the maximum complexity to allow'},
     'cov_fail_under': {'value': 100, 'help': 'target coverage percentage'},
@@ -29,7 +31,7 @@ EXTRAS = {
     'django': bool(find_spec('pytest_django')),
 }
 
-ReportInfoType = Tuple[Union[Any, str], Optional[int], str]
+ReportInfoType = tuple[Any | str, int | None, str]
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -47,6 +49,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-pylint', action='store_true', help='do not use pylint')
     group.addoption('--no-requirements', action='store_true', help='do not check requirements')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
+    group.addoption('--no-spell', action='store_true', help='do not use codespell')
     group.addoption('--no-install', action='store_true', help='do not install packages')
 
     if EXTRAS['django']:
@@ -71,7 +74,7 @@ def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
 
 
 @pytest.hookimpl(wrapper=True)
-def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) -> Iterator[None]:
+def pytest_load_initial_conftests(early_config: pytest.Config, args: list[str]) -> Iterator[None]:
     if '--no-defaults' in args:
         yield
 
@@ -105,7 +108,7 @@ def pytest_load_initial_conftests(early_config: pytest.Config, args: List[str]) 
         namespace.cov_report = {'term-missing': 'skip-covered'}
 
     # Updating config
-    ini_defaults: Dict[str, Union[str, List[str]]] = {
+    ini_defaults: dict[str, str | list[str]] = {
         'console_output_style': 'classic',
         'xfail_strict': 'True',
         'filterwarnings': ['error'],
@@ -155,6 +158,7 @@ def pytest_configure(config: pytest.Config) -> None:
         '--strict',
         '--show-column-numbers',
         '--warn-unreachable',
+        '--local-partial-types',
     ]
 
 
@@ -165,7 +169,7 @@ def unified_reportinfo(item: pytest.Item, header: str) -> Callable[[], ReportInf
 
 
 @pytest.hookimpl(trylast=True)
-def pytest_collection_modifyitems(items: List[pytest.Item]) -> None:
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         source = item.nodeid.split('::')[-1].lower()
         if source == 'mypy':

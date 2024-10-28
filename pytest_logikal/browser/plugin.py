@@ -1,8 +1,9 @@
 import inspect
+from collections.abc import Iterable
 from itertools import product
 from operator import itemgetter
 from pathlib import Path
-from typing import Any, Iterable, List, Union
+from typing import Any
 
 import pytest
 from logikal_utils.project import PYPROJECT
@@ -30,11 +31,11 @@ def pytest_sessionstart(session: pytest.Session) -> None:
     BrowserVersion.final_info()
 
 
-def pytest_report_header(config: pytest.Config) -> Union[str, List[str]]:
+def pytest_report_header(config: pytest.Config) -> str | list[str]:
     browsers = [item[1] for item in sorted(BrowserVersion.created.items())]
     if config.get_verbosity() > 0:
         return ['browsers:'] + [f'  {repr(browser)}' for browser in browsers]
-    return f'browsers: {", ".join(str(browser) for browser in browsers)}'
+    return f'browsers: {', '.join(str(browser) for browser in browsers)}'
 
 
 def check_browser_fixture_request(request: Any) -> None:
@@ -68,7 +69,7 @@ def browser(tmp_path: Path, request: Any) -> Iterable[Browser]:  # noqa: D400, D
         yield driver
 
 
-def set_browser(scenarios: Union[Scenario, List[Scenario]]) -> Fixture[Any]:
+def set_browser(scenarios: Scenario | list[Scenario]) -> Fixture[Any]:
     """
     Apply the given scenarios to the :func:`~pytest_logikal.browser.plugin.browser` fixture.
 

@@ -1,7 +1,6 @@
 import json
 import re
 import subprocess
-from typing import List
 
 import pytest
 from logikal_utils.project import PYPROJECT
@@ -21,6 +20,7 @@ ALLOWED_LICENSES = [
     r'^BSD$',
     r'^BSD-3-Clause$',
     r'^CC0 1.0 Universal \(CC0 1\.0\) Public Domain Dedication$',
+    r'^CMU License \(MIT-CMU\)$',
     r'^GNU Lesser General Public License v2 \(LGPLv2\)$',
     r'^GNU Lesser General Public License v2 or later \(LGPLv2\+\)$',
     r'^GNU Lesser General Public License v3 \(LGPLv3\)$',
@@ -38,13 +38,13 @@ ALLOWED_LICENSES = [
 ]
 
 ALLOWED_PACKAGES = {
+    'codespell': r'^GPL-2\.0-only$',  # only used as a local tool
     'django-migration-linter': r'^UNKNOWN$',  # license is Apache License 2.0, see [1]
     'djlint': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # only used as a local tool
     'facebook-business': r'^LICENSE\.txt$',  # only used as a connector
     'facebook_business': r'^LICENSE\.txt$',  # only used as a connector
     'html-tag-names': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
     'html-void-elements': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
-    'pillow': r'^Historical Permission Notice and Disclaimer \(HPND\)$',  # license is BSD-like
     'pkg-resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [2]
     'pkg_resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [2]
     'pylint': r'^GNU General Public License v2 \(GPLv2\)$',  # only used as a local tool
@@ -80,7 +80,7 @@ class LicenseItem(Item):
         allowed_licenses.extend(pyproject_licenses.get('extend_allowed_licenses', []))
         allowed_packages.update(pyproject_licenses.get('extend_allowed_packages', {}))
 
-        warnings: List[str] = []
+        warnings: list[str] = []
         for package in sorted(packages, key=lambda item: (item['License'], item['Name'].lower())):
             name, version, url = package['Name'], package.get('Version'), package.get('URL')
             licenses = [license.strip() for license in package['License'].split(';')]
@@ -97,7 +97,7 @@ class LicenseItem(Item):
 
             if (not allowed_package_license and not allowed_license):
                 url = f' ({url})' if url not in ('UNKNOWN', None) else ''
-                warnings.append(f'Warning: {package["License"]}: {name}=={version}{url}')
+                warnings.append(f'Warning: {package['License']}: {name}=={version}{url}')
         if warnings:
             raise ItemRunError('\n'.join(warnings))
 

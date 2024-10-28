@@ -31,6 +31,7 @@ which automatically runs a broad range of checks:
 - Linting (via `Pylint <https://pylint.pycqa.org/>`_)
 - Code style checks (via `isort <https://pycqa.github.io/isort/>`_,
   `pycodestyle <https://pycodestyle.pycqa.org/>`_ and `pydocstyle <http://www.pydocstyle.org/>`_)
+- Spelling checks (via `codespell <https://github.com/codespell-project/codespell>`_)
 - Coverage checks (via `coverage.py <https://coverage.readthedocs.io/>`_
   and `pytest-cov <https://pytest-cov.readthedocs.io/>`_)
 - Security checks (via `Bandit <https://bandit.readthedocs.io/>`_)
@@ -101,8 +102,8 @@ file as follows:
 .. code-block:: toml
 
     [tool.browser.versions]
-    chrome = '124.0.6367.91'
-    edge = '124.0.2478.80'
+    chrome = '130.0.6723.69'
+    edge = '129.0.2792.65'
 
 django
 ~~~~~~

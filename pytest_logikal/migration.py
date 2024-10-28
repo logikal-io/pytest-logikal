@@ -1,7 +1,6 @@
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
-from typing import Optional
 
 import pytest
 from django.conf import settings
@@ -27,7 +26,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 class MigrationItem(Item):
-    def runtest(self, migrations_file_path: Optional[Path] = None) -> None:
+    def runtest(self, migrations_file_path: Path | None = None) -> None:
         with self.config.stash[blocking_manager_key].unblock():
             linter = MigrationLinter(**{
                 'all_warnings_as_errors': True,

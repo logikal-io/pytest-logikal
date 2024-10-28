@@ -1,8 +1,6 @@
-try:
-    import zoneinfo  # type: ignore[import-not-found]
-except ImportError:
-    from backports import zoneinfo  # note: this is built-in after Python 3.9+
-from typing import Any, Dict, Iterable, Optional, Protocol, Sequence
+import zoneinfo
+from collections.abc import Iterable, Sequence
+from typing import Any, Protocol
 
 import pytest
 from django.conf import settings
@@ -56,9 +54,9 @@ def factory_seed() -> None:
 class LiveURL(Protocol):
     def __call__(
         self,
-        name: Optional[str] = None,
-        args: Optional[Sequence[Any]] = None,
-        kwargs: Optional[Dict[str, Any]] = None,
+        name: str | None = None,
+        args: Sequence[Any] | None = None,
+        kwargs: dict[str, Any] | None = None,
     ) -> str:
         ...
 
@@ -66,7 +64,7 @@ class LiveURL(Protocol):
 @pytest.fixture
 def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400, D402, D415, D417
     """
-    live_url(name: str | None, args: Sequence[Any] | None, kwargs: Dict[str, Any] | None) -> str
+    live_url(name: str | None, args: Sequence[Any] | None, kwargs: dict[str, Any] | None) -> str
 
     Return the path to a URL.
 
@@ -77,9 +75,9 @@ def live_url(live_server: LiveServer) -> LiveURL:  # noqa: D400, D402, D415, D41
 
     """
     def live_url_path(
-        name: Optional[str] = None,
-        args: Optional[Sequence[Any]] = None,
-        kwargs: Optional[Dict[str, Any]] = None,
+        name: str | None = None,
+        args: Sequence[Any] | None = None,
+        kwargs: dict[str, Any] | None = None,
     ) -> str:
         return live_server.url + (reverse(viewname=name, args=args, kwargs=kwargs) if name else '')
     return live_url_path

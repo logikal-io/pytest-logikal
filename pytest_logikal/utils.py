@@ -1,4 +1,5 @@
 import sys
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from io import BytesIO
 from logging import getLogger
@@ -8,7 +9,7 @@ from pathlib import Path
 from shutil import copy
 from subprocess import run
 from tempfile import TemporaryDirectory, mkdtemp
-from typing import Any, Callable, Dict, Generator, Optional, Type, TypeVar
+from typing import Any, TypeVar
 
 from logikal_utils.project import PYPROJECT
 from PIL import Image, ImageChops
@@ -34,13 +35,13 @@ def get_ini_option(name: str) -> Any:
     return type(default)(ini_options.get(name, default))
 
 
-def hide_traceback(function: Function, error: Type[Exception] = AssertionError) -> Function:
+def hide_traceback(function: Function, error: type[Exception] = AssertionError) -> Function:
     getattr(function, '__globals__')['__tracebackhide__'] = methodcaller('errisinstance', error)
     return function
 
 
 @contextmanager
-def render_template(path: Path, context: Dict[str, Any]) -> Generator[Path, None, None]:
+def render_template(path: Path, context: dict[str, Any]) -> Generator[Path]:
     with TemporaryDirectory(prefix='pytest_logikal_', suffix='_template') as tmp_dir:
         rendered = path.read_text(encoding='utf-8').format(**context)
         config_path = Path(tmp_dir) / path.name
@@ -85,7 +86,7 @@ def save_image_prompt(
     message: str,
     source: Path,
     destination: Path,
-    difference: Optional[Path] = None,
+    difference: Path | None = None,
 ) -> None:
     if not sys.stdin.isatty():
         error_lines = [
@@ -102,10 +103,10 @@ def save_image_prompt(
         short_destination = destination
 
     colors = {'red': '\033[31m\033[1m', 'reset': '\033[0m'}
-    print(f'\n{colors["red"]}{message}!{colors["reset"]}')
+    print(f'\n{colors['red']}{message}!{colors['reset']}')
     print(short_destination)
 
-    prompt = f'{colors["red"]}>{colors["reset"]} '
+    prompt = f'{colors['red']}>{colors['reset']} '
     if (opener := Path('/usr/bin/xdg-open')).exists():
         response = input(f'{prompt}Press "enter" to open or type "s" to skip or "c" to cancel: ')
         if response == 's':
@@ -114,7 +115,7 @@ def save_image_prompt(
             # This subprocess call is secure as it is not using untrusted input
             run([str(opener), str(source)], check=False)  # nosec
         else:
-            raise AssertionError('Image opening cancelled')
+            raise AssertionError('Image opening canceled')
     else:
         print(f'{prompt}See file://{source}')
 

@@ -6,7 +6,7 @@ from selenium.webdriver.edge.webdriver import WebDriver
 
 from pytest_logikal.browser.base import BrowserVersion
 from pytest_logikal.browser.chromium import ChromiumBrowser
-from pytest_logikal.browser.utils import download, make_executable, move, unzip
+from pytest_logikal.browser.utils import download, move, unzip
 from pytest_logikal.utils import tmp_path
 
 
@@ -16,6 +16,10 @@ class Edge(ChromiumBrowser, WebDriver):
     """
     options_class = Options
     service_class = Service
+
+    # See https://github.com/SeleniumHQ/selenium/issues/14660
+    height_offset = 123
+    width_offset = 8
 
 
 class EdgeVersion(BrowserVersion):
@@ -40,4 +44,3 @@ class EdgeVersion(BrowserVersion):
             tmp = tmp_path(self.driver_name)
             unzip(download(url, tmp / 'edgedriver.zip'))
             move(tmp / 'edgedriver', self.driver_path.parent)
-            make_executable(self.driver_path)
