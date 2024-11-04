@@ -67,6 +67,7 @@ module = [
   'factory.*',
   'pycodestyle',
   'pydocstyle',
+  'pytest_cov',
   'xdist.*',
 ]
 
@@ -84,6 +85,8 @@ known_first_party = ['pytest_logikal']
 omit = [
   '/tmp/*',  # ignore temporary files created during testing
   'tests/pytest_logikal/files/*',  # ignore files used inside plugin runs
+  'pytest_logikal/browser/base.py',  # reload triggers an error
+  'pytest_logikal/browser/scenarios.py',  # reload triggers an error
 ]
 exclude_lines = [
   'pragma: no cover',

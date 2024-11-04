@@ -90,6 +90,30 @@ def test_clear(mocker: MockerFixture) -> None:
     assert shutil.rmtree.called
 
 
+def test_install_only(
+    mocker: MockerFixture,
+    pytester: pytest.Pytester,
+    capfd: pytest.CaptureFixture[str],
+) -> None:
+    mocker.patch('pytest_logikal.django.Validator')
+    for browser in ['chrome', 'edge']:
+        mocker.patch(f'pytest_logikal.browser.{browser}.download')
+        mocker.patch(f'pytest_logikal.browser.{browser}.unzip')
+        mocker.patch(f'pytest_logikal.browser.{browser}.move')
+    mocker.patch('pytest_logikal.browser.edge.run')
+
+    pytester.makepyprojecttoml(PYPROJECT_TOML)
+    result = pytester.runpytest('--install-only', '--assert', 'plain')
+    stderr = capfd.readouterr().err
+    assert 'Installing Google Chrome' in stderr
+    assert 'Installing Google Chrome WebDriver' in stderr
+    assert 'Installing Microsoft Edge' in stderr
+    assert 'Installing Microsoft Edge WebDriver' in stderr
+    assert result.outlines == ['']
+    assert result.errlines == []
+    assert result.ret == pytest.ExitCode.NO_TESTS_COLLECTED
+
+
 def test_run_without_extras(mocker: MockerFixture) -> None:
     for extra in core.EXTRAS:
         with patch.dict(core.EXTRAS, {extra: False}):
