@@ -2,6 +2,7 @@ from dataclasses import replace
 
 from pytest import mark, raises
 from pytest_factoryboy import register
+from selenium.webdriver.common.by import By
 
 from pytest_logikal.browser import Browser, scenarios, set_browser
 from pytest_logikal.django import LiveURL
@@ -40,6 +41,14 @@ def test_browser_check(browser: Browser) -> None:
     browser.check('nincs-ido')
     browser.get('https://www.sofia.hu/konyv/hamori-zsofia/perennrose')
     browser.check('perennrose')
+
+
+@set_browser(scenarios.desktop)
+def test_replace_text(live_url: LiveURL, browser: Browser) -> None:
+    browser.get(live_url())
+    header = browser.find_element(By.CSS_SELECTOR, 'h1')
+    browser.replace_text(header, 'New Header')
+    browser.check()
 
 
 @set_browser(scenarios.desktop)

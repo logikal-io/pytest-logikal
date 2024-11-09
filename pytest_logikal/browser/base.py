@@ -177,6 +177,18 @@ class Browser(ABC, WebDriver):
 
         assert_image_equal(actual=actual, expected=expected, image_tmp_path=self.image_tmp_path)
 
+    def replace_text(self, element: Any, text: str) -> None:
+        """
+        Replace the text of an element.
+
+        Args:
+            element: The element to use.
+            text: The new text value.
+
+        """
+        script = f'arguments[0].innerHTML = "{text}"'
+        self.execute_script(script, element)  # type: ignore[no-untyped-call]
+
     def login(self, user: Any, force: bool = True) -> None:
         """
         .. note:: The ``django`` extra must be installed for this method to work.
