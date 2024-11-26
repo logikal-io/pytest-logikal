@@ -1,6 +1,4 @@
-from collections.abc import Callable
 from itertools import chain
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -9,6 +7,7 @@ from logikal_utils.project import PYPROJECT
 from pytest_mock.plugin import MockerFixture
 
 from pytest_logikal import core
+from tests.pytest_logikal.conftest import append_newline
 
 pytest_plugins = ['pytester']
 
@@ -25,12 +24,11 @@ PYPROJECT_TOML = tomli_w.dumps({
 
 
 def test_run_errors(
-    makepyfile: Callable[[str], Path],
     pytester: pytest.Pytester,
 ) -> None:  # pragma: no cover, coverage does not measure after runpytest
     pytester.makepyprojecttoml(PYPROJECT_TOML)
     codespell_error = "univrsal = 'valid'"  # codespell:ignore univrsal
-    makepyfile(f"""
+    append_newline(pytester.makepyfile(f"""
         import pickle  # triggers a bandit error
         import re  # triggers a pylint error
         import os  # triggers an isort error
@@ -40,7 +38,7 @@ def test_run_errors(
             '''Invalid docstring quotes.'''  # triggers a pydocstyle error
             test: int = 'invalid'  # triggers a mypy error
             {codespell_error}
-    """)
+    """))
     result = pytester.runpytest('--clear', *PYTEST_ARGS)
     result.stdout.re_match_lines_random([
         r'.*\[bandit\] test_run_errors\.py.*',
@@ -56,12 +54,14 @@ def test_run_errors(
     assert result.parseoutcomes() == {'failed': 7, 'passed': 1}
 
 
-def test_run_success(makepyfile: Callable[[str], Path], pytester: pytest.Pytester) -> None:
+def test_run_success(
+    pytester: pytest.Pytester,
+) -> None:  # pragma: no cover, coverage does not measure after runpytest
     pytester.makepyprojecttoml(PYPROJECT_TOML)
-    makepyfile("""
+    append_newline(pytester.makepyfile("""
         def test_success() -> None:
             \"\"\"A test that will succeed.\"\"\"
-    """)
+    """))
     result = pytester.runpytest(*PYTEST_ARGS)
     result.stdout.re_match_lines_random(['.*coverage: platform.*'])
     assert result.parseoutcomes() == {'passed': 8}

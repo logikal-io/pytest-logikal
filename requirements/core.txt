@@ -1,6 +1,6 @@
 bandit==1.7.10
 codespell==2.3.0
-coverage==7.6.4
+coverage==7.6.8
 isort[colors]==5.13.2
 mypy[faster-cache]==1.13.0
 pip-licenses==5.0.0
