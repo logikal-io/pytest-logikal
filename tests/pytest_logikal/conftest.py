@@ -25,25 +25,17 @@ for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):
     reload(import_module(f'pytest_logikal.{submodule}'))
 
 
-@pytest.fixture
-def makepyfile(pytester: pytest.Pytester) -> Callable[[str], Path]:
-    def makepyfile_wrapper(file_contents: str) -> Path:
-        """
-        Create a new Python source file and append a new line at the end of the file.
-        """
-        pyfilepath = pytester.makepyfile(file_contents)
-        with pyfilepath.open('a') as pyfile:
-            pyfile.write('\n')
-        return pyfilepath
-
-    return makepyfile_wrapper
+def append_newline(file: Path) -> Path:
+    # Necessary because makefile and makepyfile strips ending new lines
+    with file.open('a') as file_obj:
+        file_obj.write('\n')
+    return file
 
 
 @pytest.fixture
 def plugin_item(
     pytester: pytest.Pytester,
     pytestconfig: pytest.Config,
-    makepyfile: Callable[[str], Path],  # pylint: disable=redefined-outer-name
     mocker: MockerFixture,
 ) -> Callable[..., pytest_logikal_plugin.Item]:
 
@@ -61,10 +53,10 @@ def plugin_item(
                 pyproject = 'pyproject.toml'
                 path = (
                     pytester.makepyprojecttoml(file_contents[name]) if name == pyproject else
-                    pytester.makefile(Path(name).suffix, **{name: contents})
+                    append_newline(pytester.makefile(Path(name).suffix, **{name: contents}))
                 )
         else:
-            path = makepyfile(file_contents)
+            path = append_newline(pytester.makepyfile(file_contents))
 
         inicfg: dict[str, str | int] = {
             option: entry['value'] for option, entry in core.DEFAULT_INI_OPTIONS.items()

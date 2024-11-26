@@ -16,3 +16,6 @@ if (validVariable === 1) {
 } else if (validVariable === 3) {
     validVariable = 4;
 }
+
+// Globals
+document.getElementById('valid');
