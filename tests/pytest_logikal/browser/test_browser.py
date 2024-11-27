@@ -52,6 +52,13 @@ def test_replace_text(live_url: LiveURL, browser: Browser) -> None:
 
 
 @set_browser(scenarios.desktop)
+def test_wait(live_url: LiveURL, browser: Browser) -> None:
+    browser.get(live_url())
+    browser.wait_for_element(By.CSS_SELECTOR, 'h1')
+    browser.check()
+
+
+@set_browser(scenarios.desktop)
 def test_login(live_url: LiveURL, browser: Browser, user: User) -> None:
     browser.get(live_url('internal'))
     browser.check('before_login')

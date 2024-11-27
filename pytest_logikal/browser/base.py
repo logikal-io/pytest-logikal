@@ -10,6 +10,8 @@ from time import sleep
 from typing import Any
 
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 from termcolor import colored
 from xdg_base_dirs import xdg_cache_home
 
@@ -188,6 +190,26 @@ class Browser(ABC, WebDriver):
         """
         script = f'arguments[0].innerHTML = "{text}"'
         self.execute_script(script, element)  # type: ignore[no-untyped-call]
+
+    def wait_for_element(
+        self,
+        by: str,
+        value: str,
+        timeout_seconds: int = 10,
+        poll_frequency: float = 0.5,
+    ) -> None:
+        """
+        Wait until a given element is present.
+
+        Args:
+            by: The selector type to use for locating the element.
+            value: The selector value to use for locating the element.
+            timeout_seconds: The maximal time to wait.
+            poll_frequency: Sleep interval between checks.
+
+        """
+        wait = WebDriverWait(driver=self, timeout=timeout_seconds, poll_frequency=poll_frequency)
+        wait.until(expected_conditions.presence_of_element_located((by, value)))
 
     def login(self, user: Any, force: bool = True) -> None:
         """
