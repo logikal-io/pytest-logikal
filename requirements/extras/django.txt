@@ -2,7 +2,7 @@ babel~=2.16
 Django~=5.1
 django-stubs~=5.1
 django-migration-linter~=5.1
-djlint==1.36.1
+djlint==1.36.4
 pylint-django==2.6.1
 pytest-django==4.9.0
 pytest-factoryboy==2.7.0

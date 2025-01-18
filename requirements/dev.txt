@@ -2,6 +2,6 @@
 -r build.txt
 -r docs.txt
 
-tomli-w==1.1.0
+tomli-w==1.2.0
 types-requests
 types-tqdm
