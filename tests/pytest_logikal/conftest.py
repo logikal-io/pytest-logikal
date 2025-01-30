@@ -16,8 +16,6 @@ MODULES = [
     'core', 'file_checker', 'plugin',
     # Additional modules
     'black', 'browser', 'django', 'node_install', 'utils', 'validator',
-    # Browser sub-modules
-    'browser.chromium', 'browser.chrome', 'browser.edge', 'browser.plugin', 'browser.utils',
 ]
 for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):
     if submodule == 'mypy':

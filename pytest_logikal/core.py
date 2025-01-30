@@ -54,7 +54,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     group.addoption('--no-spell', action='store_true', help='do not use codespell')
     group.addoption('--no-style', action='store_true', help='do not use pycodestyle & pydocstyle')
     group.addoption('--no-install', action='store_true', help='do not install packages')
-    group.addoption('--install-only', action='store_true', help='only install packages')
 
     if EXTRAS['django']:
         group.addoption('--no-migration', action='store_true', help='do not check migrations')
@@ -78,7 +77,7 @@ def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
 
 
 @pytest.hookimpl(wrapper=True)
-def pytest_load_initial_conftests(  # pylint: disable=too-complex
+def pytest_load_initial_conftests(
     early_config: pytest.Config, args: list[str],
 ) -> Iterator[None]:
     if '--no-defaults' in args:
@@ -87,14 +86,6 @@ def pytest_load_initial_conftests(  # pylint: disable=too-complex
     # Updating arguments
     args.extend(['--strict-config', '--strict-markers'])
     namespace = early_config.known_args_namespace
-    if '--install-only' in args:
-        args.append('--live')
-        args.append('--fast')
-        args.append('--collect-only')
-        args.extend(['--verbosity', '-2'])
-        args.extend(['--log-level', 'INFO'])
-        if EXTRAS['django']:
-            args.extend(['-p', 'no:django'])
     if '--live' in args:
         args.append('--capture=no')
         namespace.capture = 'no'
