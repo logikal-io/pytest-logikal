@@ -30,7 +30,7 @@ dynamic = ['version', 'entry-points', 'dependencies', 'optional-dependencies']
 'Source code' = 'https://github.com/logikal-io/pytest-logikal'
 
 [tool.setuptools]
-packages = ['pytest_logikal', 'pytest_logikal.browser']
+packages = ['pytest_logikal']
 
 [tool.setuptools.dynamic]
 entry-points = {file = 'entry_points.ini'}
@@ -62,7 +62,6 @@ plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issu
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
 module = [
-  'PIL',  # https://github.com/python-pillow/Pillow/issues/2625
   'django_migration_linter.*',  # https://github.com/3YOURMIND/django-migration-linter/issues/238
   'factory.*',
   'pycodestyle',
@@ -72,11 +71,8 @@ module = [
 ]
 
 [tool.browser.versions]
-# See https://googlechromelabs.github.io/chrome-for-testing/#stable
-chrome = '130.0.6723.69'
-# See https://learn.microsoft.com/en-us/deployedge/microsoft-edge-relnote-stable-channel
-# See https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
-edge = '129.0.2792.65'
+chrome = '132.0.6834.83'
+edge = '132.0.2957.115'
 
 [tool.isort]
 known_first_party = ['pytest_logikal']
@@ -85,8 +81,6 @@ known_first_party = ['pytest_logikal']
 omit = [
   '/tmp/*',  # ignore temporary files created during testing
   'tests/pytest_logikal/files/*',  # ignore files used inside plugin runs
-  'pytest_logikal/browser/base.py',  # reload triggers an error
-  'pytest_logikal/browser/scenarios.py',  # reload triggers an error
 ]
 exclude_lines = [
   'pragma: no cover',

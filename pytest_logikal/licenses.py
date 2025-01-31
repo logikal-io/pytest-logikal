@@ -38,23 +38,25 @@ ALLOWED_LICENSES = [
 ]
 
 ALLOWED_PACKAGES = {
-    'attrs': r'^UNKNOWN$',  # license is MIT, see [1]
     'codespell': r'^GPL-2\.0-only$',  # only used as a local tool
-    'django-migration-linter': r'^UNKNOWN$',  # license is Apache License 2.0, see [2]
+    'django-migration-linter': r'^UNKNOWN$',  # license is Apache License 2.0, see [1]
     'djlint': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # only used as a local tool
     'facebook-business': r'^LICENSE\.txt$',  # only used as a connector
     'facebook_business': r'^LICENSE\.txt$',  # only used as a connector
     'html-tag-names': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
     'html-void-elements': r'^GNU General Public License v3 or later \(GPLv3\+\)$',  # local tool
-    'pkg-resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [3]
-    'pkg_resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [3]
+    'pkg-resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [2]
+    'pkg_resources': r'^UNKNOWN$',  # caused by an Ubuntu bug, see [2]
     'pylint': r'^GNU General Public License v2 \(GPLv2\)$',  # only used as a local tool
     'pylint-django': r'^GNU General Public License v2 or later \(GPLv2\+\)$',  # local plugin
     'pylint-plugin-utils': r'^GNU General Public License v2 or later \(GPLv2\+\)$',  # local plugin
+    # Broken license inference because of PEP 639, see [3]
+    'attrs': r'^UNKNOWN$',  # license is MIT
+    'prettytable': r'^UNKNOWN$',  # license is BSD-3-Clause
 }
-# [1] https://github.com/python-attrs/attrs/issues/1386
-# [2] https://github.com/3YOURMIND/django-migration-linter/issues/290
-# [3] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
+# [1] https://github.com/3YOURMIND/django-migration-linter/issues/290
+# [2] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
+# [3] https://github.com/raimon49/pip-licenses/issues/225
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

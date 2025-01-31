@@ -1,4 +1,1 @@
-requests~=2.32
-tqdm~=4.67
-selenium==4.27.1
-xdg-base-dirs~=6.0
+logikal-browser~=2.0
