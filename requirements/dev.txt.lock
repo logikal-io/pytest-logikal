@@ -53,7 +53,7 @@ Jinja2==3.1.5
 jsbeautifier==1.15.1
 json5==0.10.0
 keyring==25.6.0
-logikal-browser==2.0.1
+logikal-browser==2.0.2
 logikal-docs==1.2.1
 logikal-utils==1.4.0
 markdown-it-py==3.0.0
@@ -102,7 +102,7 @@ requests-toolbelt==1.0.0
 rfc3986==2.0.0
 rich==13.9.4
 SecretStorage==3.3.3
-selenium==4.28.0
+selenium==4.28.1
 setuptools==75.8.0
 six==1.17.0
 sniffio==1.3.1
