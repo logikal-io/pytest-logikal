@@ -30,7 +30,7 @@ DEFAULT_INI_OPTIONS: dict[str, Any] = {
 }
 EXTRAS = {
     'black': bool(find_spec('black')),
-    'browser': bool(find_spec('selenium')),
+    'browser': bool(find_spec('logikal_browser')),
     'django': bool(find_spec('pytest_django')),
 }
 
@@ -68,7 +68,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
-    # Block uninstalled extra plugins
+    # Block extra plugins that are not installed
     for extra, installed in EXTRAS.items():
         if not installed:
             pluginmanager.set_blocked(f'logikal_{extra}')
