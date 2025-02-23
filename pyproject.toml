@@ -60,15 +60,18 @@ norecursedirs = [
 plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issues/11667
 
 [[tool.mypy.overrides]]
-ignore_missing_imports = true
 module = [
   'django_migration_linter.*',  # https://github.com/3YOURMIND/django-migration-linter/issues/238
-  'factory.*',
   'pycodestyle',
   'pydocstyle',
   'pytest_cov',
   'xdist.*',
 ]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ['tests.pytest_logikal.factories.*']
+disallow_untyped_calls = false
 
 [tool.browser.versions]
 chrome = '132.0.6834.83'

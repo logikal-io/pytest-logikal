@@ -1,13 +1,13 @@
-babel~=2.16
+babel~=2.17
 Django~=5.1
 django-stubs~=5.1
 django-migration-linter~=5.1
 djlint==1.36.4
-logikal-browser[django]~=2.0
+logikal-browser[django]~=2.1
 pylint-django==2.6.1
-pytest-django==4.9.0
+pytest-django==4.10.0
 pytest-factoryboy==2.7.0
 
 # Validator
 requests~=2.32
-logikal-utils[docker]~=1.3
+logikal-utils[docker]~=1.4

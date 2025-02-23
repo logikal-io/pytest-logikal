@@ -48,7 +48,7 @@ def factory_seed() -> None:
     """
     Set a default seed for pytest-factoryboy for deterministic testing. Automatically applied.
     """
-    factory_random.reseed_random(DEFAULT_RANDOM_SEED)
+    factory_random.reseed_random(DEFAULT_RANDOM_SEED)  # type: ignore[no-untyped-call]
 
 
 class LiveURL(Protocol):

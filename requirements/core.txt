@@ -1,8 +1,8 @@
-bandit==1.8.2
+bandit==1.8.3
 codespell==2.4.1
-coverage==7.6.10
+coverage==7.6.12
 isort[colors]==6.0.0
-mypy[faster-cache]==1.14.1
+mypy[faster-cache]==1.15.0
 pip-licenses==5.0.0
 pycodestyle==2.12.1
 pydocstyle==6.3.0
