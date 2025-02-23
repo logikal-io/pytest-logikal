@@ -53,6 +53,7 @@ ALLOWED_PACKAGES = {
     # Broken license inference because of PEP 639, see [3]
     'attrs': r'^UNKNOWN$',  # license is MIT
     'prettytable': r'^UNKNOWN$',  # license is BSD-3-Clause
+    'referencing': r'^UNKNOWN$',  # license is MIT
 }
 # [1] https://github.com/3YOURMIND/django-migration-linter/issues/290
 # [2] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
