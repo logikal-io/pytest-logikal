@@ -1,5 +1,5 @@
 import inspect
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from functools import cache
 from itertools import product
 from operator import itemgetter
@@ -70,7 +70,7 @@ def get_installed_browsers() -> dict[str, InstalledBrowser]:
     return installed_browsers()
 
 
-def set_browser(scenarios: Scenario | list[Scenario], headless: bool = True) -> Fixture[Any]:
+def set_browser(scenarios: Scenario | Sequence[Scenario], headless: bool = True) -> Fixture[Any]:
     """
     Apply the given scenarios to the :func:`~pytest_logikal.browser.browser` fixture.
 
