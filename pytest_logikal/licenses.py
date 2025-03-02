@@ -55,6 +55,7 @@ ALLOWED_PACKAGES = {
     'prettytable': r'^UNKNOWN$',  # license is BSD-3-Clause
     'referencing': r'^UNKNOWN$',  # license is MIT
     'jeepney': r'^UNKNOWN$',  # license is MIT
+    'Sphinx': r'^UNKNOWN$',  # license is BSD-2-Clause
 }
 # [1] https://github.com/3YOURMIND/django-migration-linter/issues/290
 # [2] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
