@@ -35,7 +35,7 @@ which automatically runs a broad range of checks:
 - Coverage checks (via `coverage.py <https://coverage.readthedocs.io/>`_
   and `pytest-cov <https://pytest-cov.readthedocs.io/>`_)
 - Security checks (via `Bandit <https://bandit.readthedocs.io/>`_)
-- License checks (via `pip-licenses <https://github.com/raimon49/pip-licenses>`_)
+- License checks (via `license-expression <https://github.com/aboutcode-org/license-expression>`_)
 - Requirements lockfile checks (via `pyorbs <https://pyorbs.readthedocs.io/>`_, when applicable)
 - Documentation checks (via `logikal-docs <https://docs.logikal.io/logikal-docs/>`_, when
   applicable)
@@ -147,12 +147,12 @@ the license checker plugin as follows:
 .. code-block:: toml
 
     [tool.licenses]
-    extend_allowed_licenses = ['^Allowed License$']
+    extend_allowed_licenses = ['CC-PDDC']
 
     [tool.licenses.extend_allowed_packages]
-    package = '^Package License$'
+    package = 'LGPL-3.0-or-later'
 
-Note that the licenses are Python regular expressions that are matched from the beginning of the
-actual license string. You can also override the default licenses and packages (instead of
+Note that the licenses must be specified as `SPDX license expressions
+<https://spdx.org/licenses/>`_. You can also override the default licenses and packages (instead of
 extending them) via the ``tool.licenses.allowed_licenses`` and ``tool.licenses.allowed_packages``
 options.

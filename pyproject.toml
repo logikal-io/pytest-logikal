@@ -7,13 +7,12 @@ name = 'pytest-logikal'
 description = 'Common testing environment'
 readme = 'README.rst'
 requires-python = '~= 3.12'
-license = {file = 'LICENSE.txt'}
+license = 'MIT'
 authors = [{name = 'Logikal GmbH', email = 'contact@logikal.io'}]
 keywords = ['pytest']
 classifiers = [
   'Development Status :: 5 - Production/Stable',
   'Intended Audience :: Developers',
-  'License :: OSI Approved :: MIT License',
   'Operating System :: POSIX :: Linux',
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3.12',
@@ -62,6 +61,7 @@ plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issu
 [[tool.mypy.overrides]]
 module = [
   'django_migration_linter.*',  # https://github.com/3YOURMIND/django-migration-linter/issues/238
+  'license_expression',
   'pycodestyle',
   'pydocstyle',
   'pytest_cov',
