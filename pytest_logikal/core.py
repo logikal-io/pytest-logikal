@@ -177,9 +177,8 @@ def unified_reportinfo(item: pytest.Item, header: str) -> Callable[[], ReportInf
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         source = item.nodeid.split('::')[-1].lower()
-        if source == 'mypy':
-            header = f'[{item.name}] {item.path.relative_to(item.config.invocation_params.dir)}'
-            setattr(item, 'reportinfo', unified_reportinfo(item=item, header=header))
+        if source == 'licenses':
+            setattr(item, '_nodeid', '::check::licenses')
         if source == 'mypy-status':
             setattr(item, '_nodeid', '::check::mypy-status')
             setattr(item, 'reportinfo', unified_reportinfo(item=item, header='[mypy-status]'))
