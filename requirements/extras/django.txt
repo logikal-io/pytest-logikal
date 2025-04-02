@@ -1,11 +1,11 @@
 babel~=2.17
-Django~=5.1
+Django~=5.2
 django-stubs~=5.1
-django-migration-linter~=5.1
+django-migration-linter~=5.2
 djlint==1.36.4
 logikal-browser[django]~=2.1
 pylint-django==2.6.1
-pytest-django==4.10.0
+pytest-django==4.11.0
 pytest-factoryboy==2.7.0
 
 # Validator
