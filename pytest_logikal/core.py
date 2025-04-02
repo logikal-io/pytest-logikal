@@ -2,7 +2,6 @@ import logging
 import os
 import shutil
 import sys
-import warnings
 from collections.abc import Callable, Iterator
 from importlib.util import find_spec
 from itertools import chain
@@ -10,11 +9,9 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from pytest_cov import CovFailUnderWarning
 from termcolor import colored
 
 sys.path.insert(0, os.getcwd())
-warnings.filterwarnings(action='ignore', category=CovFailUnderWarning)
 
 PLUGINS = {
     'core': [
