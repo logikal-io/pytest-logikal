@@ -156,7 +156,7 @@ class LicenseItem(Item):
     @staticmethod
     def _allowed_legacy_license(licenses: list[str], allowed_licenses: list[str]) -> bool:
         return any(
-            allowed_license in set(license, 'any')
+            allowed_license in (license, 'any')
             for license in licenses
             for allowed_license in allowed_licenses
         )
