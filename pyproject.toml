@@ -57,6 +57,7 @@ norecursedirs = [
 
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issues/11667
+untyped_calls_exclude = ['factory']
 
 [[tool.mypy.overrides]]
 module = [
@@ -68,10 +69,6 @@ module = [
   'xdist.*',
 ]
 ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = ['tests.pytest_logikal.factories.*']
-disallow_untyped_calls = false
 
 [tool.browser.versions]
 chrome = '132.0.6834.83'
