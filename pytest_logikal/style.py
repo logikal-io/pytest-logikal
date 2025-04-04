@@ -4,7 +4,7 @@ from io import StringIO
 import pycodestyle
 import pydocstyle
 import pytest
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
@@ -36,7 +36,7 @@ class StyleItem(CachedFileCheckItem):
                     max_line_length=max_line_length,
                     max_doc_length=max_line_length,
                     format='%(row)s:%(col)s: error: %(text)s (%(code)s)',
-                    ignore=PYPROJECT.get('tool', {}).get('pycodestyle', {}).get('ignore', ignore),
+                    ignore=tool_config('pycodestyle').get('ignore', ignore),
                 ).check_all()
             if code_errors:
                 messages.append(code_stdout.getvalue().rstrip())
@@ -46,7 +46,7 @@ class StyleItem(CachedFileCheckItem):
             'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D106', 'D107',
             'D200', 'D203', 'D204', 'D212', 'D406', 'D407', 'D408', 'D409',
         }
-        select = PYPROJECT.get('tool', {}).get('pydocstyle', {}).get('select', select)
+        select = tool_config('pydocstyle').get('select', select)
         if doc_errors := list(pydocstyle.check(filenames=[str(self.path)], select=select)):
             messages.extend(
                 f'{error.line}: error: {error.short_desc} ({error.code})'

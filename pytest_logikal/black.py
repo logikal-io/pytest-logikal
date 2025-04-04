@@ -3,14 +3,14 @@ import subprocess
 
 import black
 import pytest
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
 
 
 def get_mode(max_line_length: int) -> black.Mode:
-    config = PYPROJECT.get('tool', {}).get('black', {})
+    config = tool_config('black')
     return black.Mode(
         line_length=config.get('line-length', max_line_length),
         string_normalization=not config.get('skip-string-normalization', True),

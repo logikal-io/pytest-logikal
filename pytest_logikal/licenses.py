@@ -3,7 +3,7 @@ import string
 
 import pytest
 from license_expression import Licensing, Renderable, get_spdx_licensing
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 
 from pytest_logikal.core import ReportInfoType
 from pytest_logikal.plugin import Item, ItemRunError, Plugin
@@ -162,14 +162,14 @@ class LicenseItem(Item):
         )
 
     def runtest(self) -> None:  # pylint: disable=too-many-locals
-        licenses = PYPROJECT.get('tool', {}).get('licenses', {})
+        config = tool_config('licenses')
         licensing = get_spdx_licensing()
 
         # SPDX licenses
-        allowed_licenses = licenses.get('allowed_licenses', ALLOWED_LICENSES)
-        allowed_packages = licenses.get('allowed_packages', ALLOWED_PACKAGES)
-        allowed_licenses.extend(licenses.get('extend_allowed_licenses', []))
-        allowed_packages.update(licenses.get('extend_allowed_packages', {}))
+        allowed_licenses = config.get('allowed_licenses', ALLOWED_LICENSES)
+        allowed_packages = config.get('allowed_packages', ALLOWED_PACKAGES)
+        allowed_licenses.extend(config.get('extend_allowed_licenses', []))
+        allowed_packages.update(config.get('extend_allowed_packages', {}))
 
         allowed_license_expressions = [
             licensing.parse(allowed_license)
@@ -181,10 +181,10 @@ class LicenseItem(Item):
         }
 
         # Legacy licenses
-        allowed_legacy_licenses = licenses.get('allowed_legacy_licenses', ALLOWED_LEGACY_LICENSES)
-        allowed_legacy_packages = licenses.get('allowed_legacy_packages', ALLOWED_LEGACY_PACKAGES)
-        allowed_legacy_licenses.extend(licenses.get('extend_allowed_legacy_licenses', []))
-        allowed_legacy_packages.update(licenses.get('extend_allowed_legacy_packages', {}))
+        allowed_legacy_licenses = config.get('allowed_legacy_licenses', ALLOWED_LEGACY_LICENSES)
+        allowed_legacy_packages = config.get('allowed_legacy_packages', ALLOWED_LEGACY_PACKAGES)
+        allowed_legacy_licenses.extend(config.get('extend_allowed_legacy_licenses', []))
+        allowed_legacy_packages.update(config.get('extend_allowed_legacy_packages', {}))
 
         warnings: list[str] = []
         for package in importlib.metadata.distributions():
