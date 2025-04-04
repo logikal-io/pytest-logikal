@@ -6,7 +6,7 @@ import pytest
 from django.conf import settings
 from django_migration_linter import MigrationLinter
 from django_migration_linter.management.commands import lintmigrations
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 from pytest_django.plugin import blocking_manager_key
 
 from pytest_logikal.core import ReportInfoType
@@ -31,7 +31,7 @@ class MigrationItem(Item):
             linter = MigrationLinter(**{
                 'all_warnings_as_errors': True,
                 **getattr(settings, 'MIGRATION_LINTER_OPTIONS', {}),
-                **PYPROJECT.get('tool', {}).get(lintmigrations.CONFIG_NAME, {}),
+                **tool_config(lintmigrations.CONFIG_NAME),
             })
             with redirect_stdout(StringIO()) as code_stdout:
                 linter.lint_all_migrations(migrations_file_path=migrations_file_path)

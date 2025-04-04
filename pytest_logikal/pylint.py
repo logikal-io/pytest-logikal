@@ -2,7 +2,7 @@ import json
 import subprocess
 
 import pytest
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
@@ -82,9 +82,9 @@ class PylintItem(CachedFileCheckItem):
                 r'--module-rgx=[^\WA-Z]*$',  # allow (migration) modules to start with digits
             ]
 
-        pyproject_pylint = PYPROJECT.get('tool', {}).get('pylint', {}).get('messages_control', {})
-        enable = pyproject_pylint.get('enable', enable)
-        disable = pyproject_pylint.get('disable', disable)
+        messages_control = tool_config('pylint').get('messages_control', {})
+        enable = messages_control.get('enable', enable)
+        disable = messages_control.get('disable', disable)
         command += [
             f'--enable={','.join(enable)}', f'--disable={','.join(disable)}',
             f'--load-plugins={','.join(plugins)}',

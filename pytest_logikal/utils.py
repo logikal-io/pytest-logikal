@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, TypeVar
 
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 
 from pytest_logikal.core import DEFAULT_INI_OPTIONS
 
@@ -16,7 +16,7 @@ Fixture = Callable[[Function], Function]
 
 
 def get_ini_option(name: str) -> Any:
-    ini_options = PYPROJECT.get('tool', {}).get('pytest', {}).get('ini_options', {})
+    ini_options = tool_config('pytest').get('ini_options', {})
     default = DEFAULT_INI_OPTIONS[name]['value']
     return type(default)(ini_options.get(name, default))
 
