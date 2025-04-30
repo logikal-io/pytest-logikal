@@ -76,6 +76,7 @@ ALLOWED_LEGACY_PACKAGES = {
     'pkg_resources': UNKNOWN_LICENSE,  # caused by an Ubuntu bug, see [2]
     'pylint-django': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
+    'setuptools': UNKNOWN_LICENSE,  # see https://github.com/pypa/setuptools/issues/4956
 }
 # [1] https://github.com/3YOURMIND/django-migration-linter/issues/290
 # [2] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
