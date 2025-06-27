@@ -47,6 +47,7 @@ ALLOWED_LEGACY_LICENSES = [
     'BSD',
     'BSD-2-Clause',
     'BSD-3-Clause',
+    'BSD 3-Clause OR Apache-2.0',
     'CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
     'CMU License (MIT-CMU)',
     'GNU Lesser General Public License v2 (LGPLv2)',
