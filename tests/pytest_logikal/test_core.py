@@ -123,7 +123,7 @@ def test_no_defaults(mocker: MockerFixture) -> None:
     early_config = mocker.Mock()
     early_config, args = load_initial_conftests(early_config, ['--no-defaults'])
     assert args == ['--no-defaults']
-    assert not early_config.called
+    assert not early_config.called  # type: ignore[attr-defined]
 
 
 def test_live(mocker: MockerFixture) -> None:
