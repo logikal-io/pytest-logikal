@@ -71,8 +71,8 @@ module = [
 ignore_missing_imports = true
 
 [tool.browser.versions]
-chrome = '132.0.6834.83'
-edge = '132.0.2957.115'
+chrome = '139.0.7258.68'
+edge = '139.0.3405.86'
 
 [tool.isort]
 known_first_party = ['pytest_logikal']
