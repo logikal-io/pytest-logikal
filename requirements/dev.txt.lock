@@ -55,7 +55,7 @@ jsbeautifier==1.15.4
 json5==0.12.1
 keyring==25.6.0
 license-expression==30.4.4
-logikal-browser==2.1.0
+logikal-browser==2.1.1
 logikal-docs==1.2.2
 logikal-utils==1.4.1
 markdown-it-py==4.0.0
@@ -102,7 +102,7 @@ rfc3986==2.0.0
 rich==14.1.0
 roman-numerals-py==3.1.0
 SecretStorage==3.3.3
-selenium==4.28.1
+selenium==4.35.0
 setuptools==80.9.0
 six==1.17.0
 sniffio==1.3.1
@@ -119,7 +119,7 @@ sphinxcontrib-qthelp==2.0.0
 sphinxcontrib-serializinghtml==2.0.0
 sqlparse==0.5.3
 stevedore==5.4.1
-termcolor==2.5.0
+termcolor==3.1.0
 toml==0.10.2
 tomli_w==1.2.0
 tomlkit==0.13.3
