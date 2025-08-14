@@ -6,7 +6,7 @@ djlint==1.36.4
 logikal-browser[django]~=2.1
 pylint-django==2.6.1
 pytest-django==4.11.1
-pytest-factoryboy==2.7.0
+pytest-factoryboy==2.8.1
 
 # Validator
 requests~=2.32
