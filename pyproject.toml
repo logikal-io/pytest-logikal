@@ -82,7 +82,3 @@ omit = [
   '/tmp/*',  # ignore temporary files created during testing
   'tests/pytest_logikal/files/*',  # ignore files used inside plugin runs
 ]
-exclude_lines = [
-  'pragma: no cover',
-  '\.\.\.',  # exclude abstract methods
-]

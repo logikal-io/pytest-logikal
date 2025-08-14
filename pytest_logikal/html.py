@@ -23,7 +23,7 @@ def pytest_configure(config: pytest.Config) -> None:
 # Note: we disabled format checking until some issues are resolved
 # (see https://github.com/djlint/djLint/issues/636)
 # (see https://github.com/djlint/djLint/issues/637)
-# Note: the related test is also disabled (see tests/pytest_logikal/test_html.py
+# Note: the related test is also disabled (see tests/pytest_logikal/test_html.py)
 class HTMLTemplateItem(CachedFileCheckItem):
     # @staticmethod
     # def _color_diff(line: str) -> str:
@@ -60,6 +60,7 @@ class HTMLTemplateItem(CachedFileCheckItem):
         ignore = [
             'H023',  # we allow some entity references (e.g. quotes, special spaces, dashes)
             'H031',  # meta keywords are not that useful anymore
+            'H037',  # false positives (see https://github.com/djlint/djLint/issues/692)
             'J004', 'J018',  # we have our own functions for Jinja environments
             'T002',  # we always use single quotes
             'T003',  # we don't mandate named end blocks
