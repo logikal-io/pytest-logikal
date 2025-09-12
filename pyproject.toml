@@ -73,9 +73,11 @@ ignore_missing_imports = true
 chrome = '139.0.7258.68'
 edge = '139.0.3405.86'
 
+[tool.coverage.run]
+patch = ['subprocess']
+
 [tool.coverage.report]
 omit = [
   '/tmp/*',  # ignore temporary files created during testing
-  'docs/conf.py',  # ignore documentation configuration
   'tests/pytest_logikal/files/*',  # ignore files used inside plugin runs
 ]
