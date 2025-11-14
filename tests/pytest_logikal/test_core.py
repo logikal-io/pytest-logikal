@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 import tomli_w
+from _pytest.config.findpaths import ConfigValue  # pylint: disable=import-private-name
 from logikal_utils.project import PYPROJECT
 from pytest_mock.plugin import MockerFixture
 
@@ -107,16 +108,19 @@ def load_initial_conftests(
 
 def test_defaults(mocker: MockerFixture) -> None:
     early_inicfg = {'log_level': 'INFO', 'cov_fail_under': '100'}
-    config = mocker.Mock(inicfg=early_inicfg)
+    config = mocker.Mock(inicfg={
+        key: ConfigValue(value=value, origin='file', mode='toml')
+        for key, value in early_inicfg.items()
+    })
     config.getini = early_inicfg.get
     early_config, args = load_initial_conftests(early_config=config, args=[])
     assert args == [
-        '--strict-config', '--strict-markers', '-r', 'fExX', '-n', 'auto',
+        '--strict', '-r', 'fExX', '-n', 'auto',
         *[f'--{plugin}' for plugin in chain.from_iterable(core.PLUGINS.values())],
         '--cov', '--no-cov-on-fail',
     ]
-    assert early_config.inicfg['log_level'] == 'INFO'
-    assert early_config.inicfg['console_output_style'] == 'classic'
+    assert early_config.inicfg['log_level'].value == 'INFO'
+    assert early_config.inicfg['console_output_style'].value == 'classic'
 
 
 def test_no_defaults(mocker: MockerFixture) -> None:
@@ -129,7 +133,7 @@ def test_no_defaults(mocker: MockerFixture) -> None:
 def test_live(mocker: MockerFixture) -> None:
     _, args = load_initial_conftests(mocker.Mock(inicfg={}), ['--live'])
     assert args == [
-        '--live', '--strict-config', '--strict-markers', '--capture=no', '-r', 'fExX', '-n', '0',
+        '--live', '--strict', '--capture=no', '-r', 'fExX', '-n', '0',
         *[f'--{plugin}' for plugin in chain.from_iterable(core.PLUGINS.values())],
     ]
 
