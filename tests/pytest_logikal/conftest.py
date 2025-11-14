@@ -2,8 +2,10 @@ from collections.abc import Callable
 from importlib import import_module, reload
 from itertools import chain
 from pathlib import Path
+from typing import Any
 
 import pytest
+from _pytest.config.findpaths import ConfigValue  # pylint: disable=import-private-name
 from pytest_mock import MockerFixture
 
 from pytest_logikal import core, file_checker, plugin as pytest_logikal_plugin
@@ -56,13 +58,21 @@ def plugin_item(
         else:
             path = append_newline(pytester.makepyfile(file_contents))
 
-        inicfg: dict[str, str | int] = {
-            option: entry['value'] for option, entry in core.DEFAULT_INI_OPTIONS.items()
+        def getini(name: str) -> Any:
+            if config := inicfg.get(name):
+                return config.value
+            return config
+
+        inicfg: dict[str, ConfigValue] = {
+            option: ConfigValue(value=entry['value'], origin='file', mode='toml')
+            for option, entry in core.DEFAULT_INI_OPTIONS.items()
         }
         if set_django_settings_module:
-            inicfg['DJANGO_SETTINGS_MODULE'] = 'tests.website.settings'
+            inicfg['DJANGO_SETTINGS_MODULE'] = ConfigValue(
+                value='tests.website.settings', origin='file', mode='toml',
+            )
         config = mocker.Mock(inicfg=inicfg)
-        config.getini = inicfg.get
+        config.getini = getini
         config.invocation_params.dir = path.parent
         config.rootpath = pytestconfig.rootpath
         config.stash = pytestconfig.stash

@@ -13,12 +13,12 @@ def test_run_invalid(plugin_item: Callable[..., Item]) -> None:
     item = plugin_item(plugin=JSPlugin, item=JSItem, file_contents=contents)
     with raises(ItemRunError) as error:
         item.runtest()
-    error.match(r'Missing semicolon.*\(@stylistic/js/semi\)')
-    error.match(r'Expected indentation.*\(@stylistic/js/indent\)')
+    error.match(r'Missing semicolon.*\(@stylistic/semi\)')
+    error.match(r'Expected indentation.*\(@stylistic/indent\)')
     error.match(r'Expected multiple line comments.*\(multiline-comment-style\)')
     error.match(r'This line has a length of.*\(max-len\)')
-    error.match(r'Strings must use singlequote.*\(@stylistic/js/quotes\)')
-    error.match(r'Expected no linebreak.*\(@stylistic/js/nonblock-statement-body-position\)')
+    error.match(r'Strings must use singlequote.*\(@stylistic/quotes\)')
+    error.match(r'Expected no linebreak.*\(@stylistic/nonblock-statement-body-position\)')
 
 
 def test_run_valid(plugin_item: Callable[..., Item]) -> None:

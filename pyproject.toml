@@ -48,7 +48,7 @@ pytest_logikal = [
 
 [tool.setuptools_scm]
 
-[tool.pytest.ini_options]
+[tool.pytest]
 DJANGO_SETTINGS_MODULE = 'tests.website.settings'
 norecursedirs = [
   '*.egg', '.*', 'build', 'dist', 'node_modules',  # standard folders
@@ -70,8 +70,8 @@ module = [
 ignore_missing_imports = true
 
 [tool.browser.versions]
-chrome = '139.0.7258.68'
-edge = '139.0.3405.86'
+chrome = '142.0.7444.162'
+edge = '142.0.3595.80'
 
 [tool.coverage.run]
 patch = ['subprocess']

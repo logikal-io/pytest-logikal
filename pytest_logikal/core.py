@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from _pytest.config.findpaths import ConfigValue  # pylint: disable=import-private-name
 from termcolor import colored
 
 sys.path.insert(0, os.getcwd())
@@ -81,7 +82,7 @@ def pytest_load_initial_conftests(
         yield
 
     # Updating arguments
-    args.extend(['--strict-config', '--strict-markers'])
+    args.extend(['--strict'])
     namespace = early_config.known_args_namespace
     if '--live' in args:
         args.append('--capture=no')
@@ -110,17 +111,23 @@ def pytest_load_initial_conftests(
         namespace.cov_report = {'term-missing': 'skip-covered'}
 
     # Updating config
-    ini_defaults: dict[str, str | list[str]] = {
+    ini_defaults: dict[str, str | list[str] | bool] = {
         'console_output_style': 'classic',
-        'xfail_strict': 'True',
+        'xfail_strict': True,
         'filterwarnings': ['error'],
-        'log_cli': 'True' if '--live' in args else 'False',
+        'log_cli': '--live' in args,
         'log_level': 'DEBUG',
         'log_format': '%(asctime)s.%(msecs)03d %(levelname)s %(message)s (%(name)s:%(lineno)s)',
         'log_date_format': '%Y-%m-%d %H:%M:%S',
         'log_auto_indent': 'True',
     }
-    early_config.inicfg = {**ini_defaults, **early_config.inicfg}
+    early_config.inicfg = {
+        **{
+            key: ConfigValue(value=value, origin='file', mode='toml')
+            for key, value in ini_defaults.items()
+        },
+        **early_config.inicfg,
+    }
     yield
 
 
