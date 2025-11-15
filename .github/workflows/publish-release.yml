@@ -14,7 +14,7 @@ jobs:
       docs-service-account-email: docs-publisher@docs-logikal-io.iam.gserviceaccount.com
       docs-bucket-name: website-docs-logikal-io
       docs-url-map-name: website-docs-logikal-io-service
-      docs-http-to-https-url-map-name: website-docs-logikal-io-https-redirect
+      docs-http-to-https-url-map-name: website-docs-logikal-io-http-to-https
     permissions:
       contents: read
       id-token: write
