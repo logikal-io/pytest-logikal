@@ -131,7 +131,7 @@ path in your ``pyproject.toml`` file as follows:
 
 .. code-block:: toml
 
-    [tool.pytest.ini_options]
+    [tool.pytest]
     DJANGO_SETTINGS_MODULE = 'project.settings.testing'
 
     [tool.mypy]
