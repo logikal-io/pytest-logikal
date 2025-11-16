@@ -69,7 +69,6 @@ ALLOWED_LEGACY_LICENSES = [
 
 ALLOWED_LEGACY_PACKAGES = {
     'codespell': 'GPL-2.0-only',  # only used as a local tool
-    'django-migration-linter': UNKNOWN_LICENSE,  # license is Apache License 2.0, see [1]
     'djlint': 'GNU General Public License v3 or later (GPLv3+)',  # only used as a local tool
     'facebook-business': 'LICENSE.txt',  # only used as a connector
     'facebook_business': 'LICENSE.txt',  # only used as a connector
@@ -79,10 +78,17 @@ ALLOWED_LEGACY_PACKAGES = {
     'pkg_resources': UNKNOWN_LICENSE,  # caused by an Ubuntu bug, see [2]
     'pylint-django': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
-    'setuptools': UNKNOWN_LICENSE,  # see https://github.com/pypa/setuptools/issues/4956
+    # Packages with invalid license metadata
+    'django-migration-linter': UNKNOWN_LICENSE,  # license is Apache License 2.0, see [1]
+    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [3]
+    'matplotlib-inline': UNKNOWN_LICENSE,  # license is BSD-3-Clause, see [4]
+    'wrapt': 'any',  # license is BSD-2-Clause, see [5]
 }
 # [1] https://github.com/3YOURMIND/django-migration-linter/issues/290
 # [2] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
+# [3] https://github.com/jupyter/jupyter-sphinx/issues/262
+# [4] https://github.com/ipython/matplotlib-inline/issues/53
+# [5] https://github.com/GrahamDumpleton/wrapt/issues/298
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
