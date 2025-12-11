@@ -19,6 +19,7 @@ ALLOWED_LICENSES = [
     'ISC',
     'LGPL-2.0',
     'LGPL-2.0+',
+    'LGPL-2.1',
     'LGPL-2.1-or-later',
     'LGPL-3.0',
     'LGPL-3.0+',
