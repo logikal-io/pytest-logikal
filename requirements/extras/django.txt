@@ -1,6 +1,6 @@
 babel~=2.17
-Django~=6.0
-django-stubs~=5.2
+Django>=5.2,<7
+django-stubs>=5.2,<7
 django-migration-linter~=6.0
 djlint==1.36.4
 logikal-browser[django]~=3.0
