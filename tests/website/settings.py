@@ -4,7 +4,6 @@ SECRET_KEY = 'dummy'  # nosec: this is only used for testing purposes
 # Core settings
 DEBUG = True
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}}
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INSTALLED_APPS = [
     'django.contrib.auth',  # required by mypy_django_plugin
     'django.contrib.contenttypes',  # required by django.contrib.auth
@@ -14,6 +13,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',  # required for auth
+    'django.middleware.locale.LocaleMiddleware',  # required for language switching
     'django.middleware.common.CommonMiddleware',  # performs URL rewriting and sets headers
     'django.contrib.auth.middleware.AuthenticationMiddleware',  # required for auth
 ]
@@ -24,6 +24,7 @@ TEMPLATES = [{
         'context_processors': [
             'django.template.context_processors.request',  # required for auth
             'django.contrib.auth.context_processors.auth',  # required for auth
+            'django.template.context_processors.i18n',  # required for languages
         ],
     },
 }]
@@ -41,5 +42,4 @@ LANGUAGES = [
     ('en-gb', 'English (United Kingdom)'),
 ]
 LANGUAGE_CODE = 'en-us'
-USE_TZ = True  # this can be removed in Django 5+
 TIME_ZONE = 'Europe/Zurich'

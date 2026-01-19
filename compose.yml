@@ -3,5 +3,7 @@ name: pytest-logikal
 services:
   validator:
     # Note: make sure to update the version in the docs/index.rst as well when changing it here!
-    image: ghcr.io/validator/validator:23.4.11
+    # Available versions: https://github.com/validator/validator/pkgs/container/validator/versions
+    # Commit date: 2026-01-11
+    image: ghcr.io/validator/validator@sha256:fdbc3afac6f0f52636eb650b43fb39033c3fb00487cf06446d3d81a6a246ebb0
     ports: [{target: 8888}]

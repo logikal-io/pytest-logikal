@@ -19,12 +19,12 @@ Browser settings must be specified via the :func:`~pytest_logikal.browser.set_br
 
 You can specify browser scenarios with this decorator as follows:
 
-.. literalinclude:: ../tests/pytest_logikal/examples/test_single_scenario.py
+.. literalinclude:: ../tests/pytest_logikal/docs_examples/test_single_scenario.py
    :language: python
 
 You can also run your test in multiple scenarios:
 
-.. literalinclude:: ../tests/pytest_logikal/examples/test_multiple_scenarios.py
+.. literalinclude:: ../tests/pytest_logikal/docs_examples/test_multiple_scenarios.py
    :language: python
 
 live_url
