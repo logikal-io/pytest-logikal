@@ -25,7 +25,7 @@ class Validator:
     @lru_cache(maxsize=None)
     def service_url() -> str:
         if not (service_url := os.environ.get('VALIDATOR_SERVICE_URL')):
-            service = Service(name='validator', ready_log_text='Checker service started')
+            service = Service(name='validator')
             service_url = f'http://127.0.0.1:{service.container_port('8888/tcp')}'
 
         logger.debug(f'Using HTML/CSS/SVG validator service running at "{service_url}"')

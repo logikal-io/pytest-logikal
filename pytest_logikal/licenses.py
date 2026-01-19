@@ -81,16 +81,14 @@ ALLOWED_LEGACY_PACKAGES = {
     'pylint-django': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     # Packages with invalid license metadata
-    'django-migration-linter': UNKNOWN_LICENSE,  # license is Apache License 2.0, see [2]
-    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [3]
-    'matplotlib-inline': UNKNOWN_LICENSE,  # license is BSD-3-Clause, see [4]
-    'wrapt': 'any',  # license is BSD-2-Clause, see [5]
+    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [2]
+    'matplotlib-inline': UNKNOWN_LICENSE,  # license is BSD-3-Clause, see [3]
+    'wrapt': 'any',  # license is BSD-2-Clause, see [4]
 }
 # [1] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
-# [2] https://github.com/3YOURMIND/django-migration-linter/issues/290
-# [3] https://github.com/jupyter/jupyter-sphinx/issues/262
-# [4] https://github.com/ipython/matplotlib-inline/issues/53
-# [5] https://github.com/GrahamDumpleton/wrapt/issues/298
+# [2] https://github.com/jupyter/jupyter-sphinx/issues/262
+# [3] https://github.com/ipython/matplotlib-inline/issues/53
+# [4] https://github.com/GrahamDumpleton/wrapt/issues/298
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

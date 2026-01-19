@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from _pytest.config.findpaths import ConfigValue  # pylint: disable=import-private-name
 from termcolor import colored
 
 sys.path.insert(0, os.getcwd())
@@ -75,7 +74,7 @@ def pytest_addhooks(pluginmanager: pytest.PytestPluginManager) -> None:
 
 
 @pytest.hookimpl(wrapper=True)
-def pytest_load_initial_conftests(
+def pytest_load_initial_conftests(  # pylint: disable=too-complex
     early_config: pytest.Config, args: list[str],
 ) -> Iterator[None]:
     if '--no-defaults' in args:
@@ -121,13 +120,9 @@ def pytest_load_initial_conftests(
         'log_date_format': '%Y-%m-%d %H:%M:%S',
         'log_auto_indent': 'True',
     }
-    early_config.inicfg = {
-        **{
-            key: ConfigValue(value=value, origin='file', mode='toml')
-            for key, value in ini_defaults.items()
-        },
-        **early_config.inicfg,
-    }
+    for key, value in {**ini_defaults, **early_config.inicfg}.items():
+        early_config.inicfg[key] = value
+
     yield
 
 

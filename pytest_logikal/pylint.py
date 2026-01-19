@@ -78,7 +78,7 @@ class PylintItem(CachedFileCheckItem):
             ]
             plugins += ['pylint_django']
             command += [
-                f'--django-settings-module={self.config.inicfg['DJANGO_SETTINGS_MODULE'].value}',
+                f'--django-settings-module={self.config.inicfg['DJANGO_SETTINGS_MODULE']}',
                 r'--module-rgx=[^\WA-Z]*$',  # allow (migration) modules to start with digits
             ]
 

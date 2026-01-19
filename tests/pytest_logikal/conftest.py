@@ -2,10 +2,8 @@ from collections.abc import Callable
 from importlib import import_module, reload
 from itertools import chain
 from pathlib import Path
-from typing import Any
 
 import pytest
-from _pytest.config.findpaths import ConfigValue  # pylint: disable=import-private-name
 from pytest_mock import MockerFixture
 
 from pytest_logikal import core, file_checker, plugin as pytest_logikal_plugin
@@ -19,6 +17,7 @@ MODULES = [
     # Additional modules
     'black', 'browser', 'django', 'node_install', 'utils', 'validator',
 ]
+reload(import_module('pytest_logikal'))
 for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):
     if submodule == 'mypy':
         continue
@@ -58,21 +57,12 @@ def plugin_item(
         else:
             path = append_newline(pytester.makepyfile(file_contents))
 
-        def getini(name: str) -> Any:
-            if config := inicfg.get(name):
-                return config.value
-            return config
-
-        inicfg: dict[str, ConfigValue] = {
-            option: ConfigValue(value=entry['value'], origin='file', mode='toml')
-            for option, entry in core.DEFAULT_INI_OPTIONS.items()
-        }
+        inicfg = {key: config['value'] for key, config in core.DEFAULT_INI_OPTIONS.items()}
         if set_django_settings_module:
-            inicfg['DJANGO_SETTINGS_MODULE'] = ConfigValue(
-                value='tests.website.settings', origin='file', mode='toml',
-            )
+            inicfg['DJANGO_SETTINGS_MODULE'] = 'tests.website.settings'
+
         config = mocker.Mock(inicfg=inicfg)
-        config.getini = getini
+        config.getini = inicfg.get
         config.invocation_params.dir = path.parent
         config.rootpath = pytestconfig.rootpath
         config.stash = pytestconfig.stash

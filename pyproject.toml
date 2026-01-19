@@ -61,7 +61,6 @@ untyped_calls_exclude = ['factory']
 
 [[tool.mypy.overrides]]
 module = [
-  'django_migration_linter.*',  # https://github.com/3YOURMIND/django-migration-linter/issues/238
   'license_expression',
   'pycodestyle',
   'pydocstyle',
@@ -78,6 +77,5 @@ patch = ['subprocess']
 
 [tool.coverage.report]
 omit = [
-  '/tmp/*',  # ignore temporary files created during testing
   'tests/pytest_logikal/files/*',  # ignore files used inside plugin runs
 ]

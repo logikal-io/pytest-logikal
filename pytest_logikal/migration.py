@@ -34,7 +34,9 @@ class MigrationItem(Item):
                 **tool_config(lintmigrations.CONFIG_NAME),
             })
             with redirect_stdout(StringIO()) as code_stdout:
-                linter.lint_all_migrations(migrations_file_path=migrations_file_path)
+                linter.lint_all_migrations(migrations_file_path=(
+                    str(migrations_file_path) if migrations_file_path else None
+                ))
             migrations = 'migration' if linter.nb_total == 1 else 'migrations'
             print(f'Checked {linter.nb_total} {migrations} ({linter.nb_ignored} ignored)')
             if linter.nb_warnings or linter.nb_erroneous:

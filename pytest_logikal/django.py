@@ -1,5 +1,6 @@
 import zoneinfo
 from collections.abc import Iterable, Sequence
+from logging import getLogger
 from typing import Any, Protocol
 
 import pytest
@@ -15,6 +16,10 @@ from pytest_logikal.node_install import install_node_packages
 from pytest_logikal.utils import Fixture, Function
 from pytest_logikal.validator import Validator
 
+logger = getLogger(__name__)
+
+__all__ = ['LiveURL', 'set_language', 'set_timezone']
+
 
 def pytest_sessionstart(session: pytest.Session) -> None:
     if not session.config.getoption('no_install'):
@@ -29,7 +34,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 def pytest_configure(config: pytest.Config) -> None:
     # Patching django-stubs
     def parse_toml_file(self: Any, *_args: Any, **_kwargs: Any) -> None:
-        self.django_settings_module = config.inicfg['DJANGO_SETTINGS_MODULE'].value
+        self.django_settings_module = config.inicfg['DJANGO_SETTINGS_MODULE']
         self.strict_settings = True
         self.strict_model_abstract_attrs = True
 
@@ -90,6 +95,7 @@ def language(request: Any) -> Iterable[str]:
     Return the currently activated language.
     """
     if language_code := getattr(request, 'param', None):
+        logger.debug(f'Setting the language to "{language_code}"')
         with translation.override(language_code):
             yield language_code
     else:
@@ -103,6 +109,9 @@ def set_language(*language_codes: str) -> Fixture[Any]:
     Args:
         *language_codes: The language codes to use.
 
+    .. warning:: This decorator should not be used together with the :func:`set_browser
+        <pytest_logikal.browser.set_browser>` decorator. Use the ``languages`` parameter instead.
+
     .. note:: You must also use the :func:`language <pytest_logikal.django.language>` fixture in
         your test when applying this decorator.
 
@@ -110,7 +119,6 @@ def set_language(*language_codes: str) -> Fixture[Any]:
     def parametrized_test_function(function: Function) -> Any:
         return pytest.mark.parametrize(
             argnames='language', argvalues=language_codes, indirect=True,
-            ids=lambda value: f'language={value}'
         )(function)
     return parametrized_test_function
 
@@ -118,6 +126,9 @@ def set_language(*language_codes: str) -> Fixture[Any]:
 def all_languages() -> Fixture[Any]:
     """
     Mark a test to run with every available language.
+
+    .. warning:: This decorator should not be used together with the :func:`set_browser
+        <pytest_logikal.browser.set_browser>` decorator. Use the ``languages`` parameter instead.
 
     .. note:: You must also use the :func:`language <pytest_logikal.django.language>` fixture in
         your test when applying this decorator.
@@ -132,6 +143,7 @@ def timezone(request: Any) -> Iterable[str]:
     Return the current time zone ID.
     """
     if zone_id := getattr(request, 'param', None):
+        logger.debug(f'Setting the time zone to "{zone_id}"')
         current_timezone = django_timezone.get_current_timezone()
         django_timezone.activate(zoneinfo.ZoneInfo(zone_id))
         yield zone_id
@@ -154,6 +166,5 @@ def set_timezone(*zone_ids: str) -> Fixture[Any]:
     def parametrized_test_function(function: Function) -> Any:
         return pytest.mark.parametrize(
             argnames='timezone', argvalues=zone_ids, indirect=True,
-            ids=lambda value: f'timezone={value}'
         )(function)
     return parametrized_test_function
