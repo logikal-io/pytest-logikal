@@ -140,8 +140,9 @@ def set_browser(
                 _get_languages(languages or scenario.languages),
                 scenario.browsers or installed.keys(),
             ):
+                name_parts = [settings.name, language, browser_name]
                 argvalues.append({
-                    'name': f'{settings.name}-{language}-{browser_name}',
+                    'name': '-'.join(part for part in name_parts if part is not None),
                     'installed_browser': installed[browser_name],
                     'settings': settings if not headless else replace(settings, headless=headless),
                     'language': language,
