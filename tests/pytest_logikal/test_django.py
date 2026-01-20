@@ -1,9 +1,10 @@
 import re
+from typing import Any
 
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 from faker.proxy import Faker
-from pytest import mark
+from pytest import mark, raises
 from pytest_factoryboy import register
 
 from pytest_logikal.django import LiveURL, all_languages, set_language, set_timezone
@@ -64,6 +65,13 @@ def test_language_fixture_without_decorator(language: str) -> None:
 @set_language('en-us', 'en-gb')
 def test_set_language(language: str) -> None:
     assert get_language() == language
+
+
+def test_set_language_with_browser_fixture() -> None:
+    with raises(RuntimeError, match='cannot be used together'):
+        @set_language('en-us')
+        def test_function(browser: Any) -> None:  # pylint: disable=unused-argument
+            ...
 
 
 @all_languages()
