@@ -109,14 +109,21 @@ def set_language(*language_codes: str) -> Fixture[Any]:
     Args:
         *language_codes: The language codes to use.
 
-    .. warning:: This decorator should not be used together with the :func:`set_browser
-        <pytest_logikal.browser.set_browser>` decorator. Use the ``languages`` parameter instead.
+    .. warning:: This decorator should not be used together with the :func:`browser
+        <pytest_logikal.browser.browser>` fixture. Specify the language in the browser scenario or
+        use the ``languages`` parameter of the :func:`set_browser
+        <pytest_logikal.browser.set_browser>` decorator instead.
 
     .. note:: You must also use the :func:`language <pytest_logikal.django.language>` fixture in
         your test when applying this decorator.
 
     """
     def parametrized_test_function(function: Function) -> Any:
+        if 'browser' in function.__code__.co_varnames:
+            raise RuntimeError(
+                'The `set_language` and `all_languages` decorators '
+                'cannot be used together with the `browser` fixture'
+            )
         return pytest.mark.parametrize(
             argnames='language', argvalues=language_codes, indirect=True,
         )(function)
@@ -127,8 +134,9 @@ def all_languages() -> Fixture[Any]:
     """
     Mark a test to run with every available language.
 
-    .. warning:: This decorator should not be used together with the :func:`set_browser
-        <pytest_logikal.browser.set_browser>` decorator. Use the ``languages`` parameter instead.
+    .. warning:: This decorator should not be used together with the :func:`browser
+        <pytest_logikal.browser.browser>` fixture. When the ``django`` extra is installed, tests
+        automatically run with all configured languages.
 
     .. note:: You must also use the :func:`language <pytest_logikal.django.language>` fixture in
         your test when applying this decorator.
