@@ -4,4 +4,4 @@
 -r extras/browser.txt
 -r extras/django.txt
 
-logikal-docs==1.2.3
+logikal-docs==1.2.4
