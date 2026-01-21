@@ -41,6 +41,7 @@ ALLOWED_LEGACY_LICENSES = [
     'Apache License Version 2.0',
     'Apache License, Version 2.0',
     'Apache Software License',
+    'Apache-2.0 AND MIT',
     'Apache-2.0 OR BSD-3-Clause',
     'Apache-2.0',
     'BSD 3-Clause OR Apache-2.0',
@@ -81,14 +82,16 @@ ALLOWED_LEGACY_PACKAGES = {
     'pylint-django': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     # Packages with invalid license metadata
-    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [2]
-    'matplotlib-inline': UNKNOWN_LICENSE,  # license is BSD-3-Clause, see [3]
-    'wrapt': 'any',  # license is BSD-2-Clause, see [4]
+    'google-crc32c': UNKNOWN_LICENSE,  # license is Apache License 2.0, see [2]
+    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [3]
+    'matplotlib-inline': UNKNOWN_LICENSE,  # license is BSD-3-Clause, see [4]
+    'wrapt': 'any',  # license is BSD-2-Clause, see [5]
 }
 # [1] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
-# [2] https://github.com/jupyter/jupyter-sphinx/issues/262
-# [3] https://github.com/ipython/matplotlib-inline/issues/53
-# [4] https://github.com/GrahamDumpleton/wrapt/issues/298
+# [2] https://github.com/googleapis/python-crc32c/issues/320
+# [3] https://github.com/jupyter/jupyter-sphinx/issues/262
+# [4] https://github.com/ipython/matplotlib-inline/issues/53
+# [5] https://github.com/GrahamDumpleton/wrapt/issues/298
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
