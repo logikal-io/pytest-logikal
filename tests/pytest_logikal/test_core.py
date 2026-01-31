@@ -1,4 +1,5 @@
 from itertools import chain
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -9,24 +10,28 @@ from pytest_mock.plugin import MockerFixture
 from pytest_logikal import core
 from tests.pytest_logikal.conftest import append_newline
 
-pytest_plugins = ['pytester']
-
 PYTEST_ARGS = [
     '--assert', 'plain',  # modules are already imported so assertions cannot be rewritten
     '--no-licenses',  # no need to check licenses here again
     '--no-install',  # do not install packages
     '-p', 'no:django', '--no-migration', '--no-html',  # no settings module
 ]
-PYPROJECT_TOML = tomli_w.dumps({
-    'project': {'name': 'pytest-logikal'},
-    'tool': {'browser': {'versions': PYPROJECT['tool']['browser']['versions']}},
-})
+
+
+def generate_pyproject_toml(tool_config: dict[str, Any] | None = None) -> str:
+    return tomli_w.dumps({
+        'project': {'name': 'pytest-logikal'},
+        'tool': {
+            'browser': {'versions': PYPROJECT['tool']['browser']['versions']},
+            **(tool_config or {}),
+        },
+    })
 
 
 def test_run_errors(
     pytester: pytest.Pytester,
 ) -> None:  # pragma: no cover, coverage does not measure after runpytest
-    pytester.makepyprojecttoml(PYPROJECT_TOML)
+    pytester.makepyprojecttoml(generate_pyproject_toml())
     codespell_error = "univrsal = 'valid'"  # codespell:ignore univrsal
     append_newline(pytester.makepyfile(f"""
         import pickle  # triggers a bandit error
@@ -57,7 +62,7 @@ def test_run_errors(
 def test_run_success(
     pytester: pytest.Pytester,
 ) -> None:  # pragma: no cover, coverage does not measure after runpytest
-    pytester.makepyprojecttoml(PYPROJECT_TOML)
+    pytester.makepyprojecttoml(generate_pyproject_toml())
     append_newline(pytester.makepyfile("""
         def test_success() -> None:
             \"\"\"A test that will succeed.\"\"\"

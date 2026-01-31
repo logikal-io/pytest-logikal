@@ -144,7 +144,10 @@ def set_browser(
                 argvalues.append({
                     'name': '-'.join(part for part in name_parts if part is not None),
                     'installed_browser': installed[browser_name],
-                    'settings': settings if not headless else replace(settings, headless=headless),
+                    'settings': (
+                        settings if headless is None
+                        else replace(settings, headless=headless)
+                    ),
                     'language': language,
                 })
 

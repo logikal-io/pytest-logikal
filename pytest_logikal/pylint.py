@@ -63,6 +63,7 @@ class PylintItem(CachedFileCheckItem):
             'line-too-long', 'trailing-newlines', 'trailing-whitespace', 'missing-final-newline',
             # Checks covered by isort
             'wrong-import-order',
+            'ungrouped-imports',
             # Other checks
             'duplicate-code',  # not working with distributed execution
             'logging-fstring-interpolation',  # we are mostly using f-strings in logging

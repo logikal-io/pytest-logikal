@@ -6,8 +6,6 @@ from pytest_logikal.docs import DocsItem, DocsPlugin
 from pytest_logikal.plugin import ItemRunError
 from tests.pytest_logikal.conftest import FILES_DIR
 
-pytest_plugins = ['pytester']
-
 
 def test_invalid_docs(pytester: Pytester, plugin_item: Callable[..., DocsItem]) -> None:
     item = plugin_item(plugin=DocsPlugin, item=DocsItem, file_contents={

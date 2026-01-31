@@ -54,6 +54,7 @@ norecursedirs = [
   '*.egg', '.*', 'build', 'dist', 'node_modules',  # standard folders
   'tests/pytest_logikal/files',  # ignore files used inside plugin runs
 ]
+frozen_time = '2025-01-25 14:30:55'
 
 [tool.mypy]
 plugins = ['mypy_django_plugin.main']  # see https://github.com/python/mypy/issues/11667
