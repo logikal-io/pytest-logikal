@@ -1,6 +1,27 @@
 Fixtures
 ========
 
+frozen_time
+-----------
+The :func:`frozen_timestamp <pytest_logikal.time.frozen_timestamp>` and :func:`frozen_time
+<pytest_logikal.time.frozen_time>` fixtures can be used to freeze and manage time with the help of
+the `time-machine <https://time-machine.readthedocs.io/>`_ library:
+
+.. autofunction:: pytest_logikal.time.frozen_timestamp
+
+An example configuration would be as follows:
+
+.. literalinclude:: ../tests/pytest_logikal/docs_examples/pyproject_frozen_time.toml
+   :language: toml
+
+.. autofunction:: pytest_logikal.time.frozen_time
+
+You can manage time with the :func:`frozen_time <pytest_logikal.time.frozen_time>` fixture as
+follows:
+
+.. literalinclude:: ../tests/pytest_logikal/docs_examples/test_frozen_time.py
+   :language: python
+
 mocker
 ------
 The default installation provides the :doc:`mocker <pytest_mock:usage>` fixture via `pytest-mock
@@ -22,7 +43,7 @@ You can specify browser scenarios with this decorator as follows:
 .. literalinclude:: ../tests/pytest_logikal/docs_examples/test_single_scenario.py
    :language: python
 
-You can also run your test in multiple scenarios:
+You can also run your test in multiple scenarios and override the scenario languages as follows:
 
 .. literalinclude:: ../tests/pytest_logikal/docs_examples/test_multiple_scenarios.py
    :language: python

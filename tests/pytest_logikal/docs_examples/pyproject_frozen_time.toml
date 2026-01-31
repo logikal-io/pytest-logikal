@@ -1,0 +1,2 @@
+[tool.pytest]
+frozen_time = '1985-10-26 1:20:42'
