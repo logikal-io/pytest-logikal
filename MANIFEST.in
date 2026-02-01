@@ -1,4 +1,5 @@
 exclude .gitignore
+exclude conftest.py
 prune .github
 prune docs
 prune tests
