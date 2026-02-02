@@ -62,6 +62,7 @@ ALLOWED_LEGACY_LICENSES = [
     'MIT License',
     'MIT No Attribution License (MIT-0)',
     'MIT',
+    'MPL-2.0 AND MIT',
     'Mozilla Public License 2.0 (MPL 2.0)',
     'Public Domain',
     'Python Software Foundation License',

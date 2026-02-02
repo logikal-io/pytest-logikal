@@ -7,7 +7,8 @@ from faker.proxy import Faker
 from pytest import mark, raises
 from pytest_factoryboy import register
 
-from pytest_logikal.django import LiveURL, all_languages, set_language, set_timezone
+from pytest_logikal import LiveURL
+from pytest_logikal.django import all_languages, set_language, set_timezone
 from tests.pytest_logikal import factories
 from tests.website.models import Project, User
 

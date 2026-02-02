@@ -12,6 +12,7 @@ intersphinx_mapping = {
     # For these libraries only the "latest" version is published
     'pytest_mock': ('https://pytest-mock.readthedocs.io/en/latest/', None),
     'pytest_django': ('https://pytest-django.readthedocs.io/en/latest/', None),
+    'time_machine': ('https://time-machine.readthedocs.io/en/latest/', None),
 }
 nitpick_ignore = [
     ('py:class', 'pytest_django.live_server_helper.LiveServer'),
