@@ -1,4 +1,5 @@
 from itertools import permutations
+from logging import getLogger
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,8 @@ from babel.messages import Catalog, Message, mofile, pofile
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
+
+logger = getLogger(__name__)
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -66,6 +69,9 @@ class TranslationItem(CachedFileCheckItem):
 
         with open(self.path, encoding='utf-8') as catalog_file:
             catalog = pofile.read_po(catalog_file, abort_invalid=True)
+            if 'pytest: skip' in catalog.header_comment:
+                logger.info(f'Skipping file "{self.path}"')
+                return
 
         # Check compiled translation file
         compiled_path = self.path.with_suffix('.mo')
