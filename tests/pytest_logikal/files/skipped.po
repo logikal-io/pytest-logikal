@@ -1,6 +1,5 @@
 # pytest: skip
 # Skipped translation file
-# Header: used PO-Revision-Date: 2023-05-26
 msgid ""
 msgstr ""
 "Project-Id-Version: project v1.0.0\n"

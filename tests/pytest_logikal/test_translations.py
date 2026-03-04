@@ -41,7 +41,7 @@ def test_outdated(changed: str, plugin_item: Callable[..., Item], pytester: Pyte
     error.match('error: Compiled translation file ".*/outdated.mo" is outdated')
 
 
-def test_skipped(plugin_item: Callable[..., Item], pytester: Pytester) -> None:
+def test_skipped(plugin_item: Callable[..., Item]) -> None:
     contents = {'skipped.po': (FILES_DIR / 'skipped.po').read_text()}
     item = plugin_item(plugin=TranslationPlugin, item=TranslationItem, file_contents=contents)
-    results = item.runtest()  # does not raise an error
+    item.runtest()  # does not raise an error
