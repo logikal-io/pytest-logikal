@@ -2,7 +2,7 @@
 
 // Naming conventions
 function validInline(validArgument) { return validArgument; }
-let validVariable = validInline(1);
+let validVariable = validInline('1');
 function validWithArrow() {
     return (validArgument) => validArgument;
 }
@@ -11,11 +11,11 @@ function validWithArrow() {
 // and multiline comments
 if (validVariable) validVariable = validInline(2);
 
-if (validVariable === 1) {
-    validVariable = validWithArrow()(2);
-} else if (validVariable === 3) {
-    validVariable = 4;
+if (validVariable === '1') {
+    validVariable = validWithArrow()('2');
+} else if (validVariable === '3') {
+    validVariable = '4';
 }
 
 // Globals
-document.getElementById('valid');
+document.getElementById(validVariable);
