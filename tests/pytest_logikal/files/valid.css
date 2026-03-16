@@ -1,0 +1,12 @@
+/* Nesting */
+.a {
+  color: #aaaaaa;
+
+  .b {
+    color: #bbbbbb;
+  }
+
+  & .c {
+    color: #cccccc;
+  }
+}
