@@ -5,6 +5,7 @@ reportInvalidScopeDisables: true
 reportNeedlessDisables: true
 plugins:
   - '@stylistic/stylelint-plugin'
+  - 'stylelint-use-nesting'
 rules:
   # Unknown
   declaration-property-value-no-unknown: true
@@ -43,3 +44,6 @@ rules:
   '@stylistic/indentation': 2
   '@stylistic/linebreaks': unix
   '@stylistic/max-line-length': {max_line_length}
+
+  # Other rules
+  'csstools/use-nesting': always

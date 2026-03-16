@@ -26,12 +26,14 @@ class CSSItem(CachedFileCheckItem):
 
     def run(self) -> None:
         # Validate
-        content = self.path.read_text(encoding='utf-8')
-        errors = self.plugin.validator.errors(content, content_type='text/css')
-        messages = [
-            f'{error.first_line}: validation {error.severity}: {error.message}'
-            for error in errors
-        ]
+        # Note: we had to disable validation due to https://github.com/w3c/css-validator/issues/481
+        # content = self.path.read_text(encoding='utf-8')
+        # errors = self.plugin.validator.errors(content, content_type='text/css')
+        # messages = [
+        #     f'{error.first_line}: validation {error.severity}: {error.message}'
+        #     for error in errors
+        # ]
+        messages: list[str] = []
 
         # Lint
         # Note: we cannot specify max_line_length via CLI arguments currently

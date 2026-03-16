@@ -7,6 +7,7 @@
     "stylelint": "^17.4.0",
     "stylelint-config-standard": "^40.0.0",
     "@stylistic/stylelint-plugin": "^5.0.1",
-    "@stylistic/stylelint-config": "^4.0.0"
+    "@stylistic/stylelint-config": "^4.0.0",
+    "stylelint-use-nesting": "^6.0.2"
   }
 }

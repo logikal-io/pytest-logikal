@@ -28,3 +28,11 @@ unknown {
   unknown-property: unknown-value;
     margin: 0
 }
+
+p {
+  margin: 0;
+}
+
+p .unnested {
+  margin: 0;
+}
