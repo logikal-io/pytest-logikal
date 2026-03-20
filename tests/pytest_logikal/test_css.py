@@ -19,8 +19,10 @@ def test_run_invalid(plugin_item: Callable[..., Item]) -> None:
     error.match('Expected indentation')
     error.match('Expected a trailing semicolon')
     error.match('Expected "p .unnested" inside "p"')
+    error.match('Unexpected custom property "--undefined-variable"')
 
 
+# TODO: Issue: https://github.com/csstools/stylelint-value-no-unknown-custom-properties/issues/57
 def test_run_valid(plugin_item: Callable[..., Item]) -> None:
     contents = {'valid.css': (FILES_DIR / 'valid.css').read_text()}
     item = plugin_item(plugin=CSSPlugin, item=CSSItem, file_contents=contents)

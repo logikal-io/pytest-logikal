@@ -15,7 +15,7 @@
 }
 
 /* Page */
-a:active { color: var(--theme-text); }
+a:active { color: blue; }
 p, ul, ol { margin: 1em 0; }
 
 /* Mobile */
@@ -27,6 +27,10 @@ p, ul, ol { margin: 1em 0; }
 unknown {
   unknown-property: unknown-value;
     margin: 0
+}
+
+p {
+  padding: var(--undefined-variable);
 }
 
 p {

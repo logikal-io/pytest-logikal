@@ -1,12 +1,14 @@
+@import url('variables.css');
+
 /* Nesting */
 .a {
-  color: #aaaaaa;
+  color: var(--color-1);
 
   .b {
-    color: #bbbbbb;
+    color: var(--color-2);
   }
 
   & .c {
-    color: #cccccc;
+    color: var(--color-3);
   }
 }

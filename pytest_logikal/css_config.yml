@@ -6,6 +6,7 @@ reportNeedlessDisables: true
 plugins:
   - '@stylistic/stylelint-plugin'
   - 'stylelint-use-nesting'
+  - 'stylelint-value-no-unknown-custom-properties'
 rules:
   # Unknown
   declaration-property-value-no-unknown: true
@@ -47,3 +48,9 @@ rules:
 
   # Other rules
   'csstools/use-nesting': always
+  'csstools/value-no-unknown-custom-properties':
+    - true
+    - resolver:
+        extensions: ['.css']
+        paths: []
+        moduleDirectories: []
