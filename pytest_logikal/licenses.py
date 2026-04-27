@@ -13,6 +13,7 @@ UNKNOWN_LICENSE = 'UNKNOWN'
 # See https://spdx.org/licenses/
 ALLOWED_LICENSES = [
     'Apache-2.0',
+    '0BSD',
     'BSD-2-Clause',
     'BSD-3-Clause',
     'CC0-1.0',

@@ -3,12 +3,12 @@ import os
 import shutil
 import sys
 from collections.abc import Callable, Iterator
-from importlib.util import find_spec
 from itertools import chain
 from pathlib import Path
 from typing import Any
 
 import pytest
+from logikal_utils import imports
 from termcolor import colored
 
 sys.path.insert(0, os.getcwd())
@@ -26,9 +26,9 @@ DEFAULT_INI_OPTIONS: dict[str, Any] = {
     'cov_fail_under': {'value': 100, 'help': 'target coverage percentage'},
 }
 EXTRAS = {
-    'black': bool(find_spec('black')),
-    'browser': bool(find_spec('logikal_browser')),
-    'django': bool(find_spec('pytest_django')),
+    'black': imports.installed('black'),
+    'browser': imports.installed('logikal_browser'),
+    'django': imports.installed('pytest_django'),
 }
 
 ReportInfoType = tuple[Any | str, int | None, str]
