@@ -5,7 +5,7 @@ from typing import Any
 import isort
 import pytest
 from isort.wrap_modes import WrapModes
-from logikal_utils.project import PYPROJECT
+from logikal_utils.project import tool_config
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
 from pytest_logikal.plugin import ItemRunError
@@ -30,10 +30,10 @@ def get_config(max_line_length: int, black_compatible: bool = False) -> dict[str
             'ensure_newline_before_comments': True,
             'split_on_trailing_comma': True,
         })
-    if 'tool' in PYPROJECT and 'isort' in PYPROJECT['tool']:
+    if pyproject_config := tool_config('isort'):
         for option in config:
-            if option in PYPROJECT['tool']['isort']:
-                config[option] = PYPROJECT['tool']['isort'][option]
+            if option in pyproject_config:
+                config[option] = pyproject_config[option]
     return config
 
 

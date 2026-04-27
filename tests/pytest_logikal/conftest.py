@@ -15,7 +15,7 @@ MODULES = [
     # Core modules
     'core', 'file_checker', 'plugin',
     # Additional modules
-    'black', 'browser', 'django', 'node_install', 'utils', 'validator',
+    'black', 'browser', 'django', 'utils', 'validator',
 ]
 reload(import_module('pytest_logikal'))
 for submodule in chain.from_iterable([MODULES, *core.PLUGINS.values()]):

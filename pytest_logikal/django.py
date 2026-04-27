@@ -1,6 +1,7 @@
 import zoneinfo
 from collections.abc import Iterable, Sequence
 from logging import getLogger
+from pathlib import Path
 from typing import Any, Protocol
 
 import pytest
@@ -8,11 +9,10 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone as django_timezone, translation
 from factory import random as factory_random
-from logikal_utils.random import DEFAULT_RANDOM_SEED
+from logikal_utils import node, random
 from mypy_django_plugin import config as mypy_django_plugin_config
 from pytest_django.live_server_helper import LiveServer
 
-from pytest_logikal.node_install import install_node_packages
 from pytest_logikal.utils import Fixture, Function
 from pytest_logikal.validator import Validator
 
@@ -23,7 +23,7 @@ __all__ = ['LiveURL', 'set_language', 'set_timezone']
 
 def pytest_sessionstart(session: pytest.Session) -> None:
     if not session.config.getoption('no_install'):
-        install_node_packages()
+        node.install_packages(prefix=Path(__file__).parent)
 
     css_or_svg = not session.config.getoption('no_css') or not session.config.getoption('no_svg')
     if not session.config.getoption('fast') and css_or_svg:
@@ -46,7 +46,7 @@ def faker_seed() -> int:
     """
     Set a default seed for Faker for deterministic testing. Automatically applied.
     """
-    return DEFAULT_RANDOM_SEED
+    return random.DEFAULT_RANDOM_SEED
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -54,7 +54,7 @@ def factory_seed() -> None:
     """
     Set a default seed for pytest-factoryboy for deterministic testing. Automatically applied.
     """
-    factory_random.reseed_random(DEFAULT_RANDOM_SEED)
+    factory_random.reseed_random(random.DEFAULT_RANDOM_SEED)
 
 
 class LiveURL(Protocol):
