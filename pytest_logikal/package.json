@@ -1,13 +1,13 @@
 {
   "devDependencies": {
-    "globals": "^17.4.0",
-    "eslint": "^10.0.3",
+    "globals": "^17.6.0",
+    "eslint": "^10.4.0",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
-    "stylelint": "^17.4.0",
+    "stylelint": "^17.11.1",
     "stylelint-config-standard": "^40.0.0",
-    "@stylistic/stylelint-plugin": "^5.0.1",
-    "@stylistic/stylelint-config": "^4.0.0",
+    "@stylistic/stylelint-plugin": "^5.1.0",
+    "@stylistic/stylelint-config": "^5.0.0",
     "stylelint-use-nesting": "^6.0.2"
   }
 }

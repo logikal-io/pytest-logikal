@@ -13,9 +13,8 @@ def test_run_invalid(plugin_item: Callable[..., Item]) -> None:
     item = plugin_item(plugin=CSSPlugin, item=CSSItem, file_contents=contents)
     with raises(ItemRunError) as error:
         item.runtest()
-    # error.match('validation error: “unknown-property”')  # temporarily disabled
-    error.match('unknown type selector "unknown"')
-    error.match('unknown property "unknown-property"')
+    error.match('Unknown type selector "unknown"')
+    error.match('Unknown property "unknown-property"')
     error.match('Expected indentation')
     error.match('Expected a trailing semicolon')
     error.match('Expected "p .unnested" inside "p"')
