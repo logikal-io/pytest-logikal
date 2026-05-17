@@ -22,10 +22,11 @@ def pytest_configure(config: pytest.Config) -> None:
 
 class JSItem(CachedFileCheckItem):
     def run(self) -> None:
+        config = 'js_config_module.mjs' if self.path.suffix == '.mjs' else 'js_config.mjs'
         command = [
             'npx', '--no', '--',
             'eslint', '--stdin', '--format=json', '--max-warnings=0',
-            f'--config={Path(__file__).parent / 'js_config.mjs'}',
+            f'--config={Path(__file__).parent / config}',
             f'--rule=max-len: ["error", {get_ini_option('max_line_length')}]',
             f'--rule=complexity: ["error", {get_ini_option('max_complexity')}]',
         ]
@@ -52,4 +53,4 @@ class JSPlugin(CachedFileCheckPlugin):
     item = JSItem
 
     def check_file(self, file_path: Path) -> bool:
-        return file_path.suffix == '.js'
+        return file_path.suffix in {'.js', '.mjs'}

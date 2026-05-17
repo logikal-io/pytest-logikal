@@ -43,7 +43,7 @@ django = {file = 'requirements/extras/django.txt'}
 [tool.setuptools.package-data]
 pytest_logikal = [
   'py.typed', 'package.json', 'package-lock.json',
-  'bandit_config.yml', 'css_config.yml', 'js_config.yml',
+  'bandit_config.yml', 'css_config.yml', 'js_config.mjs', 'js_config_module.mjs',
 ]
 
 [tool.setuptools_scm]

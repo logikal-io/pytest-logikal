@@ -162,7 +162,6 @@ def pytest_configure(config: pytest.Config) -> None:
         '--strict',
         '--show-column-numbers',
         '--warn-unreachable',
-        '--local-partial-types',
     ]
 
 
