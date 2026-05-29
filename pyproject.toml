@@ -1,5 +1,5 @@
 [build-system]
-requires = ['setuptools>=64', 'setuptools-scm>=8']
+requires = ['setuptools>=80', 'setuptools-scm[simple]>=10']
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -46,8 +46,6 @@ pytest_logikal = [
   'bandit_config.yml', 'css_config.yml', 'js_config.mjs', 'js_config_module.mjs',
 ]
 
-[tool.setuptools_scm]
-
 [tool.pytest]
 DJANGO_SETTINGS_MODULE = 'tests.website.settings'
 norecursedirs = [
@@ -70,8 +68,8 @@ module = [
 ignore_missing_imports = true
 
 [tool.browser.versions]
-chrome = '145.0.7632.117'
-edge = '145.0.3800.82'
+chrome = '148.0.7778.216'
+edge = '148.0.3967.96'
 
 [tool.coverage.run]
 patch = ['subprocess']

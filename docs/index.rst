@@ -123,7 +123,7 @@ and `pytest-factoryboy <https://github.com/pytest-dev/pytest-factoryboy>`_.
 
         services:
           validator:
-            image: ghcr.io/validator/validator@sha256:fdbc3afac6f0f52636eb650b43fb39033c3fb00487cf06446d3d81a6a246ebb0
+            image: ghcr.io/validator/validator@sha256:1e02132147c89c4d7e9c612a6cefcab35edb3dbc08fd19bab077dbabbb6fbce5
             ports: [{target: 8888}]
 
 When using the ``django`` extra you must also specify the Django settings module and mypy plugin
