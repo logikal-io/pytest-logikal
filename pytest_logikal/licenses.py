@@ -85,11 +85,13 @@ ALLOWED_LEGACY_PACKAGES = {
     'pylint-plugin-utils': 'GNU General Public License v2 or later (GPLv2+)',  # local plugin
     # Packages with invalid license metadata
     'google-ads': 'any',  # license is Apache License 2.0, see [2]
-    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [3]
+    'google-crc32c': UNKNOWN_LICENSE,  # license is Apache License 2.0, see [3]
+    'jupyter-sphinx': 'any',  # license is BSD-3-Clause, see [4]
 }
 # [1] https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1635463
 # [2] https://github.com/googleads/google-ads-python/issues/1081
-# [3] https://github.com/jupyter/jupyter-sphinx/issues/262
+# [3] https://github.com/googleapis/python-crc32c/issues/320, can be removed after 2.8+ is released
+# [4] https://github.com/jupyter/jupyter-sphinx/issues/262
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
