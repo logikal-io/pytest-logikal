@@ -23,6 +23,10 @@ rules:
   # Notation
   color-hex-length: long
   font-weight-notation: named-where-possible
+  # Pattern
+  selector-id-pattern:
+    - '^([a-z][a-z0-9]*)(_[a-z0-9]+)*$'
+    - message: Expected id selector "%s" to be snake_case
   # Quotes
   font-family-name-quotes: always-unless-keyword
 
