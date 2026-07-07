@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from _pytest.config.findpaths import ConfigValue  # pylint: disable=import-private-name
 from logikal_utils import imports
 from termcolor import colored
 
@@ -120,9 +121,12 @@ def pytest_load_initial_conftests(  # pylint: disable=too-complex
         'log_date_format': '%Y-%m-%d %H:%M:%S',
         'log_auto_indent': 'True',
     }
-    for key, value in {**ini_defaults, **early_config.inicfg}.items():
-        early_config.inicfg[key] = value
-
+    ini_config = early_config._inicfg  # pylint: disable=protected-access
+    for key, value in {**ini_defaults, **ini_config}.items():
+        ini_config[key] = (
+            value if isinstance(value, ConfigValue)
+            else ConfigValue(value, origin='override', mode='toml')
+        )
     yield
 
 

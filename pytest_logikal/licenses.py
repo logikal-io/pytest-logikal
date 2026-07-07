@@ -33,6 +33,7 @@ ALLOWED_LICENSES = [
 ]
 ALLOWED_PACKAGES = {
     'codespell': 'GPL-2.0-only',  # only used as a local tool
+    'djlint': 'GPL-3.0-or-later',  # only used as a local tool
     'pylint': 'GPL-2.0-or-later',  # only used as a local tool
 }
 
@@ -74,7 +75,6 @@ ALLOWED_LEGACY_LICENSES = [
 ]
 
 ALLOWED_LEGACY_PACKAGES = {
-    'djlint': 'GNU General Public License v3 or later (GPLv3+)',  # only used as a local tool
     'facebook-business': 'LICENSE.txt',  # only used as a connector
     'facebook_business': 'LICENSE.txt',  # only used as a connector
     'html-tag-names': 'GNU General Public License v3 or later (GPLv3+)',  # local tool

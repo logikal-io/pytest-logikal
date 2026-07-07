@@ -34,7 +34,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
 def pytest_configure(config: pytest.Config) -> None:
     # Patching django-stubs
     def parse_toml_file(self: Any, *_args: Any, **_kwargs: Any) -> None:
-        self.django_settings_module = config.inicfg['DJANGO_SETTINGS_MODULE']
+        self.django_settings_module = config.getini('DJANGO_SETTINGS_MODULE')
         self.strict_settings = True
         self.strict_model_abstract_attrs = True
 

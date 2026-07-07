@@ -61,8 +61,8 @@ def plugin_item(
         if set_django_settings_module:
             inicfg['DJANGO_SETTINGS_MODULE'] = 'tests.website.settings'
 
-        config = mocker.Mock(inicfg=inicfg)
-        config.getini = inicfg.get
+        config = mocker.Mock(_inicfg=inicfg)
+        config.getini = config._inicfg.get  # pylint: disable=protected-access
         config.invocation_params.dir = path.parent
         config.rootpath = pytestconfig.rootpath
         config.stash = pytestconfig.stash

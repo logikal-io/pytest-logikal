@@ -1,1 +1,1 @@
-logikal-browser~=3.2
+logikal-browser~=3.3
