@@ -72,14 +72,20 @@ class PylintItem(CachedFileCheckItem):
             'use-dict-literal',  # the dict class constructor approach is sometimes useful
             'consider-using-namedtuple-or-dataclass',  # unnamed tuples can be sometimes useful
         ]
-        if 'DJANGO_SETTINGS_MODULE' in self.config.inicfg:
+
+        try:
+            django_settings_module = self.config.getini('DJANGO_SETTINGS_MODULE')
+        except ValueError:  # pragma: no cover, tested in subprocess
+            django_settings_module = None
+
+        if django_settings_module:
             disable += [
                 'too-few-public-methods',  # common error with some Django classes
                 'unsubscriptable-object',  # common error with generic types in django-stubs
             ]
             plugins += ['pylint_django']
             command += [
-                f'--django-settings-module={self.config.inicfg['DJANGO_SETTINGS_MODULE']}',
+                f'--django-settings-module={django_settings_module}',
                 r'--module-rgx=[^\WA-Z]*$',  # allow (migration) modules to start with digits
             ]
 

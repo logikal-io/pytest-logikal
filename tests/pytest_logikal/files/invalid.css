@@ -36,3 +36,7 @@ p {
 p .unnested {
   margin: 0;
 }
+
+#id-invalid-pattern {
+  margin: 0;
+}
