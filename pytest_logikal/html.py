@@ -44,6 +44,7 @@ class HTMLTemplateItem(CachedFileCheckItem):
             '--max-line-length', max_line_length,
             '--max-attribute-length', max_line_length,
             '--linter-output-format', '{line}: error: {message} ({code})',
+            '--no-github-output',
         ]
 
         # Check formatting
