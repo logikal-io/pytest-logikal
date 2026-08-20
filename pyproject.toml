@@ -68,8 +68,8 @@ module = [
 ignore_missing_imports = true
 
 [tool.browser.versions]
-chrome = '148.0.7778.216'
-edge = '148.0.3967.96'
+chrome = '151.0.7922.170'
+edge = '151.0.4129.93'
 
 [tool.coverage.run]
 patch = ['subprocess']
