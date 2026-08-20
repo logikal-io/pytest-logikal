@@ -4,6 +4,6 @@ services:
   validator:
     # Note: make sure to update the version in the docs/index.rst as well when changing it here!
     # Available versions: https://github.com/validator/validator/pkgs/container/validator/versions
-    # Commit date: 2026-05-29
-    image: ghcr.io/validator/validator@sha256:1e02132147c89c4d7e9c612a6cefcab35edb3dbc08fd19bab077dbabbb6fbce5
+    # Commit date: 2026-08-19
+    image: ghcr.io/validator/validator@sha256:e8b7707b285a3443193603a5637f64c0566c16f5a567fd4e15eb06fee34b17f2
     ports: [{target: 8888}]
