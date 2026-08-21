@@ -20,16 +20,22 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(HTMLTemplatePlugin(config=config))
 
 
+# Note: format checking is disabled due to the following issues:
+# https://github.com/djlint/djLint/issues/2408
+# https://github.com/djlint/djLint/issues/2409
+# https://github.com/djlint/djLint/issues/2410
+# https://github.com/djlint/djLint/issues/2411
+# Note: the related test cases are also disabled (see tests/pytest_logikal/test_html.py)
 class HTMLTemplateItem(CachedFileCheckItem):
-    @staticmethod
-    def _color_diff(line: str) -> str:
-        if line.startswith('@@'):
-            return colored(line, 'cyan', force_color=True)
-        if line.startswith('+'):
-            return colored(line, 'green', force_color=True)
-        if line.startswith('-'):
-            return colored(line, 'red', force_color=True)
-        return line
+    # @staticmethod
+    # def _color_diff(line: str) -> str:
+    #     if line.startswith('@@'):
+    #         return colored(line, 'cyan', force_color=True)
+    #     if line.startswith('+'):
+    #         return colored(line, 'green', force_color=True)
+    #     if line.startswith('-'):
+    #         return colored(line, 'red', force_color=True)
+    #     return line
 
     def run(self) -> None:
         messages = []
@@ -43,15 +49,16 @@ class HTMLTemplateItem(CachedFileCheckItem):
             '--max-attribute-length', max_line_length,
             '--max-blank-lines', '1',
             '--no-github-output',
+            '--custom-blocks', 'trans',
         ]
 
         # Check formatting
-        command = ['djlint', '--check', *common_args]
-        process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
-        if process.returncode:
-            errors = process.stdout.strip().replace('@@\n\n', '@@\n')
-            errors = '\n'.join(self._color_diff(line) for line in errors.splitlines()[2:-2])
-            messages.append(errors or process.stderr.strip())
+        # command = ['djlint', '--check', *common_args]
+        # process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
+        # if process.returncode:
+        #     errors = process.stdout.strip().replace('@@\n\n', '@@\n')
+        #     errors = '\n'.join(self._color_diff(line) for line in errors.splitlines()[2:-2])
+        #     messages.append(errors or process.stderr.strip())
 
         # Lint
         include = [
@@ -60,7 +67,6 @@ class HTMLTemplateItem(CachedFileCheckItem):
         ]
         ignore = [
             'H023',  # we allow some entity references (e.g. quotes, special spaces, dashes)
-            'H037',  # false positives (see https://github.com/djlint/djLint/issues/692)
             'J004', 'J018',  # we have our own functions for Jinja environments
         ]
         command = [
