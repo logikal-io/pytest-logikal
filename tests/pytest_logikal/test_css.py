@@ -18,7 +18,7 @@ def test_run_invalid(plugin_item: Callable[..., Item]) -> None:
     error.match('Expected indentation')
     error.match('Expected a trailing semicolon')
     error.match('Expected "p .unnested" inside "p"')
-    error.match('Expected id selector "#id-invalid-pattern" to be snake_case')
+    error.match('Expected id selector "#id_invalid_pattern" to be kebab-case')
 
 
 def test_run_valid(plugin_item: Callable[..., Item]) -> None:
