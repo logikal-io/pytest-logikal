@@ -26,7 +26,7 @@ class PylintPlugin(CachedBatchFileCheckPlugin):
     name = 'pylint'
     item = CachedBatchFileCheckItem
 
-    def runtest(self, paths: list[Path], workers: int | None) -> dict[Path, BatchFileCheckResult]:
+    def _command(self, paths: list[Path], workers: int | None) -> list[str]:
         plugins = [
             'pylint.extensions.code_style',
             'pylint.extensions.comparison_placement',
@@ -59,10 +59,13 @@ class PylintPlugin(CachedBatchFileCheckPlugin):
             f'--jobs={workers or 0}',  # auto-detects number of CPUs if not provided explicitly
         ]
         enable = [
+            'bad-inline-option',
+            'deprecated-pragma',
             'useless-suppression',
             'use-symbolic-message-instead',
             'use-implicit-booleaness-not-comparison-to-zero',
             'use-implicit-booleaness-not-comparison-to-string',
+            'consider-using-augmented-assign',
             'prefer-typing-namedtuple',
         ]
         disable = [
@@ -103,11 +106,15 @@ class PylintPlugin(CachedBatchFileCheckPlugin):
             f'--enable={','.join(enable)}', f'--disable={','.join(disable)}',
             f'--load-plugins={','.join(plugins)}',
         ]
+        return command
 
+    def runtest(self, paths: list[Path], workers: int | None) -> dict[Path, BatchFileCheckResult]:
         # Note that we are running Pylint in a subprocess and process its output instead of
-        # importing it due to its license (GPLv2). The subprocess call is secure as it is not using
-        # untrusted input.
-        process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
+        # importing it due to its license (GPLv2).
+        process = subprocess.run(  # nosec
+            self._command(paths=paths, workers=workers),
+            capture_output=True, text=True, check=False,
+        )
         if process.returncode < 0:
             raise RuntimeError(
                 f'Pylint was terminated by signal {-process.returncode}: '
@@ -119,10 +126,15 @@ class PylintPlugin(CachedBatchFileCheckPlugin):
                 f'{process.stderr.strip() or process.stdout.strip() or '(no output)'}'
             )
 
+        try:
+            report = json.loads(process.stdout)
+        except json.decoder.JSONDecodeError as error:
+            raise RuntimeError((process.stdout or process.stderr).strip()) from error
+
         results: dict[Path, BatchFileCheckResult] = defaultdict(BatchFileCheckResult)
         formatter = '{line}:{column}: {type}: {message} ({symbol})'
         path_set = set(paths)  # speed up path checking on large projects
-        for message in json.loads(process.stdout).get('messages', []):
+        for message in report.get('messages', []):
             if (path := Path(message['absolutePath'])) not in path_set:
                 raise RuntimeError(f'Invalid path: {path}')
             results[path].errors.append(formatter.format(**message))

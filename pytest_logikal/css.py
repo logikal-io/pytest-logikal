@@ -1,13 +1,17 @@
 import json
 import subprocess
+from collections import defaultdict
 from pathlib import Path
 
 import pytest
 
-from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
-from pytest_logikal.plugin import ItemRunError
+from pytest_logikal.file_checker import (
+    BatchFileCheckResult, CachedBatchFileCheckItem, CachedBatchFileCheckPlugin,
+)
 from pytest_logikal.utils import get_ini_option, render_template
 from pytest_logikal.validator import Validator
+
+PACKAGE_ROOT_PATH = Path(__file__).parent
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -21,55 +25,62 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(CSSPlugin(config=config))
 
 
-class CSSItem(CachedFileCheckItem):
-    plugin: 'CSSPlugin'
+class CSSPlugin(CachedBatchFileCheckPlugin):
+    name = 'css'
+    item = CachedBatchFileCheckItem
 
-    def run(self) -> None:
+    def __init__(self, config: pytest.Config):
+        super().__init__(config=config)
+        self.validator = Validator()
+
+    def runtest(
+        self, paths: list[Path], workers: int | None,
+    ) -> dict[Path, BatchFileCheckResult]:
+        results: dict[Path, BatchFileCheckResult] = defaultdict(BatchFileCheckResult)
+
         # Validate
         # Note: we had to disable validation due to https://github.com/w3c/css-validator/issues/481
-        # content = self.path.read_text(encoding='utf-8')
-        # errors = self.plugin.validator.errors(content, content_type='text/css')
-        # messages = [
-        #     f'{error.first_line}: validation {error.severity}: {error.message}'
-        #     for error in errors
-        # ]
-        messages: list[str] = []
+        # for path in paths:
+        #     content = path.read_text(encoding='utf-8')
+        #     errors = self.validator.errors(content, content_type='text/css')
+        #     results[path].errors.extend(
+        #         f'{error.first_line}: validation {error.severity}: {error.message}'
+        #         for error in errors
+        #     )
 
         # Lint
         # Note: we cannot specify max_line_length via CLI arguments currently
         # (see https://github.com/stylelint/stylelint/issues/6805)
         context = {'max_line_length': get_ini_option('max_line_length')}
-        with render_template(Path(__file__).parent / 'css_config.yml', context) as config_path:
+        with render_template(PACKAGE_ROOT_PATH / 'css_config.yml', context) as config_path:
             command = [
                 'npx', '--no',
-                'stylelint', str(self.path), '--formatter', 'json',
+                'stylelint', *(str(path) for path in paths), '--formatter', 'json',
                 '--config', str(config_path),
             ]
             process = subprocess.run(  # nosec
-                command, capture_output=True, text=True, check=False, cwd=Path(__file__).parent,
+                command, capture_output=True, text=True, check=False, cwd=PACKAGE_ROOT_PATH,
+            )
+        if process.returncode < 0:
+            raise RuntimeError(
+                f'Stylelint was terminated by signal {-process.returncode}: '
+                f'{process.stderr.strip() or process.stdout.strip() or '(no output)'}'
             )
         try:
-            report = json.loads(process.stderr)[0]
+            reports = json.loads(process.stderr)
+        except json.decoder.JSONDecodeError as error:
+            raise RuntimeError((process.stderr or process.stdout).strip()) from error
+
+        path_set = set(paths)  # speed up path checking on large projects
+        for report in reports:
+            if (path := Path(report['source'])) not in path_set:
+                raise RuntimeError(f'Invalid path: {path}')
             if report['errored']:
-                messages.extend(
+                results[path].errors.extend(
                     f'{error['line']}:{error['column']}: {error['severity']}: {error['text']}'
                     for error in report['warnings']
                 )
-        except json.decoder.JSONDecodeError:
-            messages.append(process.stderr)
-
-        # Report errors
-        if messages:
-            raise ItemRunError('\n'.join(messages))
-
-
-class CSSPlugin(CachedFileCheckPlugin):
-    name = 'css'
-    item = CSSItem
-
-    def __init__(self, config: pytest.Config):
-        super().__init__(config=config)
-        self.validator = Validator()
+        return results
 
     def check_file(self, file_path: Path) -> bool:
         return file_path.suffix == '.css'

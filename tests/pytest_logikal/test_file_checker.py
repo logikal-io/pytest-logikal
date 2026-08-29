@@ -108,8 +108,10 @@ def test_batch_check(tmp_path: Path, mocker: MockerFixture) -> None:
     config.pluginmanager.get_plugin.return_value = mocker.Mock()
     config_options = {'verbose': True}
     config.getoption = config_options.get
+    config.stash = {}
 
     plugin = ValidBatchPlugin(config=config)
+    config.pluginmanager.get_plugins.return_value = {plugin}
     runtest = mocker.spy(plugin, 'runtest')
 
     # Create individual items

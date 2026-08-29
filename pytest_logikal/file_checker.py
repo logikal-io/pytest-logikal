@@ -18,6 +18,8 @@ from pytest_logikal.plugin import Item, Plugin
 
 logger = getLogger(__name__)
 
+_BATCH_OUTPUT_STARTED_KEY = pytest.StashKey[bool]()
+
 
 class FileCheckItem(Item):
     def __init__(self, *, plugin: 'FileCheckPlugin', **kwargs: Any):
@@ -179,7 +181,7 @@ class CachedBatchFileCheckPlugin(FileCheckPlugin):
                 self.path_modification_times_key, {},
             ).items()
         }
-        self._batch_started = False
+        self.batch_started = False
         self._collection_finished_nodes: set[str] = set()
 
     @abstractmethod
@@ -204,9 +206,9 @@ class CachedBatchFileCheckPlugin(FileCheckPlugin):
 
     def _run_batch(self, paths: list[Path], workers: int | None = None) -> None:
         # Prepare batch
-        if self._batch_started:
+        if self.batch_started:
             return
-        self._batch_started = True
+        self.batch_started = True
 
         initial_path_modification_times = self._path_modification_times(paths=paths)
         results = {
@@ -216,16 +218,7 @@ class CachedBatchFileCheckPlugin(FileCheckPlugin):
 
         # Run batch when there are files to check
         if batch_paths := [path for path, result in results.items() if result is None]:
-            if terminal := self.config.pluginmanager.get_plugin('terminalreporter'):
-                files = len(batch_paths)
-                terminal.write_line(
-                    f'\nRunning {self.name} checks on {files} file{'s' if files != 1 else ''}'
-                    f' ({len(results) - files} skipped)...'
-                )
-                if self.config.getoption('verbose'):
-                    terminal.write_line(f'  paths: {batch_paths}')
-                    terminal.write_line(f'  workers: {workers}')
-
+            self._print_info(paths=batch_paths, workers=workers, all_files=len(results))
             results.update(self.runtest(paths=batch_paths, workers=workers))
 
         self._save_results(BatchFileCheckResults(path_check_results=results))
@@ -240,6 +233,36 @@ class CachedBatchFileCheckPlugin(FileCheckPlugin):
                 str(path): modification_time
                 for path, modification_time in self.path_modification_times.items()
             })
+
+        # Emit trailing newline
+        self._print_trailing_newline(workers=workers)
+
+    def _print_info(self, paths: list[Path], workers: int | None, all_files: int) -> None:
+        if terminal := self.config.pluginmanager.get_plugin('terminalreporter'):
+            if _BATCH_OUTPUT_STARTED_KEY not in self.config.stash:
+                if workers is not None:  # pragma: no cover
+                    terminal.write('\n')  # post-collection newline to clear xdist messages
+                terminal.write_line('\nRunning checks', blue=True, bold=True)
+                self.config.stash[_BATCH_OUTPUT_STARTED_KEY] = True
+            files = len(paths)
+            terminal.write_line(
+                f'Running {self.name} checks on {files} file{'s' if files != 1 else ''}'
+                f' ({all_files - files} skipped)...'
+            )
+            if self.config.getoption('verbose'):
+                terminal.write_line(f'  paths: {paths}')
+                terminal.write_line(f'  workers: {workers}')
+
+    def _print_trailing_newline(self, workers: int | None) -> None:
+        if (terminal := self.config.pluginmanager.get_plugin('terminalreporter')) and workers:
+            batch_plugins = (
+                plugin for plugin in self.config.pluginmanager.get_plugins()
+                if isinstance(plugin, CachedBatchFileCheckPlugin)
+            )
+            all_plugins_started = all(plugin.batch_started for plugin in batch_plugins)
+
+            if _BATCH_OUTPUT_STARTED_KEY in self.config.stash and all_plugins_started:
+                terminal.write_line('')  # pragma: no cover
 
     @cached_property
     def results_path(self) -> Path:
