@@ -1,13 +1,22 @@
+import dataclasses
+import json
 from abc import abstractmethod
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass, field
+from functools import cached_property
+from logging import getLogger
 from pathlib import Path
+from time import time
 from typing import Any, final
+from uuid import uuid4
 
 import pytest
-from xdist import is_xdist_worker
+from xdist import is_xdist_controller, is_xdist_worker
 from xdist.workermanage import WorkerController
 
 from pytest_logikal.plugin import Item, Plugin
+
+logger = getLogger(__name__)
 
 
 class FileCheckItem(Item):
@@ -90,3 +99,214 @@ class CachedFileCheckPlugin(FileCheckPlugin):
         else:
             # Update the cache with the new file modification times
             self.cache.set(self.mtimes_path, {**self.mtimes, **self.new_mtimes})
+
+
+class ExecutionFailed(RuntimeError):
+    """
+    Exception to represent batch check execution errors.
+    """
+
+
+@dataclass
+class BatchFileCheckResult:
+    errors: list[str] = field(default_factory=list)
+    skipped: bool = False
+
+
+@dataclass
+class BatchFileCheckResults:
+    collection_failed: bool = False
+    path_check_results: dict[Path, BatchFileCheckResult | None] | None = None
+
+    def as_dict(self) -> dict[str, Any]:
+        results = dataclasses.asdict(self)
+        if path_check_results := results.get('path_check_results'):
+            results['path_check_results'] = {  # serialize paths
+                str(path): result for path, result in path_check_results.items()
+            }
+        return results
+
+    @staticmethod
+    def from_dict(results: dict[str, Any]) -> 'BatchFileCheckResults':
+        if path_check_results := results.get('path_check_results'):  # deserialize results
+            results['path_check_results'] = {
+                Path(path): BatchFileCheckResult(**result) if result else None
+                for path, result in path_check_results.items()
+            }
+        return BatchFileCheckResults(**results)
+
+
+class CachedBatchFileCheckItem(FileCheckItem):
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        self.plugin: 'CachedBatchFileCheckPlugin'
+
+    def runtest(self) -> None:
+        try:
+            results = self.plugin.results
+            if results.collection_failed:
+                pytest.skip('check skipped due to test collection failure')
+            if not results.path_check_results or self.path not in results.path_check_results:
+                pytest.fail(f'Results not found for path "{self.path}"')
+            if result := results.path_check_results[self.path]:
+                if result.skipped:
+                    pytest.skip('file has previously passed check')
+                if result.errors:
+                    pytest.fail('\n'.join(result.errors), pytrace=False)
+        except ExecutionFailed:
+            pytest.fail('Failed due to batch check execution error', pytrace=False)
+
+
+class CachedBatchFileCheckPlugin(FileCheckPlugin):
+    item = CachedBatchFileCheckItem
+    results_max_age_seconds = 24 * 60 * 60  # 24 hours
+    results_file_prefix = 'results'
+
+    def __init__(self, config: pytest.Config):
+        super().__init__(config=config)
+
+        if not config.cache:
+            raise RuntimeError('Cannot use a batch file check plugin without a cache')
+
+        workerinput = getattr(config, 'workerinput', {})
+        self.run_id_key = f'{self.name}_run_id'
+        self.run_id = workerinput.get(self.run_id_key, uuid4().hex)
+
+        self.cache = config.cache
+        self.path_modification_times_key = f'{self.name}/path_modification_times'
+        self.path_modification_times = {
+            Path(path): modification_time for path, modification_time in self.cache.get(
+                self.path_modification_times_key, {},
+            ).items()
+        }
+        self._batch_started = False
+        self._collection_finished_nodes: set[str] = set()
+
+    @abstractmethod
+    def runtest(self, paths: list[Path], workers: int | None) -> dict[Path, BatchFileCheckResult]:
+        """
+        Run a batch check on the given paths and return the check result for each path.
+        """
+
+    @staticmethod
+    def _path_modification_time(path: Path) -> int:
+        return path.lstat().st_mtime_ns
+
+    def _path_modification_times(self, paths: list[Path]) -> dict[Path, int]:
+        return {path: self._path_modification_time(path) for path in paths}
+
+    def _skipped_result_or_none(
+        self, path: Path, modification_time: int,
+    ) -> BatchFileCheckResult | None:
+        if modification_time == self.path_modification_times.get(path):
+            return BatchFileCheckResult(skipped=True)
+        return None
+
+    def _run_batch(self, paths: list[Path], workers: int | None = None) -> None:
+        # Prepare batch
+        if self._batch_started:
+            return
+        self._batch_started = True
+
+        initial_path_modification_times = self._path_modification_times(paths=paths)
+        results = {
+            path: self._skipped_result_or_none(path=path, modification_time=modification_time)
+            for path, modification_time in initial_path_modification_times.items()
+        }
+
+        # Run batch when there are files to check
+        if batch_paths := [path for path, result in results.items() if result is None]:
+            if terminal := self.config.pluginmanager.get_plugin('terminalreporter'):
+                files = len(batch_paths)
+                terminal.write_line(
+                    f'\nRunning {self.name} checks on {files} file{'s' if files != 1 else ''}'
+                    f' ({len(results) - files} skipped)...'
+                )
+                if self.config.getoption('verbose'):
+                    terminal.write_line(f'  paths: {batch_paths}')
+                    terminal.write_line(f'  workers: {workers}')
+
+            results.update(self.runtest(paths=batch_paths, workers=workers))
+
+        self._save_results(BatchFileCheckResults(path_check_results=results))
+
+        # Update path modification times for successful checks
+        if batch_paths:
+            self.path_modification_times.update({
+                path: initial_path_modification_times[path] for path, result in results.items()
+                if not result or not result.errors
+            })
+            self.cache.set(self.path_modification_times_key, {
+                str(path): modification_time
+                for path, modification_time in self.path_modification_times.items()
+            })
+
+    @cached_property
+    def results_path(self) -> Path:
+        return self.cache.mkdir(self.name) / f'{self.results_file_prefix}_run_{self.run_id}.json'
+
+    def _save_results(self, results: BatchFileCheckResults) -> None:
+        logger.debug(f'Writing results to file "{self.results_path}"')
+        self.results_path.write_text(json.dumps(results.as_dict()))
+
+    @cached_property
+    def results(self) -> BatchFileCheckResults:
+        """
+        Return the results of each check.
+        """
+        logger.debug(f'Loading results from file "{self.results_path}"')
+        if not self.results_path.exists():
+            raise ExecutionFailed()
+        results = json.loads(self.results_path.read_text(encoding='utf-8'))
+        return BatchFileCheckResults.from_dict(results)
+
+    def pytest_configure_node(self, node: WorkerController) -> None:
+        node.workerinput[self.run_id_key] = self.run_id
+
+    def pytest_xdist_node_collection_finished(
+        self, node: WorkerController, ids: Sequence[str],
+    ) -> None:
+        # Wait until all nodes finish collection
+        self._collection_finished_nodes.add(node.gateway.id)
+        if len(self._collection_finished_nodes) < node.workerinput['workercount']:
+            return
+
+        # Skip running checks if collection failed
+        session = self.config.pluginmanager.get_plugin('session')
+        if session and session.testsfailed:
+            self._save_results(BatchFileCheckResults(collection_failed=True))
+            return
+
+        # Run batch
+        node_id_suffix = f'::{self.name}'
+        paths = [
+            (self.config.rootpath / node_id.removesuffix(node_id_suffix)).resolve()
+            for node_id in ids if node_id.endswith(node_id_suffix)
+        ]
+        self._run_batch(paths=paths, workers=node.workerinput.get('workercount'))
+
+    def pytest_collection_finish(self, session: pytest.Session) -> None:
+        # Skip running in-process checks if collection failed or if we are running with xdist
+        if session.testsfailed:
+            self._save_results(BatchFileCheckResults(collection_failed=True))
+            return
+        if is_xdist_controller(session) or is_xdist_worker(session):
+            return
+
+        # Run batch
+        self._run_batch(paths=[
+            item.path.resolve()
+            for item in session.items if getattr(item, 'plugin', None) == self
+        ])
+
+    def pytest_sessionfinish(self, session: pytest.Session, *args: Any, **kwargs: Any) -> None:
+        # Execute cleanup on controller
+        if is_xdist_worker(session):
+            return
+        self.results_path.unlink(missing_ok=True)
+
+        # Remove stale temporary results files
+        oldest_allowed_time = time() - self.results_max_age_seconds
+        for path in self.results_path.parent.glob(f'{self.results_file_prefix}*.json'):
+            if path.stat().st_mtime < oldest_allowed_time:
+                path.unlink(missing_ok=True)

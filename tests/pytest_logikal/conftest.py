@@ -66,6 +66,7 @@ def plugin_item(
         config.invocation_params.dir = path.parent
         config.rootpath = pytestconfig.rootpath
         config.stash = pytestconfig.stash
+        config.cache = pytestconfig.cache
         config.option = pytestconfig.option
 
         plugin_obj = plugin(config=config)
