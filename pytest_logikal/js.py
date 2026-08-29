@@ -1,12 +1,18 @@
 import json
 import subprocess
+from collections import defaultdict
 from pathlib import Path
 
 import pytest
 
-from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
-from pytest_logikal.plugin import ItemRunError
+from pytest_logikal.file_checker import (
+    BatchFileCheckResult, CachedBatchFileCheckItem, CachedBatchFileCheckPlugin,
+)
 from pytest_logikal.utils import get_ini_option
+
+PACKAGE_ROOT_PATH = Path(__file__).parent
+SUFFIX_CONFIG = {'.js': 'js_config.mjs', '.mjs': 'js_config_module.mjs'}
+SEVERITY = {1: 'warning', 2: 'error'}
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -20,37 +26,57 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(JSPlugin(config=config))
 
 
-class JSItem(CachedFileCheckItem):
-    def run(self) -> None:
-        config = 'js_config_module.mjs' if self.path.suffix == '.mjs' else 'js_config.mjs'
-        command = [
-            'npx', '--no', '--',
-            'eslint', '--stdin', '--format=json', '--max-warnings=0',
-            f'--config={Path(__file__).parent / config}',
-            f'--rule=max-len: ["error", {get_ini_option('max_line_length')}]',
-            f'--rule=complexity: ["error", {get_ini_option('max_complexity')}]',
-        ]
-        process = subprocess.run(  # nosec
-            command, capture_output=True, text=True, check=False, cwd=Path(__file__).parent,
-            input=self.path.read_text(encoding='utf-8'),
-        )
-        try:
-            severity = {1: 'warning', 2: 'error'}
-            report = json.loads(process.stdout)[0]
-            if report['messages']:
-                raise ItemRunError('\n'.join(
-                    f'{error['line']}:{error['column']}: {severity[error['severity']]}: '
+class JSPlugin(CachedBatchFileCheckPlugin):
+    name = 'js'
+    item = CachedBatchFileCheckItem
+
+    @staticmethod
+    def _config_batch_paths(paths: list[Path]) -> dict[str, list[Path]]:
+        config_batch_paths = {
+            config: [path for path in paths if path.suffix == suffix]
+            for suffix, config in SUFFIX_CONFIG.items()
+        }
+        return {config: paths for config, paths in config_batch_paths.items() if paths}
+
+    def runtest(
+        self, paths: list[Path], workers: int | None,
+    ) -> dict[Path, BatchFileCheckResult]:
+        results: dict[Path, BatchFileCheckResult] = defaultdict(BatchFileCheckResult)
+        for config, batch_paths in self._config_batch_paths(paths=paths).items():
+            batch_path_set = set(batch_paths)  # speed up path checking on large projects
+            command = [
+                'npx', '--prefix', str(PACKAGE_ROOT_PATH), '--no', '--',
+                'eslint', *(str(path) for path in batch_paths),
+                '--format=json', '--max-warnings=0',
+                f'--config={PACKAGE_ROOT_PATH / config}',
+                f'--concurrency={workers or 'auto'}',
+                f'--rule=max-len: ["error", {get_ini_option('max_line_length')}]',
+                f'--rule=complexity: ["error", {get_ini_option('max_complexity')}]',
+            ]
+            process = subprocess.run(  # nosec
+                command, capture_output=True, text=True, check=False,
+                cwd=self.config.invocation_params.dir,
+            )
+            if process.returncode < 0:
+                raise RuntimeError(
+                    f'ESLint was terminated by signal {-process.returncode}: '
+                    f'{process.stderr.strip() or process.stdout.strip() or '(no output)'}'
+                )
+            try:
+                reports = json.loads(process.stdout)
+            except json.decoder.JSONDecodeError as error:
+                raise RuntimeError((process.stdout or process.stderr).strip()) from error
+
+            for report in reports:
+                if (path := Path(report['filePath'])) not in batch_path_set:
+                    raise RuntimeError(f'Invalid path: {path}')
+                results[path].errors.extend(
+                    f'{error['line']}:{error['column']}: {SEVERITY[error['severity']]}: '
                     + f'{error['message']}'
                     + (f' ({error['ruleId']})' if error['ruleId'] else '')
                     for error in report['messages']
-                ))
-        except json.decoder.JSONDecodeError as error:
-            raise ItemRunError((process.stdout or process.stderr).strip()) from error
-
-
-class JSPlugin(CachedFileCheckPlugin):
-    name = 'js'
-    item = JSItem
+                )
+        return results
 
     def check_file(self, file_path: Path) -> bool:
-        return file_path.suffix in {'.js', '.mjs'}
+        return file_path.suffix in SUFFIX_CONFIG

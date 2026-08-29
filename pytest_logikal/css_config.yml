@@ -3,6 +3,7 @@ extends:
   - '@stylistic/stylelint-config'
 reportInvalidScopeDisables: true
 reportNeedlessDisables: true
+reportDescriptionlessDisables: true
 plugins:
   - '@stylistic/stylelint-plugin'
   - 'stylelint-use-nesting'

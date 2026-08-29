@@ -1,11 +1,14 @@
 import json
 import subprocess
+from collections import defaultdict
+from pathlib import Path
 
 import pytest
 from logikal_utils.project import tool_config
 
-from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
-from pytest_logikal.plugin import ItemRunError
+from pytest_logikal.file_checker import (
+    BatchFileCheckResult, CachedBatchFileCheckItem, CachedBatchFileCheckPlugin,
+)
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -19,8 +22,11 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(PylintPlugin(config=config))
 
 
-class PylintItem(CachedFileCheckItem):
-    def run(self) -> None:
+class PylintPlugin(CachedBatchFileCheckPlugin):
+    name = 'pylint'
+    item = CachedBatchFileCheckItem
+
+    def _command(self, paths: list[Path], workers: int | None) -> list[str]:
         plugins = [
             'pylint.extensions.code_style',
             'pylint.extensions.comparison_placement',
@@ -44,18 +50,22 @@ class PylintItem(CachedFileCheckItem):
             'pylint.extensions.while_used',
         ]
         command = [
-            'pylint', str(self.path),
+            'pylint', *(str(path) for path in paths),
             '--init-hook=import sys; sys.path.append(".")',
             f'--max-line-length={self.config.getini('max_line_length')}',
             '--include-naming-hint=y',
             '--output-format=json2',
             f'--max-complexity={self.config.getini('max_complexity')}',
+            f'--jobs={workers or 0}',  # auto-detects number of CPUs if not provided explicitly
         ]
         enable = [
+            'bad-inline-option',
+            'deprecated-pragma',
             'useless-suppression',
             'use-symbolic-message-instead',
             'use-implicit-booleaness-not-comparison-to-zero',
             'use-implicit-booleaness-not-comparison-to-string',
+            'consider-using-augmented-assign',
             'prefer-typing-namedtuple',
         ]
         disable = [
@@ -96,19 +106,36 @@ class PylintItem(CachedFileCheckItem):
             f'--enable={','.join(enable)}', f'--disable={','.join(disable)}',
             f'--load-plugins={','.join(plugins)}',
         ]
+        return command
 
+    def runtest(self, paths: list[Path], workers: int | None) -> dict[Path, BatchFileCheckResult]:
         # Note that we are running Pylint in a subprocess and process its output instead of
-        # importing it due to its license (GPLv2). The subprocess call is secure as it is not using
-        # untrusted input.
-        process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
+        # importing it due to its license (GPLv2).
+        process = subprocess.run(  # nosec
+            self._command(paths=paths, workers=workers),
+            capture_output=True, text=True, check=False,
+        )
+        if process.returncode < 0:
+            raise RuntimeError(
+                f'Pylint was terminated by signal {-process.returncode}: '
+                f'{process.stderr.strip() or process.stdout.strip() or '(no output)'}'
+            )
+        if process.returncode & 32:
+            raise RuntimeError(
+                f'Pylint failed with a usage error (exit code {process.returncode}): '
+                f'{process.stderr.strip() or process.stdout.strip() or '(no output)'}'
+            )
+
         try:
-            if messages := json.loads(process.stdout).get('messages'):
-                formatter = '{line}:{column}: {type}: {message} ({symbol})'
-                raise ItemRunError('\n'.join(formatter.format(**message) for message in messages))
+            report = json.loads(process.stdout)
         except json.decoder.JSONDecodeError as error:
-            raise ItemRunError(f'Error: {process.stdout or process.stderr}') from error
+            raise RuntimeError((process.stdout or process.stderr).strip()) from error
 
-
-class PylintPlugin(CachedFileCheckPlugin):
-    name = 'pylint'
-    item = PylintItem
+        results: dict[Path, BatchFileCheckResult] = defaultdict(BatchFileCheckResult)
+        formatter = '{line}:{column}: {type}: {message} ({symbol})'
+        path_set = set(paths)  # speed up path checking on large projects
+        for message in report.get('messages', []):
+            if (path := Path(message['absolutePath'])) not in path_set:
+                raise RuntimeError(f'Invalid path: {path}')
+            results[path].errors.append(formatter.format(**message))
+        return results

@@ -139,7 +139,25 @@ def pytest_sessionstart(session: pytest.Session) -> None:
         shutil.rmtree('.mypy_cache', ignore_errors=True)
 
 
+class ReporterPlugin:  # pylint: disable=too-few-public-methods
+    def __init__(self, config: pytest.Config):
+        self.config = config
+        self.shown = False
+
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_runtest_logstart(  # pylint: disable=unused-argument
+        self, nodeid: str, location: ReportInfoType,
+    ) -> None:
+        if not self.shown and not hasattr(self.config, 'workerinput'):
+            self.shown = True
+            if terminal := self.config.pluginmanager.get_plugin('terminalreporter'):
+                prefix = '\n' if self.config.getoption('dist') == 'no' else ''
+                terminal.write_line(f'{prefix}Running tests', blue=True, bold=True)
+
+
 def pytest_configure(config: pytest.Config) -> None:
+    config.pluginmanager.register(ReporterPlugin(config=config), 'logikal_reporter')
+
     # Hiding information
     if not config.getoption('verbose'):
         # Hiding overly verbose debug and info log messages
