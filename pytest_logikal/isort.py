@@ -4,7 +4,7 @@ from typing import Any
 
 import isort
 import pytest
-from isort.wrap_modes import WrapModes
+from isort.wrap_modes import WrapModes  # pylint: disable=no-name-in-module
 from logikal_utils.project import tool_config
 
 from pytest_logikal.file_checker import CachedFileCheckItem, CachedFileCheckPlugin
@@ -15,7 +15,7 @@ def get_config(max_line_length: int, black_compatible: bool = False) -> dict[str
     config = {
         'py_version': 'auto',
         'line_length': max_line_length,
-        'multi_line_output': WrapModes.VERTICAL_GRID_GROUPED,  # type: ignore[attr-defined]
+        'multi_line_output': WrapModes.VERTICAL_GRID_GROUPED,
         'balanced_wrapping': True,
         'combine_as_imports': True,
         'use_parentheses': True,
@@ -26,7 +26,7 @@ def get_config(max_line_length: int, black_compatible: bool = False) -> dict[str
         config.update({
             # See https://pycqa.github.io/isort/docs/configuration/profiles.html
             # See https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html
-            'multi_line_output': WrapModes.VERTICAL_HANGING_INDENT,  # type: ignore[attr-defined]
+            'multi_line_output': WrapModes.VERTICAL_HANGING_INDENT,
             'ensure_newline_before_comments': True,
             'split_on_trailing_comma': True,
         })
