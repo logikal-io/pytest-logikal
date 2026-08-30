@@ -21,6 +21,7 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 # Note: format checking is disabled due to the following issues:
+# https://github.com/djlint/djLint/issues/2407
 # https://github.com/djlint/djLint/issues/2408
 # https://github.com/djlint/djLint/issues/2409
 # https://github.com/djlint/djLint/issues/2410
