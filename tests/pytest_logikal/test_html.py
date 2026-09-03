@@ -21,11 +21,12 @@ def test_htmlj_template_item_run(plugin_item: Callable[..., Item]) -> None:
     print('=====')
 
     # Formatting errors
-    # error.match('\n\\x1b\\[31m-</html>')
-    # error.match('\n\\x1b\\[32m\\+  </html>')
+    error.match('\n\\x1b\\[31m-</html>')
+    error.match('\n\\x1b\\[32m\\+  </html>')
 
     # Linting errors
-    error.match('1:0: error: Html tag should have lang attribute\\. \\(H005\\)')
+    error.match('1:0: error: Html tag should have a non-empty lang attribute\\. \\(H005\\)')
+    error.match('1:0: error: <!DOCTYPE ... > should be present before the html tag\\. \\(H007\\)')
     error.match('1:0: error: Missing title tag in html\\. \\(H016\\)')
     error.match('1:0: error: Consider adding a meta description\\. \\(H030\\)')
     error.match('7:2: error: Img tag should have height and width attributes\\. \\(H006\\)')
