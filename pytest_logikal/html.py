@@ -20,16 +20,27 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(HTMLTemplatePlugin(config=config))
 
 
+# Note: format checking is disabled due to the following issues:
+# https://github.com/djlint/djLint/issues/2456
+# https://github.com/djlint/djLint/issues/2457
+# https://github.com/djlint/djLint/issues/2458
+# https://github.com/djlint/djLint/issues/2459
+# https://github.com/djlint/djLint/issues/2463
+# https://github.com/djlint/djLint/issues/2464
+# https://github.com/djlint/djLint/issues/2465
+# https://github.com/djlint/djLint/issues/2466
+# https://github.com/djlint/djLint/issues/2467
+# Note: the related test cases are also disabled (see tests/pytest_logikal/test_html.py)
 class HTMLTemplateItem(CachedFileCheckItem):
-    @staticmethod
-    def _color_diff(line: str) -> str:
-        if line.startswith('@@'):
-            return colored(line, 'cyan', force_color=True)
-        if line.startswith('+'):
-            return colored(line, 'green', force_color=True)
-        if line.startswith('-'):
-            return colored(line, 'red', force_color=True)
-        return line
+    # @staticmethod
+    # def _color_diff(line: str) -> str:
+    #     if line.startswith('@@'):
+    #         return colored(line, 'cyan', force_color=True)
+    #     if line.startswith('+'):
+    #         return colored(line, 'green', force_color=True)
+    #     if line.startswith('-'):
+    #         return colored(line, 'red', force_color=True)
+    #     return line
 
     def run(self) -> None:
         messages = []
@@ -50,12 +61,12 @@ class HTMLTemplateItem(CachedFileCheckItem):
         ]
 
         # Check formatting
-        command = ['djlint', '--check', *common_args]
-        process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
-        if process.returncode:
-            errors = process.stdout.strip().replace('@@\n\n', '@@\n')
-            errors = '\n'.join(self._color_diff(line) for line in errors.splitlines()[2:-2])
-            messages.append(errors or process.stderr.strip())
+        # command = ['djlint', '--check', *common_args]
+        # process = subprocess.run(command, capture_output=True, text=True, check=False)  # nosec
+        # if process.returncode:
+        #     errors = process.stdout.strip().replace('@@\n\n', '@@\n')
+        #     errors = '\n'.join(self._color_diff(line) for line in errors.splitlines()[2:-2])
+        #     messages.append(errors or process.stderr.strip())
 
         # Lint
         include = [
