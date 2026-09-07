@@ -21,8 +21,8 @@ def test_htmlj_template_item_run(plugin_item: Callable[..., Item]) -> None:
     print('=====')
 
     # Formatting errors
-    # error.match('\n\\x1b\\[31m-</html>')
-    # error.match('\n\\x1b\\[32m\\+  </html>')
+    error.match('\n\\x1b\\[31m-</html>')
+    error.match('\n\\x1b\\[32m\\+  </html>')
 
     # Linting errors
     error.match('1:0: error: Html tag should have a non-empty lang attribute\\. \\(H005\\)')
