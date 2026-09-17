@@ -76,7 +76,7 @@ ALLOWED_LEGACY_LICENSES = [
 
 ALLOWED_LEGACY_PACKAGES = {
     'facebook_business': 'LICENSE.txt',  # only used as a connector
-    'capi_param_builder_python': UNKNOWN_LICENSE,  # dependency of facebook_business
+    'capi_param_builder_python': 'LICENSE.txt',  # dependency of facebook_business
     'html-tag-names': 'GNU General Public License v3 or later (GPLv3+)',  # local tool
     'html-void-elements': 'GNU General Public License v3 or later (GPLv3+)',  # local tool
     'pkg-resources': UNKNOWN_LICENSE,  # caused by an Ubuntu bug, see [1]
