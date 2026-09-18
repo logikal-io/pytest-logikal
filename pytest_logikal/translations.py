@@ -1,3 +1,4 @@
+from io import BytesIO
 from itertools import permutations
 from logging import getLogger
 from pathlib import Path
@@ -23,41 +24,36 @@ def pytest_configure(config: pytest.Config) -> None:
         config.pluginmanager.register(TranslationPlugin(config=config))
 
 
-def _get_message_context(message: Message) -> str | bytes | None:
-    if isinstance(message.context, bytes):
-        return message.context.decode('utf-8')  # type: ignore[unreachable]
-    if isinstance(message.context, str):
-        return message.context.encode()
-    return message.context
-
-
-def _get_message_string(message: Message) -> str | tuple[str]:
-    if isinstance(message.string, list):
-        return tuple(message.string)  # type: ignore[return-value]
-    return message.string  # type: ignore[return-value]
-
-
 def _message_in_catalog(message: Message, catalog: Catalog) -> bool:
-    catalog_message = catalog.get(
-        id=message.id,
-        context=_get_message_context(message),  # type: ignore[arg-type]
-    )
+    catalog_message = catalog.get(id=message.id, context=message.context)
     return (
         catalog_message is not None
-        and _get_message_string(message) == _get_message_string(catalog_message)
+        and message.string == catalog_message.string
         and message.flags == catalog_message.flags
     )
 
 
+def _message_is_translated(message: Message) -> bool:
+    messages = message.string if isinstance(message.string, tuple) else [message.string]
+    return all(string for string in messages)
+
+
 def _catalogs_identical(catalog: Catalog, compiled_catalog: Catalog) -> bool:
-    if dict(catalog.mime_headers) != dict(compiled_catalog.mime_headers):
+    expected_file = BytesIO()
+    mofile.write_mo(expected_file, catalog=catalog)
+    expected_file.seek(0)
+    expected_catalog = mofile.read_mo(expected_file)
+
+    if dict(expected_catalog.mime_headers) != dict(compiled_catalog.mime_headers):
         return False
-    for catalog_1, catalog_2 in permutations([catalog, compiled_catalog]):
+
+    for catalog_1, catalog_2 in permutations([expected_catalog, compiled_catalog]):
         for message in catalog_1:
             if not message.id:
                 continue
             if not _message_in_catalog(message, catalog_2):
                 return False
+
     return True
 
 
@@ -94,8 +90,7 @@ class TranslationItem(CachedFileCheckItem):
                 errors.append(f'{message.lineno}: error: Fuzzy message')
 
             # Check missing translation
-            messages = message.string if isinstance(message.string, tuple) else [message.string]
-            if any(not string for string in messages):
+            if not _message_is_translated(message):
                 errors.append(f'{message.lineno}: error: Missing translation')
 
         # Report errors
