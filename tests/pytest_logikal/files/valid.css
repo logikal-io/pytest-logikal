@@ -15,3 +15,12 @@
 #id-valid-pattern {
   margin: 0;
 }
+
+/* Multiline values */
+.valid {
+  background: linear-gradient(
+    #ffffff, #eeeeee
+  );
+  font: bold var(--font-size-title)/var(--font-leading-title)
+    var(--font-family-display);
+}
