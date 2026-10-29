@@ -28,9 +28,11 @@ rules:
   font-family-name-quotes: always-unless-keyword
 
   # Stylistic rules
+  '@stylistic/function-comma-newline-after': null
   '@stylistic/function-comma-newline-before': never-multi-line
   '@stylistic/string-quotes': single
   '@stylistic/value-list-comma-newline-before': never-multi-line
+  '@stylistic/declaration-colon-newline-after': null
   '@stylistic/declaration-block-semicolon-newline-before': never-multi-line
   '@stylistic/block-closing-brace-space-after': null
   '@stylistic/block-opening-brace-newline-before': null
