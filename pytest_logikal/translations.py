@@ -70,7 +70,12 @@ class TranslationItem(CachedFileCheckItem):
                 return
 
         # Check compiled translation file
-        compiled_path = self.path.with_suffix('.mo')
+        if catalog.locale is None:
+            raise ItemRunError('error: Missing "Language" header')
+        suffix = self.path.stem.rsplit('_', 1)[-1]
+        domain = {'js': 'djangojs'}.get(suffix, 'django')
+        locale_path = self.path.parent.parent / 'locale' / str(catalog.locale)
+        compiled_path = locale_path / 'LC_MESSAGES' / f'{domain}.mo'
         if compiled_path.exists():
             with open(compiled_path, mode='rb') as compiled_catalog_file:
                 compiled_catalog = mofile.read_mo(compiled_catalog_file)
